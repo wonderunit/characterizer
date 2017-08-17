@@ -1,0 +1,17 @@
+{
+  "name": "character-values",
+  "version": "0.1.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "install-app-deps"
+  },
+  "devDependencies": {
+    "electron": "1.7.2",
+    "electron-builder": "^19.22.1"
+  },
+  "dependencies": {
+    "knex": "^0.13.0",
+    "sqlite3": "^3.1.9"
+  }
+}

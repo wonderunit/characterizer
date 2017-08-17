@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Characterizer</title>
+    <link rel="stylesheet" href="./css/main-window.css">
+  </head>
+  <body>
+    <div id="container">
+      <div id="characters-container">
+        <h2>Characters</h2>
+        <div id="character-input-container">
+          <input id="input-add-character-name" type="text"></input>
+          <div id="character-input-add-button">Add Characer</div>
+        </div>
+        <div id="character-list">
+        </div>
+      </div>
+      <div id="values-container">
+        <h2>Values</h2>
+        <div id="value-list">
+        </div>
+      </div>
+    </div>
+
+    <script>
+        if (typeof require !== 'undefined') {
+          window.onerror = (message, source, lineno, colno, error) => require('electron').ipcRenderer.send('errorInWindow', message, source, lineno, colno, error)
+          require('./js/window/main-window.js')
+        }
+      </script>
+  </body>
+</html>

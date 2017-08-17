@@ -1,0 +1,36 @@
+body {
+  font-family: sans-serif;
+}
+
+#character-list {
+  display: flex;
+}
+
+#character-input-container {
+  display: flex;
+  padding: 10px;
+}
+
+#character-input-add-button {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.character-list-name {
+  border-width: 1px;
+  border-color: black;
+  margin: 10px;
+  background-color: #AAA;
+  padding: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.value-list-name {
+  border-width: 1px;
+  border-color: black;
+  margin: 10px;
+  background-color: #AAA;
+  padding: 20px;
+  border-radius: 8px;
+}
