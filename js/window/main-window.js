@@ -68,7 +68,7 @@ var addCharacterFronInput = (event)=>{
           newNode.dataset.id = newID
         }
         let newCharacterValueInserts = valuesLib.map((value)=>{
-          knex('CharacterValues').insert({characterID: newCharacter.id, valueID: value.id, score: 0.0})
+          knex('CharacterValues').insert({characterID: newID, valueID: value.id, score: 0.0})
         })
         Promise.all(newCharacterValueInserts)
           .then(()=>{})
