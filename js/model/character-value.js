@@ -38,7 +38,7 @@ module.exports = class CharacterValue {
       this.lossCount++
     }
 
-    this.score = this.winCount / this.lossCount
+    this.score = this.winCount / (this.winCount + this.lossCount)
 
     let record = {
       characterID: this.characterID,
