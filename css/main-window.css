@@ -4,6 +4,7 @@ body {
 
 #character-list {
   display: flex;
+  flex-wrap: wrap;
 }
 
 #character-input-container {
@@ -26,6 +27,27 @@ body {
   cursor: pointer;
 }
 
+#battle-container {
+  outline: none;
+}
+
+.battle-view-choice-container {
+  display: flex;
+  justify-content: center;
+}
+
+.battle-view-choice-button {
+  border-width: 1px;
+  border-color: black;
+  margin: 10px;
+  background-color: #AAA;
+  padding: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 50vw;
+  text-align: center;
+}
+
 .value-list-name {
   border-width: 1px;
   border-color: black;
@@ -33,4 +55,21 @@ body {
   background-color: #AAA;
   padding: 20px;
   border-radius: 8px;
+  position: relative;
+}
+
+.value-list-label {
+  position: relative;
+  z-index: 999999;
+}
+
+.value-list-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 25px;
+  background-color: #70cc70;
+  height: 100%;
+  float: left;
+  z-index: 1;
 }
