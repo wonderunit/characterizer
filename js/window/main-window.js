@@ -1,7 +1,6 @@
 const {remote} = require('electron')
 const BattleView = require('./battle-view.js')
 const ValuesViewAverage = require('./values-view-average.js')
-const CharacterValue = require('../model/character-value.js')
 
 var valuesLib
 var characters = []
@@ -16,17 +15,6 @@ knex.select().table('Characters')
     characters = result
     for(let character of characters) {
       addCharacterView(character.name, character.id)
-
-      // set up a cache of current character values
-      // knex.select().table('CharacterValues').where({characterID: character.id})
-      //   .then(characterValuesData => {
-      //     let characterValuesResult = []
-      //     for(let characterValueData of characterValuesData) {
-      //       characterValuesResult.push(new CharacterValue(characterValueData, valuesMap[characterValueData.valueID.toString()]))
-      //     }
-      //     characterValues[character.id.toString()] = characterValuesResult
-      //   })
-      //   .catch(console.error)
     }
   })
 
@@ -112,13 +100,5 @@ function onSelectCharacter(event) {
   
   battleView.on('battle-update', battleOutcome => {
     valuesView.onBattleOutcome(battleOutcome)
-    let cv = characterValues[battleOutcome.characterID]
-    if(cv) {
-      for(let v of cv) {
-        if(v.valueID == battleOutcome.winner || v.valueID == battleOutcome.loser) {
-          v.updateWithBattleOutcome(battleOutcome)
-        }
-      }
-    }
   })
 }
