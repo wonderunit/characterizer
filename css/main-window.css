@@ -73,3 +73,35 @@ body {
   float: left;
   z-index: 1;
 }
+
+.values-view-linechart {
+  position: relative;
+  width: 90%;
+  margin-left: 5%;
+  height: 500px;
+}
+
+.value-list-name-linechart {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #70cc70;
+}
+
+.value-list-label-linechart {
+  display: block;
+  position: absolute;
+  top: -20px;
+  display: none;
+}
+
+.value-list-label-linechart-show {
+  display: block;
+}
+
+.values-view-barchart {
+  position: relative;
+  width: 90%;
+  margin-left: 5%;
+  height: 500px;
+}

@@ -31,7 +31,7 @@ module.exports = class ValuesViewAverage extends EventEmitter {
       valueView.appendChild(progressView)
       let nameView = document.createElement('div')
       nameView.setAttribute("class", "value-list-label")
-      nameView.innerHTML = `${this.valuesMap[value.valueID.toString()].name} | ${value.score}`
+      nameView.innerHTML = `${this.valuesMap[value.valueID.toString()].name} | ${value.score} | Wins: ${value.wins}, Losses: ${value.losses}`
       valueView.appendChild(nameView)
       this.root.appendChild(valueView)
     }

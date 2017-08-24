@@ -1,13 +1,16 @@
 const {remote} = require('electron')
 const BattleView = require('./battle-view.js')
 const ValuesViewAverage = require('./values-view-average.js')
+const ValuesViewDots = require('./values-view-dots.js')
 
 var valuesLib
 var characters = []
 var valuesMap = {}
 var characterValues = {} // key: character ID, value: array of their values with scores
-
+var currentCharacterID
+var valuesViewType = "average"
 let knex = remote.getGlobal('knex')
+
 
 // set up the characters
 knex.select().table('Characters')
@@ -33,6 +36,10 @@ var charactersContainer = document.querySelector("#characters-container")
 var valuesContainer = document.getElementById("values-container")
 
 document.querySelector("#character-input-add-button").addEventListener('click', addCharacterFronInput)
+document.querySelector("#values-view-selector").addEventListener('change', (event)=>{
+  valuesViewType = event.target.value
+  showCharacterView(currentCharacterID)
+})
 
 document.querySelector("#input-add-character-name").addEventListener('keydown', (event)=>{
   if(event.keyCode === 13) {
@@ -80,11 +87,14 @@ function addCharacterView(characterName, characterID) {
 }
 
 function onSelectCharacter(event) {
-  let characterID = parseInt(event.target.dataset.id)
+  showCharacterView(parseInt(event.target.dataset.id))
+}
 
+function showCharacterView(characterID) {
+  currentCharacterID = characterID
   let character
   for(let aCharacter of characters) { 
-    if(aCharacter.id === characterID) {
+    if(aCharacter.id === currentCharacterID) {
       character = aCharacter
       break
     }
@@ -97,7 +107,8 @@ function onSelectCharacter(event) {
   document.getElementById("values-header").innerHTML = `${character.name}'s Values`
   document.getElementById("values-view").innerHTML = ''
   
-  let valuesView = new ValuesViewAverage({ character: character, valuesMap: valuesMap, values: getCharacterValues(characterID)})
+  let ValuesView = getValuesView()
+  let valuesView = new ValuesView({ valuesMap: valuesMap, values: getCharacterValues(currentCharacterID)})
   let existingValuesView = document.getElementById("values-view")
   valuesContainer.replaceChild(valuesView.getView(), existingValuesView)
   
@@ -127,6 +138,17 @@ function onSelectCharacter(event) {
     curCharacterValues.sort((a, b) => {return b.score - a.score})
     valuesView.onBattleOutcome(battleOutcome)
   })
+}
+
+function getValuesView() {
+  switch(valuesViewType) {
+    case "dots":
+      return ValuesViewDots
+    case "average":
+    default:
+      return ValuesViewAverage
+  }
+
 }
 
 function getCharacterValues(characterID) {
