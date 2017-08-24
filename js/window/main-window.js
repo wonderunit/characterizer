@@ -137,7 +137,12 @@ function showCharacterView(characterID) {
         break
       }
     }
-    curCharacterValues.sort((a, b) => {return b.score - a.score})
+    curCharacterValues.sort((a, b) => {
+      if(a.score === b.score) {
+        return b.battleCount - a.battleCount
+      }
+      return b.score - a.score
+    })
     valuesView.onBattleOutcome(battleOutcome)
   })
 }
@@ -159,9 +164,8 @@ function getCharacterValues(characterID) {
     return Promise.resolve(characterValues[characterID])
   } else {
     return new Promise((resolve, reject) => {
-      knex('CharacterValues').where({characterID: characterID})
+      knex('CharacterValues').where({characterID: characterID}).orderBy('score', 'desc').orderBy('battleCount', 'desc')
         .then(queryResult => {
-          queryResult = queryResult.sort((a, b) => {return b.score - a.score})
           resolve(queryResult)
           characterValues[characterID] = queryResult
         })
