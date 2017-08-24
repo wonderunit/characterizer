@@ -56,7 +56,9 @@ var addCharacterFronInput = (event)=>{
           newNode.dataset.id = newID
         }
         let newCharacterValueInserts = valuesLib.map((value)=>{
-          knex('CharacterValues').insert({characterID: newID, valueID: value.id, score: 0.0})
+          knex('CharacterValues').insert({characterID: newID, valueID: value.id, score: 0.0, wins: 0, losses: 0})
+            .then(()=>{})
+            .catch(console.error)
         })
         Promise.all(newCharacterValueInserts)
           .then(()=>{})
@@ -87,6 +89,7 @@ function onSelectCharacter(event) {
       break
     }
   }
+
   let battleView = new BattleView({ choices: valuesLib, character: character})
   let existing = document.getElementById("battle-container")
   container.replaceChild(battleView.getView(), existing)
@@ -94,11 +97,51 @@ function onSelectCharacter(event) {
   document.getElementById("values-header").innerHTML = `${character.name}'s Values`
   document.getElementById("values-view").innerHTML = ''
   
-  let valuesView = new ValuesViewAverage({ character: character, valuesMap: valuesMap, values: characterValues[characterID]})
+  let valuesView = new ValuesViewAverage({ character: character, valuesMap: valuesMap, values: getCharacterValues(characterID)})
   let existingValuesView = document.getElementById("values-view")
   valuesContainer.replaceChild(valuesView.getView(), existingValuesView)
   
   battleView.on('battle-update', battleOutcome => {
+    let curCharacterValues = characterValues[battleOutcome.characterID]
+    let isWinnerUpdated, isLoserUpdated
+    for(let curCharacterValue of curCharacterValues) {
+      if(curCharacterValue.valueID == battleOutcome.winner) {
+        curCharacterValue.wins += 1
+        curCharacterValue.score = curCharacterValue.wins / (curCharacterValue.wins + curCharacterValue.losses)
+        knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue)
+          .then(()=>{})
+          .catch(console.error)
+        isWinnerUpdated = true
+      } else if(curCharacterValue.valueID == battleOutcome.loser) {
+        curCharacterValue.losses += 1
+        curCharacterValue.score = curCharacterValue.wins / (curCharacterValue.wins + curCharacterValue.losses)
+        knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue)
+          .then(()=>{})
+          .catch(console.error)
+        isLoserUpdated = true
+      }
+      if(isWinnerUpdated && isLoserUpdated) {
+        break
+      }
+    }
+    curCharacterValues.sort((a, b) => {return b.score - a.score})
     valuesView.onBattleOutcome(battleOutcome)
   })
+}
+
+function getCharacterValues(characterID) {
+  characterID = characterID.toString()
+  if(characterValues[characterID]) {
+    return Promise.resolve(characterValues[characterID])
+  } else {
+    return new Promise((resolve, reject) => {
+      knex('CharacterValues').where({characterID: characterID})
+        .then(queryResult => {
+          queryResult = queryResult.sort((a, b) => {return b.score - a.score})
+          resolve(queryResult)
+          characterValues[characterID] = queryResult
+        })
+        .catch(console.error)
+    })
+  }
 }
