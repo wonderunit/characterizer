@@ -21,6 +21,8 @@ function initDB(knex) {
     table.increments('id').primary()
     table.integer('characterID').references('id').inTable('Characters')
     table.integer('valueID').references('id').inTable('Values')
+    table.integer('wins')
+    table.integer('losses')
     table.float('score')
   })
   
