@@ -1,14 +1,8 @@
 const EventEmitter = require('events').EventEmitter
-const {remote} = require('electron')
-
-let knex
-knex = remote.getGlobal('knex')
 
 module.exports = class ValuesViewAverage extends EventEmitter {
   constructor(properties) {
     super()
-    if(!properties.character) throw new Error("Missing Character")
-    this.character = properties.character
 
     this.valuesMap = properties.valuesMap
 
