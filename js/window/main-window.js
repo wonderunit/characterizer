@@ -63,7 +63,7 @@ function addCharacterFronInput(event) {
           newNode.dataset.id = newID
         }
         let newCharacterValueInserts = valuesLib.map((value)=>{
-          knex('CharacterValues').insert({characterID: newID, valueID: value.id, score: 0.0, wins: 0, losses: 0})
+          knex('CharacterValues').insert({characterID: newID, valueID: value.id, score: 0.0, wins: 0, losses: 0, battleCount: 0})
             .then(()=>{})
             .catch(console.error)
         })
@@ -118,6 +118,7 @@ function showCharacterView(characterID) {
     for(let curCharacterValue of curCharacterValues) {
       if(curCharacterValue.valueID == battleOutcome.winner) {
         curCharacterValue.wins += 1
+        curCharacterValue.battleCount = curCharacterValue.wins + curCharacterValue.losses
         curCharacterValue.score = curCharacterValue.wins / (curCharacterValue.wins + curCharacterValue.losses)
         knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue)
           .then(()=>{})
@@ -125,6 +126,7 @@ function showCharacterView(characterID) {
         isWinnerUpdated = true
       } else if(curCharacterValue.valueID == battleOutcome.loser) {
         curCharacterValue.losses += 1
+        curCharacterValue.battleCount = curCharacterValue.wins + curCharacterValue.losses
         curCharacterValue.score = curCharacterValue.wins / (curCharacterValue.wins + curCharacterValue.losses)
         knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue)
           .then(()=>{})

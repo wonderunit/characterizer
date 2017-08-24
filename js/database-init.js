@@ -4,17 +4,20 @@ function initDB(knex) {
   let characterQuery = knex.schema.createTableIfNotExists('Characters', function(table) {
     table.string('name')
     table.increments('id').primary()
+    table.timestamps(false, true)
   })
 
   let valuesQuery = knex.schema.createTableIfNotExists('Values', function(table) {
     table.string('name')
     table.increments('id').primary()
     table.string('uuid')
+    table.timestamps(false, true)
   })
 
   let collectionsQuery = knex.schema.createTableIfNotExists('Collections', function(table) {
     table.string('name')
     table.increments('id').primary()
+    table.timestamps(false, true)
   })
 
   let characterValuesQuery = knex.schema.createTableIfNotExists('CharacterValues',function(table){
@@ -23,13 +26,16 @@ function initDB(knex) {
     table.integer('valueID').references('id').inTable('Values')
     table.integer('wins')
     table.integer('losses')
+    table.integer('battleCount')
     table.float('score')
+    table.timestamps(false, true)
   })
   
   let valuesCollectionsQuery = knex.schema.createTableIfNotExists('ValuesCollections',function(table){
     table.increments('id').primary()
     table.string('name')
     table.integer('valueID').references('id').inTable('Values')
+    table.timestamps(false, true)
   })
   
   let valuesBattleOutcomesQuery = knex.schema.createTableIfNotExists('ValuesBattleOutcomes',function(table){
@@ -37,6 +43,7 @@ function initDB(knex) {
     table.integer('characterID').references('id').inTable('Characters')
     table.integer('loser').references('id').inTable('Values')
     table.integer('winner').references('id').inTable('Values')
+    table.timestamps(false, true)
   })
 
   Promise.all([
