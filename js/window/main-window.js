@@ -47,7 +47,7 @@ document.querySelector("#input-add-character-name").addEventListener('keydown', 
   }
 })
 
-var addCharacterFronInput = (event)=>{
+function addCharacterFronInput(event) {
   let newNameInput = document.querySelector("#input-add-character-name")
   let newName = newNameInput.value
   addCharacterView(newName, 13371337)
@@ -68,7 +68,7 @@ var addCharacterFronInput = (event)=>{
             .catch(console.error)
         })
         Promise.all(newCharacterValueInserts)
-          .then(()=>{})
+          .then(()=>{ showCharacterView(newID) })
           .catch(console.error)
       })
       .catch(console.error)
