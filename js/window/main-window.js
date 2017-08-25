@@ -111,6 +111,12 @@ function onSelectCharacter(characterID) {
       return b.score - a.score
     })
     valuesView.onBattleOutcome(battleOutcome)
+
+    knex('ValuesBattleOutcomes').insert(battleOutcome)
+      .then(result => {
+        // console.log(JSON.stringify(battleOutcome, null, 2))
+      })
+      .catch(console.error)
   })
 }
 

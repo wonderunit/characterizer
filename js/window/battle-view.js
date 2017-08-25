@@ -53,27 +53,18 @@ module.exports = class BattleView extends EventEmitter {
 
   handleChoice(winnerID) {
     let winner, loser
+    let battleOutcome = {
+      characterID: this.character.id
+    }
     if(winnerID === this.choiceDataOne.id) {
-      winner = this.choiceDataOne
-      loser = this.choiceDataTwo
+      battleOutcome.winner = this.choiceDataOne.id
+      battleOutcome.loser = this.choiceDataTwo.id
     } else {
-      winner = this.choiceDataTwo
-      loser = this.choiceDataOne
+      battleOutcome.winner = this.choiceDataTwo.id
+      battleOutcome.loser = this.choiceDataOne.id
     }
-
+    this.emit('battle-update', battleOutcome)
     this.setupBattle()
-
-    let record = {
-      characterID: this.character.id,
-      loser: loser.id,
-      winner: winner.id
-    }
-    this.emit('battle-update', record)
-    knex('ValuesBattleOutcomes').insert(record)
-      .then(result => {
-        console.log(JSON.stringify(record, null, 2))
-      })
-      .catch(console.error)
   }
 
   getRandomChoiceData(exclusions) {
