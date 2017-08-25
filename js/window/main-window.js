@@ -1,26 +1,19 @@
 const {remote} = require('electron')
+const CharacterView = require('./character-view.js')
 const BattleView = require('./battle-view.js')
 const ValuesViewAverage = require('./values-view-average.js')
 const ValuesViewDots = require('./values-view-dots.js')
 
 var valuesLib
-var characters = []
+var characters
 var valuesMap = {}
 var characterValues = {} // key: character ID, value: array of their values with scores
 var currentCharacterID
 var valuesViewType = "average"
-let knex = remote.getGlobal('knex')
+var knex = remote.getGlobal('knex')
+var valuesContainer = document.getElementById("values-container")
 
-
-// set up the characters
-knex.select().table('Characters')
-  .then(result => {
-    characters = result
-    for(let character of characters) {
-      addCharacterView(character.name, character.id)
-    }
-  })
-
+// Cache the system values
 knex.select().table('Values')
   .then(values => {
     let end = Date.now()
@@ -32,65 +25,39 @@ knex.select().table('Values')
   })
 
 var container = document.getElementById("container")
-var charactersContainer = document.querySelector("#characters-container")
-var valuesContainer = document.getElementById("values-container")
 
-document.querySelector("#character-input-add-button").addEventListener('click', addCharacterFronInput)
 document.querySelector("#values-view-selector").addEventListener('change', (event)=>{
   valuesViewType = event.target.value
-  showCharacterView(currentCharacterID)
+  onSelectCharacter(currentCharacterID)
 })
 
-document.querySelector("#input-add-character-name").addEventListener('keydown', (event)=>{
-  if(event.keyCode === 13) {
-    addCharacterFronInput()
-  }
-})
-
-function addCharacterFronInput(event) {
-  let newNameInput = document.querySelector("#input-add-character-name")
-  let newName = newNameInput.value
-  addCharacterView(newName, 13371337)
-  if(newName) {
-    let record = {name: newName}
-    knex('Characters').returning('id').insert(record)
-      .then((result) => {
-        let newID = result && result[0]
-        record.id = newID
-        characters.push(record)
-        let newNode = document.querySelectorAll("[data-id='13371337']")[0]
-        if(newNode) {
-          newNode.dataset.id = newID
-        }
-        let newCharacterValueInserts = valuesLib.map((value)=>{
-          knex('CharacterValues').insert({characterID: newID, valueID: value.id, score: 0.0, wins: 0, losses: 0, battleCount: 0})
-            .then(()=>{})
-            .catch(console.error)
-        })
-        Promise.all(newCharacterValueInserts)
-          .then(()=>{ showCharacterView(newID) })
+var characterView = new CharacterView({"characters": getCharacters()})
+var existingCharacterView = document.getElementById("characters-container")
+container.replaceChild(characterView.getView(), existingCharacterView)
+characterView.on('select-character', data => onSelectCharacter(data.characterID))
+characterView.on('add-character', data => {
+  let record = data
+  knex('Characters').returning('id').insert(record)
+    .then((result) => {
+      let newID = result && result[0]
+      record.id = newID
+      characters.push(record)
+      characterView.updateView()
+      
+      let newCharacterValueInserts = valuesLib.map((value)=>{
+        knex('CharacterValues').insert({characterID: newID, valueID: value.id, score: 0.0, wins: 0, losses: 0, battleCount: 0})
+          .then(()=>{})
           .catch(console.error)
       })
-      .catch(console.error)
-    
-    newNameInput.value = ""
-  }
-}
+      Promise.all(newCharacterValueInserts)
+        .then(()=>{ onSelectCharacter(newID) })
+        .catch(console.error)
+    })
+    .catch(console.error)
+})
 
-function addCharacterView(characterName, characterID) {
-  let characterView = document.createElement('div')
-  characterView.setAttribute("class", "character-list-name")
-  characterView.setAttribute("data-id", characterID || 1)
-  characterView.innerHTML = characterName
-  characterView.addEventListener('click', onSelectCharacter);
-  document.querySelector("#character-list").appendChild(characterView)
-}
 
-function onSelectCharacter(event) {
-  showCharacterView(parseInt(event.target.dataset.id))
-}
-
-function showCharacterView(characterID) {
+function onSelectCharacter(characterID) {
   currentCharacterID = characterID
   let character
   for(let aCharacter of characters) { 
@@ -155,7 +122,6 @@ function getValuesView() {
     default:
       return ValuesViewAverage
   }
-
 }
 
 function getCharacterValues(characterID) {
@@ -170,6 +136,21 @@ function getCharacterValues(characterID) {
           characterValues[characterID] = queryResult
         })
         .catch(console.error)
+    })
+  }
+}
+
+function getCharacters() {
+  if(characters) {
+    return Promise.resolve(characters)
+  } else {
+    return new Promise((resolve, reject)=>{
+      knex.select().table('Characters')
+        .then(result => {
+          characters = result
+          resolve(characters)
+        })
+        .catch(reject)
     })
   }
 }
