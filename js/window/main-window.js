@@ -3,11 +3,13 @@ const CharacterView = require('./character-view.js')
 const BattleView = require('./battle-view.js')
 const ValuesViewAverage = require('./values-view-average.js')
 const ValuesViewDots = require('./values-view-dots.js')
+const BattlePairer = require('../battle-pairer.js')
 
 var valuesLib
 var characters
 var valuesMap = {}
 var characterValues = {} // key: character ID, value: array of their values with scores
+var battlePairers = {} // cache battle pairers
 var currentCharacterID
 var valuesViewType = "average"
 var knex = remote.getGlobal('knex')
@@ -67,7 +69,7 @@ function onSelectCharacter(characterID) {
     }
   }
 
-  let battleView = new BattleView({ choices: valuesLib, character: character})
+  let battleView = new BattleView({ character: character, battlePairer: getBattlePairer(characterID)})
   let existing = document.getElementById("battle-container")
   container.replaceChild(battleView.getView(), existing)
   
@@ -159,4 +161,13 @@ function getCharacters() {
         .catch(reject)
     })
   }
+}
+
+function getBattlePairer(characterID) {
+  if(!battlePairers[characterID]) {
+    let battlePairer = new BattlePairer({choices: valuesLib, characterID: characterID, values:getCharacterValues(characterID)})
+    battlePairers[characterID] = battlePairer
+  }
+
+  return battlePairers[characterID]
 }

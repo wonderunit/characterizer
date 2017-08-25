@@ -7,11 +7,11 @@ module.exports = class BattleView extends EventEmitter {
   constructor(properties) {
     super()
 
-    if(!properties.choices) throw new Error("Missing Choices")
-    this.choices = properties.choices
-
-    if(!properties.character) throw new Error("Missing Character")
+    if(!properties.character) throw new Error("Missing character")
     this.character = properties.character
+    
+    if(!properties.battlePairer) throw new Error("Missing battlePairer")
+    this.battlePairer = properties.battlePairer
 
     this.root = document.createElement('div')
     this.root.setAttribute("id", "battle-container")
@@ -37,11 +37,13 @@ module.exports = class BattleView extends EventEmitter {
 
   setupBattle() {
     this.choiceContainer.innerHTML = ""
-    this.choiceDataOne = this.getRandomChoiceData()
+    let battleData = this.battlePairer.getBattle()
+
+    this.choiceDataOne = battleData[0]
     this.choiceOne = this.getChoiceButtonView(this.choiceDataOne)
     this.choiceContainer.appendChild(this.choiceOne)
 
-    this.choiceDataTwo = this.getRandomChoiceData([this.choiceDataOne])
+    this.choiceDataTwo = battleData[1]
     this.choiceTwo = this.getChoiceButtonView(this.choiceDataTwo)
     this.choiceContainer.appendChild(this.choiceTwo)
   }
@@ -65,16 +67,6 @@ module.exports = class BattleView extends EventEmitter {
     }
     this.emit('battle-update', battleOutcome)
     this.setupBattle()
-  }
-
-  getRandomChoiceData(exclusions) {
-    let index = Math.floor(Math.random() * this.choices.length)
-    // let data = this.choices.splice(index, 1)[0]
-    let data = this.choices[index]
-    if(exclusions && exclusions.includes(data)) {
-      return this.getRandomChoiceData(exclusions)
-    }
-    return data
   }
 
   getChoiceButtonView(choiceData) {
