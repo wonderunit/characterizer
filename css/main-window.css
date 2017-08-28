@@ -105,3 +105,27 @@ body {
   margin-left: 5%;
   height: 500px;
 }
+
+.values-view-battlecount {
+  display: flex;
+  flex-direction: row;
+}
+
+.values-view-battlecount-tier {
+  display: flex;
+  flex-direction: column;
+  min-width: 50px;
+}
+
+.values-view-battlecount-tier h3 {
+  text-align: center;
+}
+.value-list-name-battlecount {
+  border-width: 1px;
+  border-color: black;
+  margin: 10px;
+  background-color: #AAA;
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+}

@@ -3,11 +3,12 @@ const CharacterView = require('./character-view.js')
 const BattleView = require('./battle-view.js')
 const ValuesViewAverage = require('./values-view-average.js')
 const ValuesViewDots = require('./values-view-dots.js')
+const ValuesViewBattleCounts = require('./values-view-battle-counts.js')
 const BattlePairer = require('../battle-pairer.js')
 
 var valuesLib
 var characters
-var valuesMap = {}
+var valuesMap = {} // key: valueID, value: value data
 var characterValues = {} // key: character ID, value: array of their values with scores
 var battlePairers = {} // cache battle pairers
 var currentCharacterID
@@ -77,7 +78,7 @@ function onSelectCharacter(characterID) {
   document.getElementById("values-view").innerHTML = ''
   
   let ValuesView = getValuesView()
-  let valuesView = new ValuesView({ valuesMap: valuesMap, values: getCharacterValues(currentCharacterID)})
+  let valuesView = new ValuesView({ valuesMap: valuesMap, values: getCharacterValues(currentCharacterID), battlePairer: getBattlePairer(characterID) })
   let existingValuesView = document.getElementById("values-view")
   valuesContainer.replaceChild(valuesView.getView(), existingValuesView)
   
@@ -112,6 +113,7 @@ function onSelectCharacter(characterID) {
       }
       return b.score - a.score
     })
+    battlePairers[battleOutcome.characterID].onBattleOutcome(battleOutcome)
     valuesView.onBattleOutcome(battleOutcome)
 
     knex('ValuesBattleOutcomes').insert(battleOutcome)
@@ -126,6 +128,8 @@ function getValuesView() {
   switch(valuesViewType) {
     case "dots":
       return ValuesViewDots
+    case "battleCounts":
+      return ValuesViewBattleCounts
     case "average":
     default:
       return ValuesViewAverage
@@ -165,7 +169,7 @@ function getCharacters() {
 
 function getBattlePairer(characterID) {
   if(!battlePairers[characterID]) {
-    let battlePairer = new BattlePairer({choices: valuesLib, characterID: characterID, values:getCharacterValues(characterID)})
+    let battlePairer = new BattlePairer({choices: valuesLib, characterID: characterID, values:getCharacterValues(characterID), valuesMap: valuesMap})
     battlePairers[characterID] = battlePairer
   }
 
