@@ -210,7 +210,7 @@ module.exports = class BattlePairer {
       indexTwo = Math.floor(Math.random()*topIndex)
     } while(indexTwo === indexOne)
 
-    return [this.choices[indexOne], this.choices[indexTwo]]
+    return [this.valuesMap[this.values[indexOne].valueID], this.valuesMap[this.values[indexTwo].valueID]]
   }
   
   getTopPercentileBattle() {
@@ -224,7 +224,7 @@ module.exports = class BattlePairer {
       indexTwo = Math.floor(Math.random()*topIndex)
     } while(indexTwo === indexOne)
 
-    return [this.choices[indexOne], this.choices[indexTwo]]
+    return [this.valuesMap[this.values[indexOne].valueID], this.valuesMap[this.values[indexTwo].valueID]]
   }
   
   getTopPercentileAndRandomBattle() {
@@ -238,6 +238,6 @@ module.exports = class BattlePairer {
       indexTwo = Math.floor(Math.random() * this.choices.length)
     } while(indexTwo === indexOne)
 
-    return [this.choices[indexOne], this.choices[indexTwo]]
+    return [this.valuesMap[this.values[indexOne].valueID], this.valuesMap[this.values[indexTwo].valueID]]
   }
 }
