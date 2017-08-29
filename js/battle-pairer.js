@@ -15,12 +15,31 @@ module.exports = class BattlePairer {
     if(!properties.values) throw new Error("Missing values")
     this.values = []
 
+    if(!properties.battlePairs) throw new Error("Missing battlePairs")
+
+    // TODO: we should wait for ready further up the chain
+    this.isReady = false
+
     this.valuesMap = properties.valuesMap
 
     this.valuesPercentRank = []
 
     properties.values
-      .then(inValues => { this.setValues(inValues) })
+      .then(inValues => { 
+        this.values = inValues
+        if(this.previousBattlePairs) {
+          this.isReady = true
+        }
+      })
+
+    properties.battlePairs
+      .then(inPairs => { 
+        this.previousBattlePairs = inPairs
+        if(this.values) {
+          this.isReady = true
+        }
+      })
+      .catch(console.error)
     
     // keeps the values separated by battle count.
     this.battleChoiceTiers = []
@@ -42,32 +61,57 @@ module.exports = class BattlePairer {
     let result = this.getFillDataBattle()
     if(result && result.length > 1) {
       console.log(`getFillDataBattle`)
+      if(this.isDuplicate(result)) {
+        console.log(`Found duplicate!`)
+        return this.getBattle()
+      }
       return result
+    } else {
+      let roll = Math.random()
+      if(roll < .7) {
+        console.log(`getTopPercentileBattle`)
+        result = this.getTopPercentileBattle()
+      } else if(roll < .8) {
+        console.log(`getTopPercentileAndRandomBattle`)
+        result = this.getTopPercentileAndRandomBattle()
+      } else if (roll < .9) {
+        console.log(`getTopRankBattle`)
+        result = this.getTopRankBattle()
+      }
+      if(!result) {
+        console.log(`getRandomBattle`)
+        result = this.getRandomBattle()
+      } else {
+        // We're letting the random roll for getRandomBattle fall through
+        // the duplicate check in case we reach a point where all matches have been done.
+        // TODO: check for the case where all matches have played out, and message it.
+        if(this.isDuplicate(result)) {
+          console.log(`Found duplicate!`)
+          return this.getBattle()
+        }
+      }
     }
-
-    let roll = Math.random()
-    if(roll < .7) {
-      console.log(`getTopPercentileBattle`)
-      result = this.getTopPercentileBattle()
-    } else if(roll < .8) {
-      console.log(`getTopPercentileAndRandomBattle`)
-      result = this.getTopPercentileAndRandomBattle()
-    } else if (roll < .9) {
-      console.log(`getTopRankBattle`)
-      result = this.getTopRankBattle()
-    }
-    if(!result) {
-      console.log(`getRandomBattle`)
-      result = this.getRandomBattle()
-    }
-
-    // TODO: check to make sure we're not re-running battles.
     
     return result
   }
 
-  setValues(inValues) {
-    this.values = inValues
+  isDuplicate(battlePair) {
+    let result = false
+    if(!battlePair || battlePair.length < 2) {
+      throw new Error("checkDuplicate expects an array of length >= 2")
+    }
+    var checkForPair = (contender1, contender2) => {
+      if(this.previousBattlePairs.hasOwnProperty(contender1.id)) {
+        let contender1Pairs = this.previousBattlePairs[contender1.id]
+        if(contender1Pairs.hasOwnProperty(contender2.id) && contender1Pairs[contender2.id] > 0) {
+          return true
+        }
+      }
+      return false
+    }
+
+    result = checkForPair(battlePair[0], battlePair[1]) || checkForPair(battlePair[1], battlePair[0])
+    return result
   }
 
   onBattleOutcome(battleOutcome) {

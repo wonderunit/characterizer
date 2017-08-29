@@ -11,10 +11,12 @@ var characters
 var valuesMap = {} // key: valueID, value: value data
 var characterValues = {} // key: character ID, value: array of their values with scores
 var battlePairers = {} // cache battle pairers
+var characterBattlePairs = {}
 var currentCharacterID
 var valuesViewType = "average"
 var knex = remote.getGlobal('knex')
 var valuesContainer = document.getElementById("values-container")
+var container = document.getElementById("container")
 
 // Cache the system values
 knex.select().table('Values')
@@ -26,8 +28,6 @@ knex.select().table('Values')
     }
     remote.valuesMap = valuesMap
   })
-
-var container = document.getElementById("container")
 
 document.querySelector("#values-view-selector").addEventListener('change', (event)=>{
   valuesViewType = event.target.value
@@ -58,7 +58,6 @@ characterView.on('add-character', data => {
     })
     .catch(console.error)
 })
-
 
 function onSelectCharacter(characterID) {
   currentCharacterID = characterID
@@ -113,6 +112,8 @@ function onSelectCharacter(characterID) {
       }
       return b.score - a.score
     })
+
+    updateBattlePairs(battleOutcome)
     battlePairers[battleOutcome.characterID].onBattleOutcome(battleOutcome)
     valuesView.onBattleOutcome(battleOutcome)
 
@@ -169,9 +170,52 @@ function getCharacters() {
 
 function getBattlePairer(characterID) {
   if(!battlePairers[characterID]) {
-    let battlePairer = new BattlePairer({choices: valuesLib, characterID: characterID, values:getCharacterValues(characterID), valuesMap: valuesMap})
+    let properties = {
+      choices: valuesLib, 
+      characterID: characterID, 
+      values:getCharacterValues(characterID), 
+      valuesMap: valuesMap,
+      battlePairs: getCharacterBattlePairs(characterID)
+    }
+    let battlePairer = new BattlePairer(properties)
     battlePairers[characterID] = battlePairer
   }
 
   return battlePairers[characterID]
+}
+
+function getCharacterBattlePairs(characterID) {
+  if(characterBattlePairs[characterID]) {
+    return Promise.resolve(characterBattlePairs[characterID])
+  } else {
+    return new Promise((fulfill, reject) => {
+      knex('ValuesBattleOutcomes').select().where({characterID: characterID})
+      .then(battleOutcomes => {
+        if(!battleOutcomes || battleOutcomes.length < 1) {
+          characterBattlePairs[characterID] = {}
+        }
+        for(let battleOutcome of battleOutcomes) {
+          updateBattlePairs(battleOutcome)
+        }
+        // console.log(JSON.stringify(battlePairs, null, 2))
+        fulfill(characterBattlePairs[characterID])
+      })
+      .catch(console.error)
+    })
+  }
+}
+
+function updateBattlePairs(battleOutcome) {
+  if(!characterBattlePairs.hasOwnProperty(battleOutcome.characterID)) {
+    characterBattlePairs[battleOutcome.characterID] = {}
+  }
+  let battlePairs = characterBattlePairs[battleOutcome.characterID]
+  if(!battlePairs.hasOwnProperty(battleOutcome.winner)) {
+    battlePairs[battleOutcome.winner] = {}
+  }
+  let winnerPairs = battlePairs[battleOutcome.winner]
+  if(!winnerPairs.hasOwnProperty(battleOutcome.loser)) {
+    winnerPairs[battleOutcome.loser] = 0
+  }
+  winnerPairs[battleOutcome.loser] += 1
 }
