@@ -3,6 +3,7 @@ const CharacterView = require('./character-view.js')
 const BattleView = require('./battle-view.js')
 const ValuesViewAverage = require('./values-view-average.js')
 const ValuesViewDots = require('./values-view-dots.js')
+const ValuesViewNone = require('./values-view-none.js')
 const ValuesViewBattleCounts = require('./values-view-battle-counts.js')
 const BattlePairer = require('../battle-pairer.js')
 
@@ -13,7 +14,7 @@ var characterValues = {} // key: character ID, value: array of their values with
 var battlePairers = {} // cache battle pairers
 var characterBattlePairs = {}
 var currentCharacterID
-var valuesViewType = "average"
+var valuesViewType = "none"
 var knex = remote.getGlobal('knex')
 var valuesContainer = document.getElementById("values-container")
 var container = document.getElementById("container")
@@ -84,22 +85,19 @@ function onSelectCharacter(characterID) {
   battleView.on('battle-update', battleOutcome => {
     let curCharacterValues = characterValues[battleOutcome.characterID]
     let isWinnerUpdated, isLoserUpdated
+    let tailPromises = []
     for(let curCharacterValue of curCharacterValues) {
       if(curCharacterValue.valueID == battleOutcome.winner) {
         curCharacterValue.wins += 1
         curCharacterValue.battleCount = curCharacterValue.wins + curCharacterValue.losses
         curCharacterValue.score = curCharacterValue.wins / (curCharacterValue.wins + curCharacterValue.losses)
-        knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue)
-          .then(()=>{})
-          .catch(console.error)
+        tailPromises.push(knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue))
         isWinnerUpdated = true
       } else if(curCharacterValue.valueID == battleOutcome.loser) {
         curCharacterValue.losses += 1
         curCharacterValue.battleCount = curCharacterValue.wins + curCharacterValue.losses
         curCharacterValue.score = curCharacterValue.wins / (curCharacterValue.wins + curCharacterValue.losses)
-        knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue)
-          .then(()=>{})
-          .catch(console.error)
+        tailPromises.push(knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue))
         isLoserUpdated = true
       }
       if(isWinnerUpdated && isLoserUpdated) {
@@ -117,16 +115,19 @@ function onSelectCharacter(characterID) {
     battlePairers[battleOutcome.characterID].onBattleOutcome(battleOutcome)
     valuesView.onBattleOutcome(battleOutcome)
 
-    knex('ValuesBattleOutcomes').insert(battleOutcome)
-      .then(result => {
-        // console.log(JSON.stringify(battleOutcome, null, 2))
-      })
-      .catch(console.error)
+    tailPromises.push(knex('ValuesBattleOutcomes').insert(battleOutcome))
+    setImmediate(()=>{
+      Promise.all(tailPromises)
+        .then(()=> {})
+        .catch(console.error)
+    })
   })
 }
 
 function getValuesView() {
   switch(valuesViewType) {
+    case "none":
+      return ValuesViewNone
     case "dots":
       return ValuesViewDots
     case "battleCounts":
@@ -145,8 +146,9 @@ function getCharacterValues(characterID) {
     return new Promise((resolve, reject) => {
       knex('CharacterValues').where({characterID: characterID}).orderBy('score', 'desc').orderBy('battleCount', 'desc')
         .then(queryResult => {
-          resolve(queryResult)
-          characterValues[characterID] = queryResult
+          let result = JSON.parse(JSON.stringify(queryResult))
+          resolve(result)
+          characterValues[characterID] = result
         })
         .catch(console.error)
     })
