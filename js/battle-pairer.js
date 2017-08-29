@@ -1,8 +1,8 @@
 const {remote} = require('electron')
 const knex = remote.getGlobal('knex')
-const MIN_BATTTLE_COUNT = 4
-const TOP_PERCENT_CUTOFF = .2
-const TOP_RANK_CUTOFF = 4
+const MIN_BATTTLE_COUNT = 2
+const TOP_PERCENT_CUTOFF = .4
+const TOP_RANK_CUTOFF = 20
 
 module.exports = class BattlePairer {
   constructor(properties) {
@@ -68,13 +68,13 @@ module.exports = class BattlePairer {
       return result
     } else {
       let roll = Math.random()
-      if(roll < .7) {
+      if(roll < .6) {
         console.log(`getTopPercentileBattle`)
         result = this.getTopPercentileBattle()
-      } else if(roll < .8) {
+      } else if(roll < .7) {
         console.log(`getTopPercentileAndRandomBattle`)
         result = this.getTopPercentileAndRandomBattle()
-      } else if (roll < .9) {
+      } else if (roll < .8) {
         console.log(`getTopRankBattle`)
         result = this.getTopRankBattle()
       }
@@ -235,8 +235,9 @@ module.exports = class BattlePairer {
     let indexOne = Math.floor(Math.random()*topIndex)
     let indexTwo
     do {
-      indexTwo = Math.floor(Math.random() * this.choices.length)
+      indexTwo = Math.floor(Math.random() * this.values.length)
     } while(indexTwo === indexOne)
+
 
     return [this.valuesMap[this.values[indexOne].valueID], this.valuesMap[this.values[indexTwo].valueID]]
   }
