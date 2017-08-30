@@ -14,7 +14,7 @@ var characterValues = {} // key: character ID, value: array of their values with
 var battlePairers = {} // cache battle pairers
 var characterBattlePairs = {}
 var currentCharacterID
-var valuesViewType = "none"
+var valuesViewType = "average"
 var knex = remote.getGlobal('knex')
 var valuesContainer = document.getElementById("values-container")
 var container = document.getElementById("container")
