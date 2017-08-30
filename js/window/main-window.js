@@ -63,6 +63,7 @@ characterView.on('add-character', data => {
 })
 
 function onSelectCharacter(characterID) {
+  let start = Date.now()
   currentCharacterID = characterID
   let character
   for(let aCharacter of characters) { 
@@ -90,6 +91,8 @@ function onSelectCharacter(characterID) {
         handleBattleUpdate(battleOutcome)
       })
 
+      let end = Date.now()
+      console.log(`Character select: ${end - start}`)
     })
   })
 }
@@ -155,9 +158,15 @@ function getCharacterValues(characterID) {
     return Promise.resolve(characterValues[characterID])
   } else {
     return new Promise((resolve, reject) => {
-      knex('CharacterValues').where({characterID: characterID}).orderBy('score', 'desc').orderBy('battleCount', 'desc')
+      knex.raw(`select * from CharacterValues where "characterID" = ?`, [characterID])
         .then(queryResult => {
-          let result = JSON.parse(JSON.stringify(queryResult))
+          queryResult = JSON.parse(JSON.stringify(queryResult))
+          let result = queryResult.sort((a, b)=>{
+            if(a.score === b.score) {
+              return b.battleCount - a.battleCount
+            }
+            return b.score - a.score
+          })
           resolve(result)
           characterValues[characterID] = result
         })
@@ -214,14 +223,12 @@ function getCharacterBattlePairs(characterID) {
   } else {
     return new Promise((fulfill, reject) => {
       let start = Date.now()
-      knex('ValuesBattleOutcomes').select().where({characterID: characterID})
-        .then(result => {
-          // TODO: this operation is very slow
-          let battleOutcomes = JSON.parse(JSON.stringify(result))
-          if(!battleOutcomes || battleOutcomes.length < 1 || !characterBattlePairs[characterID]) {
+      knex.raw(`select * from ValuesBattleOutcomes where "characterID" = ?`, [characterID])
+        .then((result) => {
+          if(!result || result.length < 1 || !characterBattlePairs[characterID]) {
             characterBattlePairs[characterID] = {}
           }
-          for(let battleOutcome of battleOutcomes) {
+          for(let battleOutcome of result) {
             updateBattlePairs(battleOutcome)
           }
           fulfill(characterBattlePairs[characterID])
