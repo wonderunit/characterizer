@@ -44,12 +44,11 @@ module.exports = class BattlePairer {
     // Make sure enough data selection mode.
     let result = this.getFillDataBattle()
     if(result && result.length > 1) {
-      console.log(`getFillDataBattle`)
       if(this.isDuplicate(result)) {
         console.log(`Found duplicate!`)
-        return this.getBattle()
+        result = this.getBattle()
       }
-      return result
+      console.log(`getFillDataBattle`)
     } else {
       let roll = Math.random()
       if(roll < .6) {
@@ -71,12 +70,19 @@ module.exports = class BattlePairer {
         // TODO: check for the case where all matches have played out, and message it.
         if(this.isDuplicate(result)) {
           console.log(`Found duplicate!`)
-          return this.getBattle()
+          result = this.getBattle()
         }
       }
     }
     
-    return result
+    let randomizedResult = []
+    let firstIndex = Math.floor(Math.random()*2)
+    if(firstIndex === 0) {
+      randomizedResult = [result[0], result[1]]
+    } else {
+      randomizedResult = [result[1], result[0]]
+    }
+    return randomizedResult
   }
 
   isDuplicate(battlePair) {
