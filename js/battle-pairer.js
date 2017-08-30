@@ -13,9 +13,10 @@ module.exports = class BattlePairer {
     this.choices = properties.choices
 
     if(!properties.values) throw new Error("Missing values")
-    this.values = []
+    this.values = properties.values
 
     if(!properties.battlePairs) throw new Error("Missing battlePairs")
+    this.previousBattlePairs = properties.battlePairs
 
     // TODO: we should wait for ready further up the chain
     this.isReady = false
@@ -23,23 +24,6 @@ module.exports = class BattlePairer {
     this.valuesMap = properties.valuesMap
 
     this.valuesPercentRank = []
-
-    properties.values
-      .then(inValues => { 
-        this.values = inValues
-        if(this.previousBattlePairs) {
-          this.isReady = true
-        }
-      })
-
-    properties.battlePairs
-      .then(inPairs => { 
-        this.previousBattlePairs = inPairs
-        if(this.values) {
-          this.isReady = true
-        }
-      })
-      .catch(console.error)
     
     // keeps the values separated by battle count.
     this.battleChoiceTiers = []

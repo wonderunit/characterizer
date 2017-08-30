@@ -11,10 +11,8 @@ module.exports = class ValuesViewDots extends EventEmitter {
     this.root.setAttribute("class", "values-view-linechart")
     this.values = []
 
-    properties.values.then(inValues => {
-      this.values = inValues
-      this.updateView()
-    })
+    this.values = properties.values
+    this.updateView()
   }
 
   getView() {

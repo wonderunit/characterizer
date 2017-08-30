@@ -10,10 +10,8 @@ module.exports = class ValuesViewAverage extends EventEmitter {
     this.root.setAttribute("id", "values-view")
     this.values = []
 
-    properties.values.then(inValues => {
-      this.values = inValues
-      this.updateView()
-    })
+    this.values = properties.values
+    this.updateView()
   }
 
   getView() {

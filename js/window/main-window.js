@@ -18,10 +18,12 @@ var valuesViewType = "none"
 var knex = remote.getGlobal('knex')
 var valuesContainer = document.getElementById("values-container")
 var container = document.getElementById("container")
+var curValuesView
 
 // Cache the system values
 knex.select().table('Values')
   .then(values => {
+    values = JSON.parse(JSON.stringify(values))
     let end = Date.now()
     valuesLib = values
     for(let value of valuesLib) {
@@ -70,57 +72,66 @@ function onSelectCharacter(characterID) {
     }
   }
 
-  let battleView = new BattleView({ character: character, battlePairer: getBattlePairer(characterID)})
-  let existing = document.getElementById("battle-container")
-  container.replaceChild(battleView.getView(), existing)
-  
-  document.getElementById("values-header").innerHTML = `${character.name}'s Values`
-  document.getElementById("values-view").innerHTML = ''
-  
-  let ValuesView = getValuesView()
-  let valuesView = new ValuesView({ valuesMap: valuesMap, values: getCharacterValues(currentCharacterID), battlePairer: getBattlePairer(characterID) })
-  let existingValuesView = document.getElementById("values-view")
-  valuesContainer.replaceChild(valuesView.getView(), existingValuesView)
-  
-  battleView.on('battle-update', battleOutcome => {
-    let curCharacterValues = characterValues[battleOutcome.characterID]
-    let isWinnerUpdated, isLoserUpdated
-    let tailPromises = []
-    for(let curCharacterValue of curCharacterValues) {
-      if(curCharacterValue.valueID == battleOutcome.winner) {
-        curCharacterValue.wins += 1
-        curCharacterValue.battleCount = curCharacterValue.wins + curCharacterValue.losses
-        curCharacterValue.score = curCharacterValue.wins / (curCharacterValue.wins + curCharacterValue.losses)
-        tailPromises.push(knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue))
-        isWinnerUpdated = true
-      } else if(curCharacterValue.valueID == battleOutcome.loser) {
-        curCharacterValue.losses += 1
-        curCharacterValue.battleCount = curCharacterValue.wins + curCharacterValue.losses
-        curCharacterValue.score = curCharacterValue.wins / (curCharacterValue.wins + curCharacterValue.losses)
-        tailPromises.push(knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue))
-        isLoserUpdated = true
-      }
-      if(isWinnerUpdated && isLoserUpdated) {
-        break
-      }
+  getBattlePairer(characterID).then(battlePairer =>{
+    getCharacterValues(currentCharacterID).then(characterValues =>{
+      let battleView = new BattleView({ character: character, battlePairer: battlePairer})
+      let existing = document.getElementById("battle-container")
+      container.replaceChild(battleView.getView(), existing)
+      
+      document.getElementById("values-header").innerHTML = `${character.name}'s Values`
+      document.getElementById("values-view").innerHTML = ''
+      
+      let ValuesView = getValuesView()
+      curValuesView = new ValuesView({ valuesMap: valuesMap, values: characterValues, battlePairer: battlePairer })
+      let existingValuesView = document.getElementById("values-view")
+      valuesContainer.replaceChild(curValuesView.getView(), existingValuesView)
+      
+      battleView.on('battle-update', battleOutcome => {
+        handleBattleUpdate(battleOutcome)
+      })
+
+    })
+  })
+}
+
+function handleBattleUpdate(battleOutcome) {
+  let curCharacterValues = characterValues[battleOutcome.characterID]
+  let isWinnerUpdated, isLoserUpdated
+  let tailPromises = []
+  for(let curCharacterValue of curCharacterValues) {
+    if(curCharacterValue.valueID == battleOutcome.winner) {
+      curCharacterValue.wins += 1
+      curCharacterValue.battleCount = curCharacterValue.wins + curCharacterValue.losses
+      curCharacterValue.score = curCharacterValue.wins / (curCharacterValue.wins + curCharacterValue.losses)
+      tailPromises.push(knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue))
+      isWinnerUpdated = true
+    } else if(curCharacterValue.valueID == battleOutcome.loser) {
+      curCharacterValue.losses += 1
+      curCharacterValue.battleCount = curCharacterValue.wins + curCharacterValue.losses
+      curCharacterValue.score = curCharacterValue.wins / (curCharacterValue.wins + curCharacterValue.losses)
+      tailPromises.push(knex('CharacterValues').where({id: curCharacterValue.id}).update(curCharacterValue))
+      isLoserUpdated = true
     }
-    curCharacterValues.sort((a, b) => {
-      if(a.score === b.score) {
-        return b.battleCount - a.battleCount
-      }
-      return b.score - a.score
-    })
+    if(isWinnerUpdated && isLoserUpdated) {
+      break
+    }
+  }
+  curCharacterValues.sort((a, b) => {
+    if(a.score === b.score) {
+      return b.battleCount - a.battleCount
+    }
+    return b.score - a.score
+  })
 
-    updateBattlePairs(battleOutcome)
-    battlePairers[battleOutcome.characterID].onBattleOutcome(battleOutcome)
-    valuesView.onBattleOutcome(battleOutcome)
+  updateBattlePairs(battleOutcome)
+  battlePairers[battleOutcome.characterID].onBattleOutcome(battleOutcome)
+  curValuesView.onBattleOutcome(battleOutcome)
 
-    tailPromises.push(knex('ValuesBattleOutcomes').insert(battleOutcome))
-    setImmediate(()=>{
-      Promise.all(tailPromises)
-        .then(()=> {})
-        .catch(console.error)
-    })
+  tailPromises.push(knex('ValuesBattleOutcomes').insert(battleOutcome))
+  setImmediate(()=>{
+    Promise.all(tailPromises)
+      .then(()=> {})
+      .catch(console.error)
   })
 }
 
@@ -162,6 +173,7 @@ function getCharacters() {
     return new Promise((resolve, reject)=>{
       knex.select().table('Characters')
         .then(result => {
+          characters = JSON.parse(JSON.stringify(result))
           characters = result
           resolve(characters)
         })
@@ -171,17 +183,27 @@ function getCharacters() {
 }
 
 function getBattlePairer(characterID) {
-  if(!battlePairers[characterID]) {
-    let properties = {
-      choices: valuesLib, 
-      characterID: characterID, 
-      values:getCharacterValues(characterID), 
-      valuesMap: valuesMap,
-      battlePairs: getCharacterBattlePairs(characterID)
-    }
-    let battlePairer = new BattlePairer(properties)
-    battlePairers[characterID] = battlePairer
+  if(battlePairers[characterID]) {
+    return Promise.resolve(battlePairers[characterID])
+  } else {
+    return new Promise((fulfill, reject) =>{
+      getCharacterValues(characterID).then(characterValues => {
+        getCharacterBattlePairs(characterID).then(characterBattlePairs => {
+          let properties = {
+            choices: valuesLib, 
+            characterID: characterID, 
+            values:characterValues,
+            valuesMap: valuesMap,
+            battlePairs: characterBattlePairs
+          }
+          let battlePairer = new BattlePairer(properties)
+          battlePairers[characterID] = battlePairer
+          fulfill(battlePairers[characterID])
+        })
+      })
+    })
   }
+  
 
   return battlePairers[characterID]
 }
@@ -191,26 +213,29 @@ function getCharacterBattlePairs(characterID) {
     return Promise.resolve(characterBattlePairs[characterID])
   } else {
     return new Promise((fulfill, reject) => {
+      let start = Date.now()
       knex('ValuesBattleOutcomes').select().where({characterID: characterID})
-      .then(battleOutcomes => {
-        if(!battleOutcomes || battleOutcomes.length < 1) {
-          characterBattlePairs[characterID] = {}
-        }
-        for(let battleOutcome of battleOutcomes) {
-          updateBattlePairs(battleOutcome)
-        }
-        // console.log(JSON.stringify(battlePairs, null, 2))
-        fulfill(characterBattlePairs[characterID])
-      })
-      .catch(console.error)
+        .then(result => {
+          // TODO: this operation is very slow
+          let battleOutcomes = JSON.parse(JSON.stringify(result))
+          if(!battleOutcomes || battleOutcomes.length < 1 || !characterBattlePairs[characterID]) {
+            characterBattlePairs[characterID] = {}
+          }
+          for(let battleOutcome of battleOutcomes) {
+            updateBattlePairs(battleOutcome)
+          }
+          fulfill(characterBattlePairs[characterID])
+        })
+        .catch(console.error)
     })
   }
 }
 
 function updateBattlePairs(battleOutcome) {
-  if(!characterBattlePairs.hasOwnProperty(battleOutcome.characterID)) {
+  if(!characterBattlePairs[battleOutcome.characterID]) {
     characterBattlePairs[battleOutcome.characterID] = {}
   }
+  return
   let battlePairs = characterBattlePairs[battleOutcome.characterID]
   if(!battlePairs.hasOwnProperty(battleOutcome.winner)) {
     battlePairs[battleOutcome.winner] = {}

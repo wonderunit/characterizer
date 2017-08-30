@@ -37,11 +37,6 @@ module.exports = class BattleView extends EventEmitter {
 
   setupBattle() {
     this.choiceContainer.innerHTML = ""
-    // TODO: we should wait for ready further up the chain
-    if(!this.battlePairer.isReady) {
-      setTimeout(()=> {this.setupBattle()}, 100)
-      return
-    }
     let battleData = this.battlePairer.getBattle()
 
     this.choiceDataOne = battleData[0]
