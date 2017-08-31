@@ -61,5 +61,4 @@ typings/
 .vscode
 
 # Database file.
-characterizer.sqlite
 

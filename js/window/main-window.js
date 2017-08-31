@@ -242,7 +242,6 @@ function updateBattlePairs(battleOutcome) {
   if(!characterBattlePairs[battleOutcome.characterID]) {
     characterBattlePairs[battleOutcome.characterID] = {}
   }
-  return
   let battlePairs = characterBattlePairs[battleOutcome.characterID]
   if(!battlePairs.hasOwnProperty(battleOutcome.winner)) {
     battlePairs[battleOutcome.winner] = {}

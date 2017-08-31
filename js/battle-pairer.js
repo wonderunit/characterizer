@@ -40,13 +40,13 @@ module.exports = class BattlePairer {
     }
   }
 
-  getBattle() {
+  getBattle(rechooseCount=0) {
     // Make sure enough data selection mode.
     let result = this.getFillDataBattle()
     if(result && result.length > 1) {
       if(this.isDuplicate(result)) {
         console.log(`Found duplicate!`)
-        result = this.getBattle()
+        result = this.getBattle(++rechoiceNumber)
       }
       console.log(`getFillDataBattle`)
     } else {
@@ -60,19 +60,16 @@ module.exports = class BattlePairer {
       } else if (roll < .8) {
         console.log(`getTopRankBattle`)
         result = this.getTopRankBattle()
-      }
-      if(!result) {
+      } else {
         console.log(`getRandomBattle`)
         result = this.getRandomBattle()
-      } else {
-        // We're letting the random roll for getRandomBattle fall through
-        // the duplicate check in case we reach a point where all matches have been done.
-        // TODO: check for the case where all matches have played out, and message it.
-        if(this.isDuplicate(result)) {
-          console.log(`Found duplicate!`)
-          result = this.getBattle()
-        }
       }
+    }
+    // TODO: check for the case where all matches have played out, and message it.
+    // For now, let's just let it try to re-choose
+    if(this.isDuplicate(result) && rechooseCount < 4) {
+      console.log(`Found duplicate!`)
+      result = this.getBattle(++rechooseCount)
     }
     
     let randomizedResult = []
@@ -90,9 +87,10 @@ module.exports = class BattlePairer {
     if(!battlePair || battlePair.length < 2) {
       throw new Error("checkDuplicate expects an array of length >= 2")
     }
+    var self = this
     var checkForPair = (contender1, contender2) => {
-      if(this.previousBattlePairs.hasOwnProperty(contender1.id)) {
-        let contender1Pairs = this.previousBattlePairs[contender1.id]
+      if(self.previousBattlePairs.hasOwnProperty(contender1.id)) {
+        let contender1Pairs = self.previousBattlePairs[contender1.id]
         if(contender1Pairs.hasOwnProperty(contender2.id) && contender1Pairs[contender2.id] > 0) {
           return true
         }
