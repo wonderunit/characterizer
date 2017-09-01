@@ -1,7 +1,7 @@
 const {remote} = require('electron')
 const knex = remote.getGlobal('knex')
 const MIN_BATTTLE_COUNT = 2
-const TOP_PERCENT_CUTOFF = .4
+const TOP_PERCENT_CUTOFF = .1
 const TOP_RANK_CUTOFF = 20
 
 module.exports = class BattlePairer {
@@ -17,6 +17,25 @@ module.exports = class BattlePairer {
 
     if(!properties.battlePairs) throw new Error("Missing battlePairs")
     this.previousBattlePairs = properties.battlePairs
+
+    this.battleModes = [
+      {
+        "function": this.getTopPercentileBattle.bind(this),
+        "weight": 40
+      },
+      {
+        "function": this.getTopPercentileAndRandomBattle.bind(this),
+        "weight": 10
+      },
+      {
+        "function": this.getTopRankBattle.bind(this),
+        "weight": 40
+      },
+      {
+        "function": this.getRandomBattle.bind(this),
+        "weight": 10
+      }
+    ]
 
     // TODO: we should wait for ready further up the chain
     this.isReady = false
@@ -50,20 +69,8 @@ module.exports = class BattlePairer {
       }
       console.log(`getFillDataBattle`)
     } else {
-      let roll = Math.random()
-      if(roll < .6) {
-        console.log(`getTopPercentileBattle`)
-        result = this.getTopPercentileBattle()
-      } else if(roll < .7) {
-        console.log(`getTopPercentileAndRandomBattle`)
-        result = this.getTopPercentileAndRandomBattle()
-      } else if (roll < .8) {
-        console.log(`getTopRankBattle`)
-        result = this.getTopRankBattle()
-      } else {
-        console.log(`getRandomBattle`)
-        result = this.getRandomBattle()
-      }
+      let battleMode = this.chooseRandomBattleMode()
+      result = battleMode()
     }
     // TODO: check for the case where all matches have played out, and message it.
     // For now, let's just let it try to re-choose
@@ -174,6 +181,7 @@ module.exports = class BattlePairer {
   }
 
   getRandomBattle() {
+    console.log(`getRandomBattle`)
     let indexOne = Math.floor(Math.random() * this.choices.length)
     let indexTwo
     do {
@@ -184,6 +192,7 @@ module.exports = class BattlePairer {
   }
 
   getTopRankBattle() {
+    console.log(`getTopRankBattle`)
     if(this.values.length < TOP_RANK_CUTOFF) {
       return
     }
@@ -202,6 +211,7 @@ module.exports = class BattlePairer {
   }
   
   getTopPercentileBattle() {
+    console.log(`getTopPercentileBattle`)
     let topIndex = this.values.length * TOP_PERCENT_CUTOFF
     if(topIndex < 2) {
       return null
@@ -216,6 +226,7 @@ module.exports = class BattlePairer {
   }
   
   getTopPercentileAndRandomBattle() {
+    console.log(`getTopPercentileAndRandomBattle`)
     let topIndex = this.values.length * TOP_PERCENT_CUTOFF
     if(topIndex < 2) {
       return null
@@ -228,5 +239,25 @@ module.exports = class BattlePairer {
 
 
     return [this.valuesMap[this.values[indexOne].valueID], this.valuesMap[this.values[indexTwo].valueID]]
+  }
+
+  chooseRandomBattleMode() {
+    let totalWeight = 0
+    for (let battleMode of this.battleModes) {
+      totalWeight += battleMode.weight
+    }
+    let randomNum = this.rand(0, totalWeight)
+    let weightSum = 0
+    for (let battleMode of this.battleModes) {
+      weightSum += battleMode.weight
+      weightSum = +weightSum.toFixed(2)
+      if (randomNum <= weightSum) {
+        return battleMode.function
+      }
+    }
+  }
+
+  rand (min, max) {
+    return Math.random() * (max - min) + min
   }
 }
