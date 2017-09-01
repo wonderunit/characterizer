@@ -15,19 +15,23 @@ const {initDB} = require('./js/database-init.js')
 let win
 
 function createWindow () {
-  win = new BrowserWindow({width: 800, height: 600})
-  win.loadURL(url.format({
-    pathname: path.join(__dirname, 'main-window.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-
-  win.on('closed', () => {
-    win = null
-  })
-
+  
   // Setup the database.
   initDB(knex)
+    .then(()=>{
+      win = new BrowserWindow({width: 800, height: 600})
+      win.loadURL(url.format({
+        pathname: path.join(__dirname, 'main-window.html'),
+        protocol: 'file:',
+        slashes: true
+      }))
+    
+      win.on('closed', () => {
+        win = null
+      })
+
+    })
+    .catch(console.error)
 }
 
 app.on('ready', createWindow)

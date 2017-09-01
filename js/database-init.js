@@ -46,37 +46,47 @@ function initDB(knex) {
     table.timestamps(false, true)
   })
 
-  Promise.all([
-    characterQuery,
-    valuesQuery,
-    collectionsQuery,
-    characterValuesQuery,
-    valuesCollectionsQuery,
-    valuesBattleOutcomesQuery,
-  ])
-    .then(results => {
-      console.log("db initialized")
-      seedDB(knex)
-    })
-    .catch(console.error)
+  return new Promise((fulfill, reject) =>{
+    Promise.all([
+      characterQuery,
+      valuesQuery,
+      collectionsQuery,
+      characterValuesQuery,
+      valuesCollectionsQuery,
+      valuesBattleOutcomesQuery,
+    ])
+      .then(results => {
+        console.log("db initialized")
+        seedDB(knex)
+          .then(()=>{
+            fulfill()
+          })
+      })
+      .catch(reject)
+  })
 }
 
 function seedDB(knex) {
-  var lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./data/values.txt')
-  });
-  
-  lineReader.on('line', (line)=>{
-    knex('Values').where({name: line}).select('id')
-      .then(result => {
-        if(!result || result.length === 0) {
-          knex('Values').insert({name: line, uuid: generateUUID()})
-            .then(value => {
-              // console.log(`Added Value: ${JSON.stringify(value)}`)
-            })
-        }
-      })
+  let values = fs.readFileSync('./data/values.txt').toString().split("\n");
+  let writes = values.map(value => {
+    return new Promise((fulfill, reject)=>{
+      knex('Values').where({name: value}).select('id')
+        .then(result => {
+          // check for existing value
+          if(!result || result.length === 0) {
+            knex('Values').insert({name: value, uuid: generateUUID()})
+              .then(value => {
+                console.log(`Added Value: ${JSON.stringify(value)}`)
+                fulfill()
+              })
+          } else {
+            fulfill()
+          }
+        })
+        .catch(reject)
     })
+  })
+  return Promise.all(writes)
 }
 
 function generateUUID() {
