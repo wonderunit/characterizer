@@ -1,13 +1,7 @@
 const {remote} = require('electron')
-const CharacterView = require('./character-view.js')
-const BattleView = require('./battle-view.js')
-const ValuesViewAverage = require('./values-view-average.js')
-const ValuesViewDots = require('./values-view-dots.js')
-const ValuesViewNone = require('./values-view-none.js')
-const ValuesViewTime = require('./values-view-time.js')
-const ValuesViewBattleCounts = require('./values-view-battle-counts.js')
+const CharacterTrainerView = require('./character-trainer-view.js')
+
 const BattlePairer = require('../battle-pairer.js')
-const BattleTimeKeeper = require('../battle-timekeeper.js')
 
 var valuesLib
 var characters
@@ -16,12 +10,9 @@ var characterValues = {} // key: character ID, value: array of their values with
 var battlePairers = {} // cache battle pairers
 var characterBattlePairs = {}
 var currentCharacterID
-var valuesViewType = "average"
 var knex = remote.getGlobal('knex')
-var valuesContainer = document.getElementById("values-container")
 var container = document.getElementById("container")
-var curValuesView
-var curBattleTimeKeeper
+var curViewType = "characterTrainer"
 
 // Cache the system values
 knex.select().table('Values')
@@ -35,23 +26,35 @@ knex.select().table('Values')
     remote.valuesMap = valuesMap
   })
 
-document.querySelector("#values-view-selector").addEventListener('change', (event)=>{
-  valuesViewType = event.target.value
-  onSelectCharacter(currentCharacterID)
-})
+function getContentView() {
+  switch(curViewType) {
+    case "characterTrainer":
+    default:
+      return CharacterTrainerView
+  }
+}
 
-var characterView = new CharacterView({"characters": getCharacters()})
-var existingCharacterView = document.getElementById("characters-container")
-container.replaceChild(characterView.getView(), existingCharacterView)
-characterView.on('select-character', data => onSelectCharacter(data.characterID))
-characterView.on('add-character', data => {
+const viewProperties = {
+  "getBattlePairer": getBattlePairer,
+  "getCharacterValues": getCharacterValues,
+  "getCharacters": getCharacters,
+  "valuesMap": valuesMap
+}
+
+var ContentView = getContentView()
+var currentContentView = new ContentView(viewProperties)
+document.getElementById("content-container").innerHTML = ``
+document.getElementById("content-container").appendChild(currentContentView.getView())
+currentContentView.on('battle-update', battleOutcome => {
+  handleBattleUpdate(battleOutcome)
+})
+currentContentView.on('add-character', data => {
   let record = data
   knex('Characters').returning('id').insert(record)
     .then((result) => {
       let newID = result && result[0]
       record.id = newID
       characters.push(record)
-      characterView.updateView()
       
       let newCharacterValueInserts = valuesLib.map((value)=>{
         knex('CharacterValues').insert({characterID: newID, valueID: value.id, score: 0.0, wins: 0, losses: 0, battleCount: 0})
@@ -59,53 +62,14 @@ characterView.on('add-character', data => {
           .catch(console.error)
       })
       Promise.all(newCharacterValueInserts)
-        .then(()=>{ onSelectCharacter(newID) })
+        .then(()=>{ currentContentView.onSelectCharacter(newID) })
         .catch(console.error)
     })
     .catch(console.error)
 })
 
-function onSelectCharacter(characterID) {
-  let start = Date.now()
-  curBattleTimeKeeper = new BattleTimeKeeper()
-  currentCharacterID = characterID
-  let character
-  for(let aCharacter of characters) { 
-    if(aCharacter.id === currentCharacterID) {
-      character = aCharacter
-      break
-    }
-  }
-
-  getBattlePairer(characterID).then(battlePairer =>{
-    getCharacterValues(currentCharacterID).then(characterValues =>{
-      let battleView = new BattleView({ character: character, battlePairer: battlePairer})
-      let existing = document.getElementById("battle-container")
-      container.replaceChild(battleView.getView(), existing)
-      
-      document.getElementById("values-header").innerHTML = `${character.name}'s Values`
-      document.getElementById("values-view").innerHTML = ''
-      
-      let ValuesView = getValuesView()
-      curValuesView = new ValuesView({ valuesMap: valuesMap, values: characterValues, battlePairer: battlePairer, battleTimeKeeper: curBattleTimeKeeper })
-      let existingValuesView = document.getElementById("values-view")
-      valuesContainer.replaceChild(curValuesView.getView(), existingValuesView)
-      
-      battleView.on('battle-update', battleOutcome => {
-        handleBattleUpdate(battleOutcome)
-      })
-
-      battleView.on('battle-start', battleData => {
-        curBattleTimeKeeper.onBattleStart()
-      })
-      
-      battleView.on('battle-skip', () => {
-      })
-
-      let end = Date.now()
-      console.log(`Character select: ${end - start}`)
-    })
-  })
+function updateView() {
+  currentContentView.updateView()
 }
 
 function handleBattleUpdate(battleOutcome) {
@@ -139,8 +103,6 @@ function handleBattleUpdate(battleOutcome) {
 
   updateBattlePairs(battleOutcome)
   battlePairers[battleOutcome.characterID].onBattleOutcome(battleOutcome)
-  curValuesView.onBattleOutcome(battleOutcome)
-  curBattleTimeKeeper.onBattleOutcome(battleOutcome)
 
   tailPromises.push(knex('ValuesBattleOutcomes').insert(battleOutcome))
   setImmediate(()=>{
@@ -148,22 +110,6 @@ function handleBattleUpdate(battleOutcome) {
       .then(()=> {})
       .catch(console.error)
   })
-}
-
-function getValuesView() {
-  switch(valuesViewType) {
-    case "none":
-      return ValuesViewNone
-    case "dots":
-      return ValuesViewDots
-    case "battleCounts":
-      return ValuesViewBattleCounts
-    case "time":
-      return ValuesViewTime
-    case "average":
-    default:
-      return ValuesViewAverage
-  }
 }
 
 function getCharacterValues(characterID) {
@@ -226,7 +172,6 @@ function getBattlePairer(characterID) {
       })
     })
   }
-  
 
   return battlePairers[characterID]
 }
