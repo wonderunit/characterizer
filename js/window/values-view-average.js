@@ -8,7 +8,6 @@ module.exports = class ValuesViewAverage extends EventEmitter {
 
     this.root = document.createElement('div')
     this.root.setAttribute("id", "values-view")
-    this.values = []
 
     this.values = properties.values
     this.updateView()
