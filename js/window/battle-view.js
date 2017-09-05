@@ -27,6 +27,12 @@ module.exports = class BattleView extends EventEmitter {
     this.choiceContainer = document.createElement("div")
     this.choiceContainer.setAttribute("class", "battle-view-choice-container")
     this.root.appendChild(this.choiceContainer)
+    
+    this.skipButton = document.createElement("div")
+    this.skipButton.setAttribute("class", "battle-view-skip")
+    this.skipButton.addEventListener('click', this.onSkipClick.bind(this))
+    this.skipButton.innerHTML = `Skip`
+    this.root.appendChild(this.skipButton)
 
     this.setupBattle()
   }
@@ -46,6 +52,8 @@ module.exports = class BattleView extends EventEmitter {
     this.choiceDataTwo = battleData[1]
     this.choiceTwo = this.getChoiceButtonView(this.choiceDataTwo)
     this.choiceContainer.appendChild(this.choiceTwo)
+
+    this.emit('battle-start', battleData)
   }
 
   onChoiceClick(event) {
@@ -85,6 +93,11 @@ module.exports = class BattleView extends EventEmitter {
     if(event.key == "2") {
       this.handleChoice(this.choiceDataTwo.id)
     }
+  }
+
+  onSkipClick(event) {
+    this.emit('battle-skip')
+    this.setupBattle()
   }
 
 }

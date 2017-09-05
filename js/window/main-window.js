@@ -4,8 +4,10 @@ const BattleView = require('./battle-view.js')
 const ValuesViewAverage = require('./values-view-average.js')
 const ValuesViewDots = require('./values-view-dots.js')
 const ValuesViewNone = require('./values-view-none.js')
+const ValuesViewTime = require('./values-view-time.js')
 const ValuesViewBattleCounts = require('./values-view-battle-counts.js')
 const BattlePairer = require('../battle-pairer.js')
+const BattleTimeKeeper = require('../battle-timekeeper.js')
 
 var valuesLib
 var characters
@@ -19,6 +21,7 @@ var knex = remote.getGlobal('knex')
 var valuesContainer = document.getElementById("values-container")
 var container = document.getElementById("container")
 var curValuesView
+var curBattleTimeKeeper
 
 // Cache the system values
 knex.select().table('Values')
@@ -64,6 +67,7 @@ characterView.on('add-character', data => {
 
 function onSelectCharacter(characterID) {
   let start = Date.now()
+  curBattleTimeKeeper = new BattleTimeKeeper()
   currentCharacterID = characterID
   let character
   for(let aCharacter of characters) { 
@@ -83,12 +87,19 @@ function onSelectCharacter(characterID) {
       document.getElementById("values-view").innerHTML = ''
       
       let ValuesView = getValuesView()
-      curValuesView = new ValuesView({ valuesMap: valuesMap, values: characterValues, battlePairer: battlePairer })
+      curValuesView = new ValuesView({ valuesMap: valuesMap, values: characterValues, battlePairer: battlePairer, battleTimeKeeper: curBattleTimeKeeper })
       let existingValuesView = document.getElementById("values-view")
       valuesContainer.replaceChild(curValuesView.getView(), existingValuesView)
       
       battleView.on('battle-update', battleOutcome => {
         handleBattleUpdate(battleOutcome)
+      })
+
+      battleView.on('battle-start', battleData => {
+        curBattleTimeKeeper.onBattleStart()
+      })
+      
+      battleView.on('battle-skip', () => {
       })
 
       let end = Date.now()
@@ -129,6 +140,7 @@ function handleBattleUpdate(battleOutcome) {
   updateBattlePairs(battleOutcome)
   battlePairers[battleOutcome.characterID].onBattleOutcome(battleOutcome)
   curValuesView.onBattleOutcome(battleOutcome)
+  curBattleTimeKeeper.onBattleOutcome(battleOutcome)
 
   tailPromises.push(knex('ValuesBattleOutcomes').insert(battleOutcome))
   setImmediate(()=>{
@@ -146,6 +158,8 @@ function getValuesView() {
       return ValuesViewDots
     case "battleCounts":
       return ValuesViewBattleCounts
+    case "time":
+      return ValuesViewTime
     case "average":
     default:
       return ValuesViewAverage
