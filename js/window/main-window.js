@@ -46,13 +46,15 @@ const viewProperties = {
   "valuesMap": valuesMap
 }
 
-var mainViewSelector = new MainViewSelector()
+var mainViewSelector = new MainViewSelector({type: curViewType})
 document.getElementById("navigation").appendChild(mainViewSelector.getView())
 mainViewSelector.on('select-view', viewType => {
   console.log(viewType)
   curViewType = viewType
   onSelectView()
 })
+
+onSelectView()
 
 function onSelectView() {
   var ContentView = getContentView()

@@ -16,15 +16,23 @@ module.exports = class MainViewSelector extends EventEmitter {
     super()
     this.root = document.createElement("div")
     this.root.setAttribute("id", "main-view-selector")
-    
+
+    if(properties && properties.type) {
+      this.selectedViewType = properties.type
+    }
+
+    this.updateView()
+  }
+
+  setSelectedViewType(type) {
+    this.selectedViewType = type
     this.updateView()
   }
 
   onOptionClick(event) {
     let type = event.target.dataset.type
     this.emit('select-view', type)
-    this.selectedViewType = type
-    this.updateView()
+    this.setSelectedViewType(type)
   }
 
   getView() {
