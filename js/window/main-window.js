@@ -15,6 +15,7 @@ var currentCharacterID
 var knex = remote.getGlobal('knex')
 var container = document.getElementById("container")
 var curViewType = "characterTrainer"
+var currentContentView
 
 // Cache the system values
 knex.select().table('Values')
@@ -55,7 +56,7 @@ mainViewSelector.on('select-view', viewType => {
 
 function onSelectView() {
   var ContentView = getContentView()
-  var currentContentView = new ContentView(viewProperties)
+  currentContentView = new ContentView(viewProperties)
   document.getElementById("content-container").innerHTML = ``
   document.getElementById("content-container").appendChild(currentContentView.getView())
   currentContentView.on('battle-update', battleOutcome => {
