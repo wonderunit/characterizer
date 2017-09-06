@@ -1,5 +1,4 @@
-const EventEmitter = require('events').EventEmitter
-const {remote} = require('electron')
+const MainBaseView = require('./main-base-view.js')
 const CharacterView = require('./character-view.js')
 const BattleView = require('./battle-view.js')
 const ValuesViewAverage = require('./values-view-average.js')
@@ -9,15 +8,10 @@ const ValuesViewTime = require('./values-view-time.js')
 const ValuesViewBattleCounts = require('./values-view-battle-counts.js')
 const BattleTimeKeeper = require('../battle-timekeeper.js')
 
-module.exports = class CharacterTrainerView extends EventEmitter {
+module.exports = class CharacterTrainerView extends MainBaseView {
   constructor(properties) {
-    super()
-    this.getCharacterValues = properties.getCharacterValues
-    this.getBattlePairer = properties.getBattlePairer
-    this.getCharacters = properties.getCharacters
-    this.valuesMap = properties.valuesMap
+    super(properties)
     this.valuesViewType = "average"
-
     
     this.root = document.createElement("div")
     this.root.setAttribute("id", "character-trainer-container")

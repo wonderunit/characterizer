@@ -1,5 +1,7 @@
 const {remote} = require('electron')
 const CharacterTrainerView = require('./character-trainer-view.js')
+const CharacterComparisonView = require('./character-comparison-view.js')
+const MainViewSelector = require('./main-view-selector.js')
 
 const BattlePairer = require('../battle-pairer.js')
 
@@ -28,6 +30,8 @@ knex.select().table('Values')
 
 function getContentView() {
   switch(curViewType) {
+    case "characterComparison":
+     return CharacterComparisonView
     case "characterTrainer":
     default:
       return CharacterTrainerView
@@ -41,15 +45,32 @@ const viewProperties = {
   "valuesMap": valuesMap
 }
 
-var ContentView = getContentView()
-var currentContentView = new ContentView(viewProperties)
-document.getElementById("content-container").innerHTML = ``
-document.getElementById("content-container").appendChild(currentContentView.getView())
-currentContentView.on('battle-update', battleOutcome => {
-  handleBattleUpdate(battleOutcome)
+var mainViewSelector = new MainViewSelector()
+document.getElementById("navigation").appendChild(mainViewSelector.getView())
+mainViewSelector.on('select-view', viewType => {
+  console.log(viewType)
+  curViewType = viewType
+  onSelectView()
 })
-currentContentView.on('add-character', data => {
-  let record = data
+
+function onSelectView() {
+  var ContentView = getContentView()
+  var currentContentView = new ContentView(viewProperties)
+  document.getElementById("content-container").innerHTML = ``
+  document.getElementById("content-container").appendChild(currentContentView.getView())
+  currentContentView.on('battle-update', battleOutcome => {
+    handleBattleUpdate(battleOutcome)
+  })
+  currentContentView.on('add-character', data => {
+    addCharacter(data)
+  })
+}
+
+function updateView() {
+  currentContentView.updateView()
+}
+
+function addCharacter(record) {
   knex('Characters').returning('id').insert(record)
     .then((result) => {
       let newID = result && result[0]
@@ -62,14 +83,14 @@ currentContentView.on('add-character', data => {
           .catch(console.error)
       })
       Promise.all(newCharacterValueInserts)
-        .then(()=>{ currentContentView.onSelectCharacter(newID) })
+        .then(()=>{ 
+          if(currentContentView && typeof currentContentView.onSelectCharacter === "function") {
+            currentContentView.onSelectCharacter(newID) 
+          }
+        })
         .catch(console.error)
     })
     .catch(console.error)
-})
-
-function updateView() {
-  currentContentView.updateView()
 }
 
 function handleBattleUpdate(battleOutcome) {

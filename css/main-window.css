@@ -139,3 +139,41 @@ body {
   margin-top: 45px;
   text-align: center;
 }
+
+#container {
+  display: flex;
+  flex-direction: row;
+}
+
+#main-view-selector {
+  padding: 10px;
+}
+
+.main-view-selector-option {
+  border-width: 1px;
+  border-color: black;
+  margin: 10px;
+  background-color: #CCC;
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+}
+
+.main-view-selector-selected {
+  background-color: #AAA;
+}
+
+#character-comparison-view {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+#navigation {
+  max-width: 20%;
+}
+
+#content-container {
+  max-width: 80%;
+}
