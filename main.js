@@ -1,10 +1,15 @@
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const url = require('url')
+const userDataPath = app.getPath('userData')
+const dbFileName = path.join( userDataPath, "characterizer.sqlite")
+const valuesSeedDataPath = path.join(__dirname, "data", "values.txt")
+console.log(dbFileName)
+
 var knex = require('knex')({
   client: 'sqlite3',
   connection: {
-    filename: "./characterizer.sqlite"
+    filename: dbFileName
   }
 })
 global.knex = knex
@@ -17,7 +22,7 @@ let win
 function createWindow () {
   
   // Setup the database.
-  initDB(knex)
+  initDB(knex, {valuesSeedDataPath})
     .then(()=>{
       win = new BrowserWindow({width: 800, height: 600})
       win.loadURL(url.format({

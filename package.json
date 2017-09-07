@@ -4,14 +4,23 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "postinstall": "install-app-deps"
+    "postinstall-dev": "install-app-deps",
+    "postinstall": "electron-builder install-app-deps",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "devDependencies": {
     "electron": "1.7.2",
-    "electron-builder": "^19.22.1"
+    "electron-builder": "^19.27.7"
   },
   "dependencies": {
     "knex": "^0.13.0",
     "sqlite3": "^3.1.9"
+  },
+  "build": {
+    "appId": "com.wonderunit.characterizer",
+    "mac": {
+      "icon": "build/icon.icns"
+    }
   }
 }

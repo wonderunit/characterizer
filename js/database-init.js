@@ -1,6 +1,7 @@
 const fs = require('fs')
+const path = require('path')
 
-function initDB(knex) {
+function initDB(knex, properties) {
   let characterQuery = knex.schema.createTableIfNotExists('Characters', function(table) {
     table.string('name')
     table.increments('id').primary()
@@ -57,7 +58,7 @@ function initDB(knex) {
     ])
       .then(results => {
         console.log("db initialized")
-        seedDB(knex)
+        seedDB(knex, properties)
           .then(()=>{
             fulfill()
           })
@@ -66,8 +67,8 @@ function initDB(knex) {
   })
 }
 
-function seedDB(knex) {
-  let values = fs.readFileSync('./data/values.txt').toString().split("\n");
+function seedDB(knex, properties) {
+  let values = fs.readFileSync(properties.valuesSeedDataPath).toString().split("\n");
   let writes = values.map(value => {
     return new Promise((fulfill, reject)=>{
       knex('Values').where({name: value}).select('id')
@@ -76,7 +77,7 @@ function seedDB(knex) {
           if(!result || result.length === 0) {
             knex('Values').insert({name: value, uuid: generateUUID()})
               .then(value => {
-                console.log(`Added Value: ${JSON.stringify(value)}`)
+                // console.log(`Added Value: ${JSON.stringify(value)}`)
                 fulfill()
               })
           } else {

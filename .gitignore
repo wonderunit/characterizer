@@ -63,3 +63,7 @@ typings/
 # Database file.
 characterizer.sqlite
 
+# built app
+dist/
+
+yarn.lock
