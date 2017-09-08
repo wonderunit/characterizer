@@ -6,8 +6,12 @@ body {
   border-width: 1px;
   border-color: black;
   margin: 10px;
-  background-color: #AAA;
+  background-color: #DDD;
   padding: 20px;
   border-radius: 8px;
   cursor: pointer;
+}
+
+.button:hover {
+  background-color: #BBB;
 }

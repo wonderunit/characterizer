@@ -3,11 +3,11 @@ const path = require('path')
 const url = require('url')
 const fs = require('fs')
 const userDataPath = app.getPath('userData')
-const dbFileName = path.join( userDataPath, "characterizer.sqlite")
 const valuesSeedDataPath = path.join(__dirname, "data", "values.txt")
 const {initDB} = require('./js/database-init.js')
 const prefModule = require('./js/prefs.js')
 const utils = require('./js/utils.js')
+const trash = require('trash')
 
 let win
 
@@ -78,23 +78,29 @@ function createNewProject() {
     if(!filename) {
       return
     }
+    function openWindow() {
+      fs.mkdirSync(filename)      
+      let projectName = path.basename(filename)
+      let dbFileName = path.join(filename, projectName + '.sqlite')
+      showMainWindow(dbFileName)
+      addToRecentDocs(filename)
+    }
+
     if(fs.existsSync(filename)) {
       if(fs.lstatSync(filename).isDirectory()) {
         console.log('\ttrash existing folder', filename)
-        tasks = tasks.then(() => trash(filename)).catch(err => reject(err))
+        trash(filename)
+          .then(openWindow)
+          .catch(console.error)
       } else {
         dialog.showMessageBox(null, {
           message: "Could not overwrite file " + path.basename(filename) + ". Only folders can be overwritten." 
         })
         return
       }
+    } else {
+      openWindow()
     }
-
-    fs.mkdirSync(filename)      
-    let projectName = path.basename(filename)
-    let dbFileName = path.join(filename, projectName + '.sqlite')
-    showMainWindow(dbFileName)
-    addToRecentDocs(filename)
   })
 }
 
@@ -102,7 +108,7 @@ function showMainWindow(dbFile) {
   var knex = require('knex')({
     client: 'sqlite3',
     connection: {
-      filename: dbFileName
+      filename: dbFile
     }
   })
   global.knex = knex
@@ -134,7 +140,7 @@ let addToRecentDocs = (filename, metadata={}) => {
   if (!prefs.recentDocuments) {
     recentDocuments = []
   } else {
-    recentDocuments = prefs.recentDocuments
+    recentDocuments = JSON.parse(JSON.stringify(prefs.recentDocuments))
   }
 
   let currPos = 0

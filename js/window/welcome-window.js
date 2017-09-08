@@ -7,10 +7,14 @@ let container = document.getElementById("container")
 let recentContainer = document.createElement("div")
 recentContainer.setAttribute("id", "recent-container")
 let recentHeader = document.createElement("h2")
+recentHeader.classList.add("recent-documents-header")
 recentHeader.innerHTML = `Recent Documents`
 recentContainer.appendChild(recentHeader)
 container.appendChild(recentContainer)
 
+let recentDocumentsList = document.createElement("div")
+recentDocumentsList.classList.add("recent-documents-list")
+recentContainer.appendChild(recentDocumentsList)
 let recentDocuments = prefsModule.getPrefs('welcome')['recentDocuments']
 if (recentDocuments && recentDocuments.length>0) {
   for (var recentDocument of recentDocuments) {
@@ -23,7 +27,7 @@ if (recentDocuments && recentDocuments.length>0) {
       event.target.setAttribute("disabled", true)
       ipcRenderer.send("open-project", event.target.dataset.filename)
     })
-    recentContainer.appendChild(recent)
+    recentDocumentsList.appendChild(recent)
   }
 }
 
@@ -43,7 +47,7 @@ let openButton = document.createElement("div")
 openButton.innerText = "Open Project"
 openButton.classList.add("button")
 openButton.addEventListener('click', event => {
-  ipcRenderer.send('browse  -for-project')
+  ipcRenderer.send('browse-for-project')
 })
 buttonContainer.appendChild(openButton)
 

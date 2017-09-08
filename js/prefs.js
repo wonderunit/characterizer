@@ -56,16 +56,16 @@ const set = (keyPath, value, sync) => {
   let keyProp = keys.shift()
   let prevValue = obj[keyProp]
   if (Object.equals(prevValue,value)) {
-    //console.log("IM THE SAME!!!!")
+    console.log("IM THE SAME!!!!")
   } else {
     obj[keyProp] = value
-    //console.log("SAVING TO DISK")
-    //console.log(prefs)
+    console.log("SAVING TO DISK")
+    console.log(prefs)
     if (sync) {
       fs.writeFileSync(prefFile, JSON.stringify(prefs, null, 2))
     } else {
       fs.writeFile(prefFile, JSON.stringify(prefs, null, 2), (err) => {
-        // console.log("SAVED ASYNC")
+        console.log("SAVED ASYNC")
       })
     }
   }

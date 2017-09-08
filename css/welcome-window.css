@@ -7,7 +7,17 @@
   flex-direction: row;
   width: 100%;
   align-items: center;
-  justify-content: space-around;
+}
+
+.recent-documents-header {
+  font-size: 15px;
+  opacity: 0.5;
+  color: #3A3A3A;
+  margin: 15px 40px 5px 40px;
+}
+
+.recent-documents-list {
+  display: flex;
 }
 
 .recent-document {

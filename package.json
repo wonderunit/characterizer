@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "knex": "^0.13.0",
-    "sqlite3": "^3.1.9"
+    "sqlite3": "^3.1.9",
+    "trash": "^4.0.1"
   },
   "build": {
     "appId": "com.wonderunit.characterizer",
