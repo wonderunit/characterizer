@@ -42,7 +42,7 @@ module.exports = class ValuesViewDots extends EventEmitter {
 
   addCharacterView(characterName, characterID) {
     let characterView = document.createElement('div')
-    characterView.setAttribute("class", "character-list-name")
+    characterView.classList.add("button")
     characterView.setAttribute("data-id", characterID || 1)
     characterView.innerHTML = characterName
     characterView.addEventListener('click', this.onSelectCharacter.bind(this));

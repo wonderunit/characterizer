@@ -17,16 +17,6 @@ body {
   cursor: pointer;
 }
 
-.character-list-name {
-  border-width: 1px;
-  border-color: black;
-  margin: 10px;
-  background-color: #AAA;
-  padding: 20px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
 #battle-container {
   outline: none;
 }

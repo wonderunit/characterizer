@@ -4,20 +4,16 @@
     <meta charset="UTF-8">
     <title>Characterizer</title>
     <link rel="stylesheet" href="./css/common.css">
-    <link rel="stylesheet" href="./css/main-window.css">
+    <link rel="stylesheet" href="./css/welcome-window.css">
   </head>
   <body>
     <div id="container">
-      <div id="navigation">
-      </div>
-      <div id="content-container">
-      </div>
     </div>
 
     <script>
         if (typeof require !== 'undefined') {
           window.onerror = (message, source, lineno, colno, error) => require('electron').ipcRenderer.send('errorInWindow', message, source, lineno, colno, error)
-          require('./js/window/main-window.js')
+          require('./js/window/welcome-window.js')
         }
       </script>
   </body>
