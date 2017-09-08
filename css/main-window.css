@@ -1,7 +1,3 @@
-body {
-  font-family: sans-serif;
-}
-
 #character-list {
   display: flex;
   flex-wrap: wrap;

@@ -9,3 +9,7 @@
   align-items: center;
   justify-content: space-around;
 }
+
+.recent-document {
+  max-width: 300px;
+}
