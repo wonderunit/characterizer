@@ -83,7 +83,7 @@ function createNewProject() {
       let projectName = path.basename(filename)
       let dbFileName = path.join(filename, projectName + '.sqlite')
       showMainWindow(dbFileName)
-      addToRecentDocs(filename)
+      addToRecentDocs(dbFileName)
     }
 
     if(fs.existsSync(filename)) {
