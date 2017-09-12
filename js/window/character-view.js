@@ -1,8 +1,8 @@
-const EventEmitter = require('events').EventEmitter
+const MainBaseView = require('./main-base-view.js')
 
-module.exports = class ValuesViewDots extends EventEmitter {
+module.exports = class CharacterView extends MainBaseView {
   constructor(properties) {
-    super()
+    super(properties)
 
     this.valuesMap = properties.valuesMap
 
@@ -34,7 +34,7 @@ module.exports = class ValuesViewDots extends EventEmitter {
     this.root.appendChild(this.characterList)
     
     this.characters = []
-    properties.characters.then(inValues => {
+    this.getCharacters().then(inValues => {
       this.characters = inValues
       this.updateView()
     })

@@ -13,7 +13,7 @@ module.exports = class CharacterComparisonView extends MainBaseView {
     this.root = document.createElement("div")
     this.root.setAttribute("id", "character-comparison-container")
     
-    this.characterView = new CharacterView({"characters": this.getCharacters()})
+    this.characterView = new CharacterView(properties)
     this.root.appendChild(this.characterView.getView())
     this.getCharacters()
       .then(inCharacters => {

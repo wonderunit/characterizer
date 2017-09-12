@@ -16,7 +16,7 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     this.root = document.createElement("div")
     this.root.setAttribute("id", "character-trainer-container")
     
-    this.characterView = new CharacterView({"characters": this.getCharacters()})
+    this.characterView = new CharacterView(properties)
     this.root.appendChild(this.characterView.getView())
     
     this.characterView.on('select-character', data => {

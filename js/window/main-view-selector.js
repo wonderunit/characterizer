@@ -2,8 +2,16 @@ const EventEmitter = require('events').EventEmitter
 
 const viewTypes = [
   {
+    "type": "manageCharacters",
+    "label": "Manage Characters"
+  },
+  {
     "type": "characterTrainer",
-    "label": "Character Trainer"
+    "label": "Value Training"
+  },
+  {
+    "type": "valueList",
+    "label": "Value List"
   },
   {
     "type": "characterComparison",

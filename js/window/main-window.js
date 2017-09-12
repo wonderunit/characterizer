@@ -1,9 +1,18 @@
 const {remote} = require('electron')
+const CharacterView = require('./character-view.js')
 const CharacterTrainerView = require('./character-trainer-view.js')
 const CharacterComparisonView = require('./character-comparison-view.js')
 const MainViewSelector = require('./main-view-selector.js')
 
 const BattlePairer = require('../battle-pairer.js')
+
+
+const viewProperties = {
+  "getBattlePairer": getBattlePairer,
+  "getCharacterValues": getCharacterValues,
+  "getCharacters": getCharacters,
+  "valuesMap": valuesMap
+}
 
 var valuesLib
 var characters
@@ -29,23 +38,6 @@ knex.select().table('Values')
     remote.valuesMap = valuesMap
   })
 
-function getContentView() {
-  switch(curViewType) {
-    case "characterComparison":
-     return CharacterComparisonView
-    case "characterTrainer":
-    default:
-      return CharacterTrainerView
-  }
-}
-
-const viewProperties = {
-  "getBattlePairer": getBattlePairer,
-  "getCharacterValues": getCharacterValues,
-  "getCharacters": getCharacters,
-  "valuesMap": valuesMap
-}
-
 var mainViewSelector = new MainViewSelector({type: curViewType})
 document.getElementById("navigation").appendChild(mainViewSelector.getView())
 mainViewSelector.on('select-view', viewType => {
@@ -56,6 +48,9 @@ mainViewSelector.on('select-view', viewType => {
 
 onSelectView()
 
+/**
+ * Switch 
+ */
 function onSelectView() {
   var ContentView = getContentView()
   currentContentView = new ContentView(viewProperties)
@@ -67,6 +62,21 @@ function onSelectView() {
   currentContentView.on('add-character', data => {
     addCharacter(data)
   })
+}
+
+/**
+ * @return The class for the currently selected main view.
+ */
+function getContentView() {
+  switch(curViewType) {
+    case "manageCharacters":
+      return CharacterView
+    case "characterComparison":
+     return CharacterComparisonView
+    case "characterTrainer":
+    default:
+      return CharacterTrainerView
+  }
 }
 
 function updateView() {
@@ -96,6 +106,10 @@ function addCharacter(record) {
     .catch(console.error)
 }
 
+/**
+ * 
+ * @param {Object} battleOutcome 
+ */
 function handleBattleUpdate(battleOutcome) {
   let curCharacterValues = characterValues[battleOutcome.characterID]
   let isWinnerUpdated, isLoserUpdated
@@ -136,6 +150,10 @@ function handleBattleUpdate(battleOutcome) {
   })
 }
 
+/**
+ * 
+ * @param {String} characterID 
+ */
 function getCharacterValues(characterID) {
   characterID = characterID.toString()
   if(characterValues[characterID]) {
@@ -159,6 +177,9 @@ function getCharacterValues(characterID) {
   }
 }
 
+/**
+ * @return array of characters
+ */
 function getCharacters() {
   if(characters) {
     return Promise.resolve(characters)
@@ -175,6 +196,10 @@ function getCharacters() {
   }
 }
 
+/**
+ * 
+ * @param {Number} characterID 
+ */
 function getBattlePairer(characterID) {
   if(battlePairers[characterID]) {
     return Promise.resolve(battlePairers[characterID])
@@ -200,6 +225,11 @@ function getBattlePairer(characterID) {
   return battlePairers[characterID]
 }
 
+
+/**
+ * 
+ * @param {Number} characterID 
+ */
 function getCharacterBattlePairs(characterID) {
   if(characterBattlePairs[characterID]) {
     return Promise.resolve(characterBattlePairs[characterID])
@@ -221,6 +251,10 @@ function getCharacterBattlePairs(characterID) {
   }
 }
 
+/**
+ * 
+ * @param {Object} battleOutcome 
+ */
 function updateBattlePairs(battleOutcome) {
   if(!characterBattlePairs[battleOutcome.characterID]) {
     characterBattlePairs[battleOutcome.characterID] = {}
