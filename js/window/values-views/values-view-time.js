@@ -1,8 +1,5 @@
-const EventEmitter = require('events').EventEmitter
-
-module.exports = class ValuesViewTime extends EventEmitter {
+module.exports = class ValuesViewTime {
   constructor(properties) {
-    super()
     this.battleTimeKeeper = properties.battleTimeKeeper
 
     this.root = document.createElement('div')

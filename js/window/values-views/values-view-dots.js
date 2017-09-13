@@ -1,15 +1,10 @@
-const EventEmitter = require('events').EventEmitter
-
-module.exports = class ValuesViewDots extends EventEmitter {
+module.exports = class ValuesViewDots {
   constructor(properties) {
-    super()
-
     this.valuesMap = properties.valuesMap
 
     this.root = document.createElement('div')
     this.root.setAttribute("id", "values-view")
     this.root.setAttribute("class", "values-view-linechart")
-    this.values = []
 
     this.values = properties.values
     this.updateView()

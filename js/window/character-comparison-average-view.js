@@ -1,5 +1,5 @@
 const EventEmitter = require('events').EventEmitter
-const ValuesViewAverage = require('./values-view-average.js')
+const ValuesViewAverage = require('./values-views/values-view-average.js')
 
 module.exports = class CharacterComparisonAverageView extends EventEmitter {
   constructor(properties) {

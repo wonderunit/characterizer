@@ -1,15 +1,10 @@
-const EventEmitter = require('events').EventEmitter
-
-module.exports = class ValuesViewAverage extends EventEmitter {
+module.exports = class ValuesViewAverage {
   constructor(properties) {
-    super()
-
-    this.valuesMap = properties.valuesMap
-
     this.root = document.createElement('div')
     this.root.setAttribute("id", "values-view")
 
     this.values = properties.values
+    this.valuesMap = properties.valuesMap
     this.updateView()
   }
 

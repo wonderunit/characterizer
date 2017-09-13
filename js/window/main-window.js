@@ -1,18 +1,30 @@
 const {remote} = require('electron')
 const CharacterView = require('./character-view.js')
 const CharacterTrainerView = require('./character-trainer-view.js')
+const ValueListView = require('./value-list-view.js')
 const CharacterComparisonView = require('./character-comparison-view.js')
 const MainViewSelector = require('./main-view-selector.js')
 
 const BattlePairer = require('../battle-pairer.js')
 
-
-const viewProperties = {
-  "getBattlePairer": getBattlePairer,
-  "getCharacterValues": getCharacterValues,
-  "getCharacters": getCharacters,
-  "valuesMap": valuesMap
-}
+const mainViews = [
+  {
+    "type": "manageCharacters",
+    "label": "Manage Characters"
+  },
+  {
+    "type": "characterTrainer",
+    "label": "Value Training"
+  },
+  {
+    "type": "valueList",
+    "label": "Value List"
+  },
+  {
+    "type": "characterComparison",
+    "label": "Character Comparison"
+  }
+]
 
 var valuesLib
 var characters
@@ -26,6 +38,13 @@ var container = document.getElementById("container")
 var curViewType = "characterTrainer"
 var currentContentView
 
+const viewProperties = {
+  "getBattlePairer": getBattlePairer,
+  "getCharacterValues": getCharacterValues,
+  "getCharacters": getCharacters,
+  "valuesMap": valuesMap
+}
+
 // Cache the system values
 knex.select().table('Values')
   .then(values => {
@@ -38,7 +57,7 @@ knex.select().table('Values')
     remote.valuesMap = valuesMap
   })
 
-var mainViewSelector = new MainViewSelector({type: curViewType})
+var mainViewSelector = new MainViewSelector({type: curViewType, mainViews: mainViews})
 document.getElementById("navigation").appendChild(mainViewSelector.getView())
 mainViewSelector.on('select-view', viewType => {
   console.log(viewType)
@@ -73,6 +92,8 @@ function getContentView() {
       return CharacterView
     case "characterComparison":
      return CharacterComparisonView
+    case "valueList":
+      return ValueListView
     case "characterTrainer":
     default:
       return CharacterTrainerView

@@ -1,15 +1,11 @@
-const EventEmitter = require('events').EventEmitter
-
-module.exports = class ValuesViewBattleCount extends EventEmitter {
+module.exports = class ValuesViewBattleCount {
   constructor(properties) {
-    super()
-
     this.valuesMap = properties.valuesMap
-
+    this.battlePairer = properties.battlePairer
+    
     this.root = document.createElement('div')
     this.root.setAttribute("id", "values-view")
     this.root.setAttribute("class", "values-view-battlecount")
-    this.battlePairer = properties.battlePairer
     this.updateView()
   }
 

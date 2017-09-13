@@ -1,27 +1,9 @@
 const EventEmitter = require('events').EventEmitter
 
-const viewTypes = [
-  {
-    "type": "manageCharacters",
-    "label": "Manage Characters"
-  },
-  {
-    "type": "characterTrainer",
-    "label": "Value Training"
-  },
-  {
-    "type": "valueList",
-    "label": "Value List"
-  },
-  {
-    "type": "characterComparison",
-    "label": "Character Comparison"
-  }
-]
-
 module.exports = class MainViewSelector extends EventEmitter {
   constructor(properties) {
     super()
+    this.viewTypes = properties.mainViews
     this.root = document.createElement("div")
     this.root.setAttribute("id", "main-view-selector")
 
@@ -49,7 +31,7 @@ module.exports = class MainViewSelector extends EventEmitter {
 
   updateView() {
     this.root.innerHTML = ``
-    for(let viewType of viewTypes) {
+    for(let viewType of this.viewTypes) {
       let option = document.createElement("div")
       option.setAttribute("data-type", viewType.type)
       option.classList.add("main-view-selector-option")
