@@ -163,3 +163,28 @@
 #content-container {
   max-width: 80%;
 }
+
+.countdown-progress-bar {
+  height: 20px;
+  background-color: #CCC;
+}
+
+#battle-view-timer-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+#value-list-footer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+#value-list-session {
+  display: flex;
+  justify-content: space-around;
+}

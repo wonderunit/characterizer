@@ -1,6 +1,7 @@
 const MainBaseView = require('./main-base-view.js')
 const BattleView = require('./battle-view.js')
 const BattleTimeKeeper = require('../battle-timekeeper.js')
+const { getFriendlyMS } = require('../utils.js')
 
 module.exports = class CharacterTrainerView extends MainBaseView {
   constructor(properties) {
@@ -20,56 +21,80 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     this.getCharacters()
       .then(inCharacters => {
         this.characters = inCharacters
-        this.updateView()
         if(this.characters && this.characters.length) {
           this.onSelectCharacter(this.characters[0].id)
         }
+        this.updateView()
       })
       .catch(console.error)
 
     this.battleView = document.createElement("div")
     this.battleView.setAttribute("id", "battle-container")
     this.root.appendChild(this.battleView)
+
+    this.footerView = document.createElement("div")
+    this.footerView.setAttribute("id", "value-list-footer")
+    this.footerView.classList.add("footer")
+    this.root.appendChild(this.footerView)
+
+    this.battleCountView = document.createElement("div")
+    this.battleCountView.setAttribute("id", "value-list-battle-count")
+    this.footerView.appendChild(this.battleCountView)
+    
+    this.sessionView = document.createElement("div")
+    this.sessionView.setAttribute("id", "value-list-session")
+    this.sessionCountView = document.createElement("div")
+    this.sessionView.appendChild(this.sessionCountView)
+    this.sessionTimeView = document.createElement("div")
+    this.sessionView.appendChild(this.sessionTimeView)
+    this.footerView.appendChild(this.sessionView)
   }
 
   onSelectCharacter(characterID) {
+    if(this.timerID) {
+      clearInterval(this.timerID)
+      this.timerID = null
+    }
+
     let start = Date.now()
     this.curBattleTimeKeeper = new BattleTimeKeeper()
     this.currentCharacterID = characterID
-    let character
     for(let aCharacter of this.characters) { 
       if(aCharacter.id === this.currentCharacterID) {
-        character = aCharacter
+        this.character = aCharacter
         break
       }
     }
 
     this.getBattlePairer(characterID).then(battlePairer =>{
       this.getCharacterValues(characterID).then(characterValues =>{
-        let battleView = new BattleView({ character: character, battlePairer: battlePairer})
+        let battleView = new BattleView({ character: this.character, battlePairer: battlePairer})
         let existing = document.getElementById("battle-container")
         this.root.replaceChild(battleView.getView(), existing)
         
         battleView.on('battle-update', battleOutcome => {
-          this.handleBattleUpdate(battleOutcome)
+          this.emit('battle-update', battleOutcome)
         })
   
         battleView.on('battle-start', battleData => {
+          this.emit('battle-start', battleData)
           this.curBattleTimeKeeper.onBattleStart()
         })
         
         battleView.on('battle-skip', () => {
+          this.emit('battle-skip')
         })
   
         let end = Date.now()
+        this.updateView()
         console.log(`Character select: ${end - start}`)
       })
     })
   }
 
   handleBattleUpdate(battleOutcome) {
-    this.emit('battle-update', battleOutcome)
     this.curBattleTimeKeeper.onBattleOutcome(battleOutcome)
+    this.updateView()
   }
 
   getView() {
@@ -82,7 +107,32 @@ module.exports = class CharacterTrainerView extends MainBaseView {
       let option = document.createElement("option")
       option.setAttribute("value", character.id)
       option.innerHTML = character.name
+      if(this.character.id === character.id) {
+        option.setAttribute("selected", true)
+      }
       this.characterSelector.appendChild(option)
     }
+    
+    this.battleCountView.innerHTML = `${this.character.name} // ${this.getCharacterBattleCount(this.character.id)} Questions`
+
+    let session = this.getCharacterSession(this.character.id)
+    this.sessionCountView.innerHTML = `${session.battleCount} Questions `
+    if(session.battleStart) {
+      if(!this.timerID) {
+        this.characterSessionStartTime = session.battleStart
+        this.startSessionTimerView()
+      }
+    } else {
+      this.sessionTimeView.innerHTML = ``
+    }
+  }
+
+  startSessionTimerView() {
+    this.timerID = setInterval(() => {
+      let now = Date.now()
+      let elapsed = getFriendlyMS(now - this.characterSessionStartTime)
+
+      this.sessionTimeView.innerHTML = ` // ${elapsed.h ? elapsed.h+':' : ''}${elapsed.m}:${elapsed.s}`
+    }, 500)
   }
 }

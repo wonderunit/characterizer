@@ -37,9 +37,6 @@ module.exports = class BattlePairer {
       }
     ]
 
-    // TODO: we should wait for ready further up the chain
-    this.isReady = false
-
     this.valuesMap = properties.valuesMap
 
     this.valuesPercentRank = []

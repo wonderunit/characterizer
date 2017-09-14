@@ -32,3 +32,28 @@ Object.equals = function( x, y ) {
   }
   return true;
 }
+
+function convertMS(ms) {
+  var d, h, m, s
+  s = Math.floor(ms / 1000)
+  m = Math.floor(s / 60)
+  s = s % 60
+  h = Math.floor(m / 60)
+  m = m % 60
+  d = Math.floor(h / 24)
+  h = h % 24
+  return { d: d, h: h, m: m, s: s }
+}
+
+function getFriendlyMS(ms) {
+  let converted = convertMS(ms)
+  converted.h = converted.h < 10 ? '0'+converted.h : converted.h
+  converted.m = converted.m < 10 ? '0'+converted.m : converted.m
+  converted.s = converted.s < 10 ? '0'+converted.s : converted.s
+  return converted
+}
+
+module.exports = {
+  convertMS,
+  getFriendlyMS
+}

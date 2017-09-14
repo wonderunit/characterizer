@@ -3,6 +3,8 @@ const {remote} = require('electron')
 
 let knex = remote.getGlobal('knex')
 
+const EXPIRE_TIME = 10*1000
+
 module.exports = class BattleView extends EventEmitter {
   constructor(properties) {
     super()
@@ -25,14 +27,21 @@ module.exports = class BattleView extends EventEmitter {
     this.root.appendChild(this.header)
 
     this.choiceContainer = document.createElement("div")
-    this.choiceContainer.setAttribute("class", "battle-view-choice-container")
+    this.choiceContainer.classList.add("battle-view-choice-container")
     this.root.appendChild(this.choiceContainer)
+
+    this.timerContainer = document.createElement("div")
+    this.timerContainer.setAttribute("id", "battle-view-timer-container")
+    this.root.appendChild(this.timerContainer)
+    this.countdownTimer = document.createElement("div")
+    this.countdownTimer.classList.add("countdown-progress-bar")
+    this.timerContainer.appendChild(this.countdownTimer)
     
     this.skipButton = document.createElement("div")
     this.skipButton.setAttribute("class", "battle-view-skip")
-    this.skipButton.addEventListener('click', this.onSkipClick.bind(this))
+    this.skipButton.addEventListener('click', this.onSkip.bind(this))
     this.skipButton.innerHTML = `Skip`
-    this.root.appendChild(this.skipButton)
+    // this.root.appendChild(this.skipButton)
 
     this.setupBattle()
   }
@@ -42,6 +51,12 @@ module.exports = class BattleView extends EventEmitter {
   }
 
   setupBattle() {
+    if(this.timerID) {
+      clearInterval(this.timerID)
+      this.timerID = null
+    }
+    this.battleStartTime = Date.now()
+
     this.choiceContainer.innerHTML = ""
     let battleData = this.battlePairer.getBattle()
 
@@ -52,6 +67,8 @@ module.exports = class BattleView extends EventEmitter {
     this.choiceDataTwo = battleData[1]
     this.choiceTwo = this.getChoiceButtonView(this.choiceDataTwo)
     this.choiceContainer.appendChild(this.choiceTwo)
+
+    this.startBattleTimerView()
 
     this.emit('battle-start', battleData)
   }
@@ -95,9 +112,20 @@ module.exports = class BattleView extends EventEmitter {
     }
   }
 
-  onSkipClick(event) {
+  onSkip(event) {
     this.emit('battle-skip')
     this.setupBattle()
+  }
+
+  startBattleTimerView() {
+    this.timerID = setInterval(() => {
+      let now = Date.now()
+      let elapsed = now - this.battleStartTime
+      if(elapsed > (EXPIRE_TIME)) {
+        this.onSkip()
+      }
+      this.countdownTimer.setAttribute("style", `width: ${((EXPIRE_TIME-elapsed)/EXPIRE_TIME)*100}%`)
+    }, 1000/60)
   }
 
 }

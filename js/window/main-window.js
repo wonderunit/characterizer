@@ -31,7 +31,12 @@ var characters
 var valuesMap = {} // key: valueID, value: value data
 var characterValues = {} // key: character ID, value: array of their values with scores
 var battlePairers = {} // cache battle pairers
-var characterBattlePairs = {}
+
+// objects of the form { winnerID: { loserID: count }, ... },
+// keyed by character id
+var characterBattlePairs = {} 
+var characterBattleCounts = {}
+var characterSessions = {}
 var currentCharacterID
 var knex = remote.getGlobal('knex')
 var container = document.getElementById("container")
@@ -42,6 +47,8 @@ const viewProperties = {
   "getBattlePairer": getBattlePairer,
   "getCharacterValues": getCharacterValues,
   "getCharacters": getCharacters,
+  "getCharacterBattleCount": getCharacterBattleCount,
+  "getCharacterSession": getCharacterSession,
   "valuesMap": valuesMap
 }
 
@@ -163,6 +170,16 @@ function handleBattleUpdate(battleOutcome) {
   updateBattlePairs(battleOutcome)
   battlePairers[battleOutcome.characterID].onBattleOutcome(battleOutcome)
 
+  let characterSession = getCharacterSession(battleOutcome.characterID)
+  characterSessions[battleOutcome.characterID].battleCount += 1
+  if(!characterSessions[battleOutcome.characterID].battleStart) {
+    characterSessions[battleOutcome.characterID].battleStart = Date.now()
+  }
+
+  if(currentContentView && typeof currentContentView.handleBattleUpdate === 'function') {
+    currentContentView.handleBattleUpdate(battleOutcome)
+  }
+
   tailPromises.push(knex('ValuesBattleOutcomes').insert(battleOutcome))
   setImmediate(()=>{
     Promise.all(tailPromises)
@@ -250,6 +267,7 @@ function getBattlePairer(characterID) {
 /**
  * 
  * @param {Number} characterID 
+ * @return {Object} has the form objects of the form { winnerID: { loserID: count }, ... }
  */
 function getCharacterBattlePairs(characterID) {
   if(characterBattlePairs[characterID]) {
@@ -274,9 +292,10 @@ function getCharacterBattlePairs(characterID) {
 
 /**
  * 
- * @param {Object} battleOutcome 
+ * @param {Object} battleOutcome
  */
 function updateBattlePairs(battleOutcome) {
+  // update the pair count.
   if(!characterBattlePairs[battleOutcome.characterID]) {
     characterBattlePairs[battleOutcome.characterID] = {}
   }
@@ -289,4 +308,27 @@ function updateBattlePairs(battleOutcome) {
     winnerPairs[battleOutcome.loser] = 0
   }
   winnerPairs[battleOutcome.loser] += 1
+
+  // update the total count.
+  if(!characterBattleCounts[battleOutcome.characterID]) {
+    characterBattleCounts[battleOutcome.characterID] = 0
+  }
+  characterBattleCounts[battleOutcome.characterID] += 1
+}
+
+function getCharacterBattleCount(characterID) {
+  if(!characterBattleCounts[characterID]) {
+    characterBattleCounts[characterID] = 0
+  }
+  return characterBattleCounts[characterID]
+}
+
+function getCharacterSession(characterID) {
+  if(!characterSessions[characterID]) {
+    characterSessions[characterID] = {
+      battleCount: 0,
+      battleStart: 0
+    }
+  }
+  return characterSessions[characterID]
 }
