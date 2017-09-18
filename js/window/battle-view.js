@@ -42,6 +42,12 @@ module.exports = class BattleView extends EventEmitter {
     this.skipButton.addEventListener('click', this.onSkip.bind(this))
     this.skipButton.innerHTML = `Skip`
     this.root.appendChild(this.skipButton)
+    
+    this.favoriteButton = document.createElement("div")
+    this.favoriteButton.setAttribute("class", "battle-view-skip")
+    this.favoriteButton.addEventListener('click', this.onFavorite.bind(this))
+    this.favoriteButton.innerHTML = `Favorite`
+    this.root.appendChild(this.favoriteButton)
 
     this.setupBattle()
   }
@@ -55,6 +61,7 @@ module.exports = class BattleView extends EventEmitter {
       clearInterval(this.timerID)
       this.timerID = null
     }
+    this.favoriteButton.innerHTML = `Favorite`
     this.battleStartTime = Date.now()
 
     this.choiceContainer.innerHTML = ""
@@ -115,6 +122,15 @@ module.exports = class BattleView extends EventEmitter {
   onSkip(event) {
     this.emit('battle-skip')
     this.setupBattle()
+  }
+
+  onFavorite(event) {
+    this.emit('battle-favorite', {value1: this.choiceDataOne, value2: this.choiceDataTwo, character: this.character})
+    if(this.favoriteButton.innerHTML === `✔ Favorite`) {
+      this.favoriteButton.innerHTML = `Favorite`
+    } else {
+      this.favoriteButton.innerHTML = `✔ Favorite`
+    }
   }
 
   startBattleTimerView() {

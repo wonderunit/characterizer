@@ -58,7 +58,7 @@ function initDB(knex, properties) {
     }
   })
   
-  let valuesCollectionsQuery = knex.schema.hasTable('CharacterValues').then((exists) => {
+  let valuesCollectionsQuery = knex.schema.hasTable('ValuesCollections').then((exists) => {
     if(!exists) {
       return knex.schema.createTable('ValuesCollections',function(table){
         table.increments('id').primary()
@@ -71,13 +71,27 @@ function initDB(knex, properties) {
     }
   })
   
-  let valuesBattleOutcomesQuery = knex.schema.hasTable('CharacterValues').then((exists) => {
+  let valuesBattleOutcomesQuery = knex.schema.hasTable('ValuesBattleOutcomes').then((exists) => {
     if(!exists) {
       return knex.schema.createTable('ValuesBattleOutcomes',function(table){
         table.increments('id').primary()
         table.integer('characterID').references('id').inTable('Characters')
         table.integer('loser').references('id').inTable('Values')
         table.integer('winner').references('id').inTable('Values')
+        table.timestamps(false, true)
+      })
+    } else {
+      return Promise.resolve(true)
+    }
+  })
+  
+  let valuesBattleFavorites = knex.schema.hasTable('ValuesBattleFavorites').then((exists) => {
+    if(!exists) {
+      return knex.schema.createTable('ValuesBattleFavorites',function(table){
+        table.increments('id').primary()
+        table.integer('characterID').references('id').inTable('Characters')
+        table.integer('value1ID').references('id').inTable('Values')
+        table.integer('value2ID').references('id').inTable('Values')
         table.timestamps(false, true)
       })
     } else {

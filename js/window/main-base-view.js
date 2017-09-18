@@ -8,6 +8,7 @@ module.exports = class MainBaseView extends EventEmitter {
     this.getCharacters = properties.getCharacters
     this.getCharacterBattleCount = properties.getCharacterBattleCount
     this.getCharacterSession = properties.getCharacterSession
+    this.getCharacterBattleFavorites = properties.getCharacterBattleFavorites
     this.valuesMap = properties.valuesMap
     
     this.root = document.createElement("div")

@@ -84,6 +84,10 @@ module.exports = class CharacterTrainerView extends MainBaseView {
         battleView.on('battle-skip', () => {
           this.emit('battle-skip')
         })
+        
+        battleView.on('battle-favorite', (data) => {
+          this.emit('battle-favorite', data)
+        })
   
         let end = Date.now()
         this.updateView()
