@@ -125,6 +125,7 @@ function addCharacter(record) {
       })
       Promise.all(newCharacterValueInserts)
         .then(()=>{ 
+          updateView()
           if(currentContentView && typeof currentContentView.onSelectCharacter === "function") {
             currentContentView.onSelectCharacter(newID) 
           }

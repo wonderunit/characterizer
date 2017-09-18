@@ -45,7 +45,7 @@ module.exports = class CharacterView extends MainBaseView {
     characterView.classList.add("button")
     characterView.setAttribute("data-id", characterID || 1)
     characterView.innerHTML = characterName
-    characterView.addEventListener('click', this.onSelectCharacter.bind(this));
+    characterView.addEventListener('click', this.onCharacterClick.bind(this));
     this.characterList.appendChild(characterView)
   }
 
@@ -59,7 +59,7 @@ module.exports = class CharacterView extends MainBaseView {
     }
   }
   
-  onSelectCharacter(event) {
+  onCharacterClick(event) {
     this.emit('select-character', {characterID: parseInt(event.target.dataset.id)})
   }
 

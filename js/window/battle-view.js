@@ -41,7 +41,7 @@ module.exports = class BattleView extends EventEmitter {
     this.skipButton.setAttribute("class", "battle-view-skip")
     this.skipButton.addEventListener('click', this.onSkip.bind(this))
     this.skipButton.innerHTML = `Skip`
-    // this.root.appendChild(this.skipButton)
+    this.root.appendChild(this.skipButton)
 
     this.setupBattle()
   }
