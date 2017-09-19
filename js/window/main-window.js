@@ -3,7 +3,7 @@ const CharacterView = require('./character-view.js')
 const CharacterTrainerView = require('./character-trainer-view.js')
 const ValueListView = require('./value-list-view.js')
 const CharacterComparisonView = require('./character-comparison-view.js')
-const DeveloperView = require('./developer-view.js')
+const BattleFavoritesView = require('./battle-favorites-view.js')
 const MainViewSelector = require('./main-view-selector.js')
 
 const BattlePairer = require('../battle-pairer.js')
@@ -25,10 +25,10 @@ const mainViews = [
     "type": "characterComparison",
     "label": "Character Comparison"
   },
-  // {
-  //   "type": "developer",
-  //   "label": "Developer View"
-  // }
+  {
+    "type": "battleFavorites",
+    "label": "Battle Favorites"
+  }
 ]
 
 var valuesLib
@@ -42,6 +42,7 @@ var battlePairers = {} // cache battle pairers
 var characterBattlePairs = {} 
 var characterBattleCounts = {}
 var characterSessions = {}
+var characterBattleFavorites = {}
 var currentCharacterID
 var knex = remote.getGlobal('knex')
 var container = document.getElementById("container")
@@ -92,7 +93,7 @@ function onSelectView() {
     handleBattleUpdate(battleOutcome)
   })
   currentContentView.on('battle-favorite', battleData => {
-    toggleBattleFavorite(battleData)
+    updateCharacterBattleFavorites(battleData)
   })
   currentContentView.on('add-character', data => {
     addCharacter(data)
@@ -110,8 +111,8 @@ function getContentView() {
      return CharacterComparisonView
     case "valueList":
       return ValueListView
-    case "developer":
-      return DeveloperView
+    case "battleFavorites":
+      return BattleFavoritesView
     case "characterTrainer":
     default:
       return CharacterTrainerView
@@ -144,29 +145,6 @@ function addCharacter(record) {
         .catch(console.error)
     })
     .catch(console.error)
-}
-
-function toggleBattleFavorite(battleData) {
-  
-  let values = [battleData.character.id, battleData.value1.id, battleData.value2.id]
-  knex.raw(`select * from ValuesBattleFavorites where "characterID" = ? and "value1ID" = ? and "value2ID" = ?`, values)
-    .then(result => {
-      let record = {
-        value1ID: battleData.value1.id,
-        value2ID: battleData.value2.id,
-        characterID: battleData.character.id
-      }
-      if(result && result.length) {
-        knex.raw(`delete from ValuesBattleFavorites where "characterID" = ? and "value1ID" = ? and "value2ID" = ?`, values)
-          .then(()=>{})
-          .catch(console.error)
-        let index = 0
-      } else {
-        knex('ValuesBattleFavorites').insert(record)
-          .then(()=>{})
-          .catch(console.error)
-      }
-    })
 }
 
 /**
@@ -327,25 +305,6 @@ function getCharacterBattlePairs(characterID) {
 
 /**
  * 
- * @param {Number} characterID 
- * @return {Array} objects have the form { characterID: id, value1ID: id, value2ID: id}
- */
-function getCharacterBattleFavorites(characterID) {
-  return new Promise((fulfill, reject) => {
-    let start = Date.now()
-    knex.raw(`select * from ValuesBattleFavorites where "characterID" = ?`, [characterID])
-      .then((result) => {
-        if(!result) {
-          return fulfill([])
-        }
-        fulfill(result)
-      })
-      .catch(console.error)
-  })
-}
-
-/**
- * 
  * @param {Object} battleOutcome
  */
 function updateBattlePairs(battleOutcome) {
@@ -370,6 +329,92 @@ function updateBattlePairs(battleOutcome) {
   characterBattleCounts[battleOutcome.characterID] += 1
 }
 
+/**
+ * 
+ * @param {Number} characterID 
+ * @return {Object} objects have the form { value1ID: { value2ID: true, value2ID: true }, value1ID: {value2ID: true } }
+ */
+function getCharacterBattleFavorites(characterID) {
+  if(characterBattleFavorites[characterID]) {
+    return Promise.resolve(characterBattleFavorites[characterID])
+  } else {
+    return new Promise((fulfill, reject) => {
+      let start = Date.now()
+      knex.raw(`select * from ValuesBattleFavorites where "characterID" = ?`, [characterID])
+        .then((result) => {
+          if(!result) {
+            result = []
+          }
+          for(let record of result) {
+            if(!characterBattleFavorites[record.characterID]) {
+              characterBattleFavorites[characterID] = {}
+            }
+            let favorites = characterBattleFavorites[characterID]
+            if(!favorites[record.value1ID]) {
+              favorites[record.value1ID] = {}
+            }
+            favorites[record.value1ID][record.value2ID] = true
+          }
+          fulfill(characterBattleFavorites[characterID])
+        })
+        .catch(console.error)
+    })
+  }
+}
+
+/**
+ * Updates both the local cache and database of character battle favorites.
+ * Note that this is a toggle. If the pair exists, it is deleted.
+ * 
+ * @param {Object} battleData has the shape { character: character, value1: value, value2: value }
+ */
+function updateCharacterBattleFavorites(battleData) {
+  let record = {
+    value1ID: battleData.value1.id,
+    value2ID: battleData.value2.id,
+    characterID: battleData.character.id
+  }
+  if(!characterBattleFavorites[record.characterID]) {
+    characterBattleFavorites[record.characterID] = {}
+  }
+
+  let battlePairs = characterBattleFavorites[record.characterID]
+  let value1Pairs
+  let value2Pairs
+  if(battlePairs.hasOwnProperty(record.value1ID)) {
+    value1Pairs = battlePairs[record.value1ID]
+  }
+  if(battlePairs.hasOwnProperty(record.value2ID)) {
+    value2Pairs = battlePairs[record.value2ID]
+  }
+
+  let replacements = [record.characterID, record.value1ID, record.value2ID]
+  if(value1Pairs && value1Pairs.hasOwnProperty(record.value2ID)) {
+    delete value1Pairs[record.value2ID]
+    knex.raw(`delete from ValuesBattleFavorites where "characterID" = ? and "value1ID" = ? and "value2ID" = ?`, replacements)
+      .then(()=>{})
+      .catch(console.error)
+  } else if(value2Pairs && value2Pairs.hasOwnProperty(record.value1ID)) {
+    delete value2Pairs[record.value1ID]
+    knex.raw(`delete from ValuesBattleFavorites where "characterID" = ? and "value1ID" = ? and "value2ID" = ?`, replacements)
+      .then(()=>{})
+      .catch(console.error)
+  } else {
+    if(!value1Pairs) {
+      battlePairs[record.value1ID] = {}
+    }
+    battlePairs[record.value1ID][record.value2ID] = true
+    knex('ValuesBattleFavorites').insert(record)
+      .then(()=>{})
+      .catch(console.error)
+  }
+}
+
+/**
+ * 
+ * @param {Number} characterID 
+ * @return {Number} Number of battles the character has been trained on.
+ */
 function getCharacterBattleCount(characterID) {
   if(!characterBattleCounts[characterID]) {
     characterBattleCounts[characterID] = 0
@@ -377,6 +422,11 @@ function getCharacterBattleCount(characterID) {
   return characterBattleCounts[characterID]
 }
 
+/**
+ * 
+ * @param {Number} characterID 
+ * @return {Object} Object of the shape { battleCount: count, battleStart: timestamp }
+ */
 function getCharacterSession(characterID) {
   if(!characterSessions[characterID]) {
     characterSessions[characterID] = {

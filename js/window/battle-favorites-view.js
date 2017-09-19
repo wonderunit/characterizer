@@ -1,6 +1,6 @@
 const MainBaseView = require('./main-base-view.js')
 
-module.exports = class ValueListView extends MainBaseView {
+module.exports = class BattleFavoritesView extends MainBaseView {
   constructor(properties) {
     super(properties)
     
@@ -62,12 +62,14 @@ module.exports = class ValueListView extends MainBaseView {
         return
       }
       this.valuesViewContainer.innerHTML = ``
-      for(let characterBattleFavorite of characterBattleFavorites) {
-        let value1 = this.valuesMap[characterBattleFavorite.value1ID]
-        let value2 = this.valuesMap[characterBattleFavorite.value2ID]
-        let view = document.createElement("div")
-        view.innerHTML = `${value1.name} vs ${value2.name}`
-        this.valuesViewContainer.appendChild(view)
+      for(var value1ID in characterBattleFavorites) {
+        let value1 = this.valuesMap[value1ID]
+        for(var value2ID in characterBattleFavorites[value1ID]) {
+          let value2 = this.valuesMap[value2ID]
+          let view = document.createElement("div")
+          view.innerHTML = `<b>${value1.name}</b> <i>vs</i> <b>${value2.name}</b>`
+          this.valuesViewContainer.appendChild(view)
+        }
       }
     })
   }
