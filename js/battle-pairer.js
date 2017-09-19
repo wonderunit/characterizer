@@ -17,6 +17,9 @@ module.exports = class BattlePairer {
 
     if(!properties.battlePairs) throw new Error("Missing battlePairs")
     this.previousBattlePairs = properties.battlePairs
+    
+    if(!properties.favorites) throw new Error("Missing favorites")
+    this.favorites = properties.favorites
 
     this.battleModes = [
       {
@@ -34,6 +37,14 @@ module.exports = class BattlePairer {
       {
         "function": this.getRandomBattle.bind(this),
         "weight": 10
+      },
+      {
+        "function": this.getFavoritesAndTopPercentileBattle.bind(this),
+        "weight": 40
+      },
+      {
+        "function": this.getFavoritesBattle.bind(this),
+        "weight": 40
       }
     ]
 
@@ -236,6 +247,43 @@ module.exports = class BattlePairer {
 
 
     return [this.valuesMap[this.values[indexOne].valueID], this.valuesMap[this.values[indexTwo].valueID]]
+  }
+
+  getFavoritesAndTopPercentileBattle() {
+    console.log(`getFavoritesAndTopPercentileBattle`)
+    let favoriteValues = this.favorites.values
+    if(favoriteValues.length < 1) {
+      return null
+    }
+    let favoritesIndex = Math.floor(Math.random() * favoriteValues.length)
+    let favoritesID = favoriteValues[favoritesIndex]
+    let topIndex = this.values.length * TOP_PERCENT_CUTOFF
+    if(topIndex < 2) {
+      return null
+    }
+    let topID
+    do {
+      let indexOne = Math.floor(Math.random()*topIndex)
+      topID = this.values[indexOne].valueID
+    } while(topID === favoritesID)
+    return [this.valuesMap[favoritesID], this.valuesMap[topID]]
+  }
+
+  getFavoritesBattle() {
+    console.log(`getFavoritesBattle`)
+
+    let favoriteValues = this.favorites.values
+    if(favoriteValues.length < 2) {
+      return null
+    }
+
+    let indexOne = Math.floor(Math.random() * favoriteValues.length)
+    let indexTwo
+    do {
+      indexTwo = Math.floor(Math.random() * favoriteValues.length)
+    } while(indexTwo === indexOne)
+
+    return [this.valuesMap[favoriteValues[indexOne]], this.valuesMap[favoriteValues[indexTwo]]]
   }
 
   chooseRandomBattleMode() {

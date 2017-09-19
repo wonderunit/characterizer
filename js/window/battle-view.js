@@ -56,6 +56,13 @@ module.exports = class BattleView extends EventEmitter {
     return this.root
   }
 
+  viewWillDisappear() {
+    if(this.timerID) {
+      clearInterval(this.timerID)
+      this.timerID = null
+    }
+  }
+
   setupBattle() {
     if(this.timerID) {
       clearInterval(this.timerID)

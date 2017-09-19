@@ -21,4 +21,8 @@ module.exports = class MainBaseView extends EventEmitter {
   updateView() {
 
   }
+
+  viewWillDisappear() {
+    
+  }
 }

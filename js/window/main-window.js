@@ -85,6 +85,9 @@ onSelectView()
  * Switch 
  */
 function onSelectView() {
+  if(currentContentView) {
+    currentContentView.viewWillDisappear()
+  }
   var ContentView = getContentView()
   currentContentView = new ContentView(viewProperties)
   document.getElementById("content-container").innerHTML = ``
@@ -258,16 +261,19 @@ function getBattlePairer(characterID) {
     return new Promise((fulfill, reject) =>{
       getCharacterValues(characterID).then(characterValues => {
         getCharacterBattlePairs(characterID).then(characterBattlePairs => {
-          let properties = {
-            choices: valuesLib, 
-            characterID: characterID, 
-            values:characterValues,
-            valuesMap: valuesMap,
-            battlePairs: characterBattlePairs
-          }
-          let battlePairer = new BattlePairer(properties)
-          battlePairers[characterID] = battlePairer
-          fulfill(battlePairers[characterID])
+          getCharacterValueFavorites(characterID).then(favorites =>{
+            let properties = {
+              choices: valuesLib, 
+              characterID: characterID, 
+              values:characterValues,
+              valuesMap: valuesMap,
+              favorites: favorites,
+              battlePairs: characterBattlePairs
+            }
+            let battlePairer = new BattlePairer(properties)
+            battlePairers[characterID] = battlePairer
+            fulfill(battlePairers[characterID])
+          })
         })
       })
     })

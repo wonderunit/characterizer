@@ -68,24 +68,24 @@ module.exports = class CharacterTrainerView extends MainBaseView {
 
     this.getBattlePairer(characterID).then(battlePairer =>{
       this.getCharacterValues(characterID).then(characterValues =>{
-        let battleView = new BattleView({ character: this.character, battlePairer: battlePairer})
+        this.battleView = new BattleView({ character: this.character, battlePairer: battlePairer})
         let existing = document.getElementById("battle-container")
-        this.root.replaceChild(battleView.getView(), existing)
+        this.root.replaceChild(this.battleView.getView(), existing)
         
-        battleView.on('battle-update', battleOutcome => {
+        this.battleView.on('battle-update', battleOutcome => {
           this.emit('battle-update', battleOutcome)
         })
   
-        battleView.on('battle-start', battleData => {
+        this.battleView.on('battle-start', battleData => {
           this.emit('battle-start', battleData)
           this.curBattleTimeKeeper.onBattleStart()
         })
         
-        battleView.on('battle-skip', () => {
+        this.battleView.on('battle-skip', () => {
           this.emit('battle-skip')
         })
         
-        battleView.on('battle-favorite', (data) => {
+        this.battleView.on('battle-favorite', (data) => {
           this.emit('battle-favorite', data)
         })
   
@@ -138,5 +138,9 @@ module.exports = class CharacterTrainerView extends MainBaseView {
 
       this.sessionTimeView.innerHTML = ` // ${elapsed.h ? elapsed.h+':' : ''}${elapsed.m}:${elapsed.s}`
     }, 500)
+  }
+
+  viewWillDisappear() {
+    this.battleView.viewWillDisappear()
   }
 }
