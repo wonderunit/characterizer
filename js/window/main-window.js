@@ -55,7 +55,7 @@ const viewProperties = {
   "getCharacters": getCharacters,
   "getCharacterBattleCount": getCharacterBattleCount,
   "getCharacterSession": getCharacterSession,
-  "getCharacterBattleFavorites": getCharacterBattleFavorites,
+  "getCharacterValueFavorites": getCharacterValueFavorites,
   "valuesMap": valuesMap
 }
 
@@ -334,7 +334,7 @@ function updateBattlePairs(battleOutcome) {
  * @param {Number} characterID 
  * @return {Object} objects have the form { value1ID: { value2ID: true, value2ID: true }, value1ID: {value2ID: true } }
  */
-function getCharacterBattleFavorites(characterID) {
+function getCharacterValueFavorites(characterID) {
   if(characterValueFavorites[characterID]) {
     return Promise.resolve(characterValueFavorites[characterID])
   } else {

@@ -57,7 +57,7 @@ module.exports = class BattleFavoritesView extends MainBaseView {
 
     this.valuesViewContainer.innerHTML = ``
 
-    this.getCharacterBattleFavorites(characterID).then(characterBattleFavorites => {
+    this.getCharacterValueFavorites(characterID).then(characterBattleFavorites => {
       if(!characterBattleFavorites) {
         return
       }
