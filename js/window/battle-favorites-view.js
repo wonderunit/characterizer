@@ -62,15 +62,36 @@ module.exports = class BattleFavoritesView extends MainBaseView {
         return
       }
       this.valuesViewContainer.innerHTML = ``
-      for(var value1ID in characterBattleFavorites) {
+
+      let values = characterBattleFavorites.values
+      let favoriteValuesHolder = document.createElement("div")
+      favoriteValuesHolder.setAttribute("id", "favorite-values-holder")
+      let valueNames = []
+      for(let valueID of values) {
+        let value = this.valuesMap[valueID]
+        valueNames.push(value.name)
+      }
+      valueNames = valueNames.sort()
+      for(let valueName of valueNames) {
+        let view = document.createElement("div")
+        view.innerHTML = `<b>${valueName}</b>`
+        favoriteValuesHolder.appendChild(view)
+      }
+      this.valuesViewContainer.appendChild(favoriteValuesHolder)
+
+      let pairs = characterBattleFavorites.pairs
+      let pairsHolder = document.createElement("div")
+      pairsHolder.setAttribute("id", "favorite-pairs-holder")
+      for(var value1ID in pairs) {
         let value1 = this.valuesMap[value1ID]
-        for(var value2ID in characterBattleFavorites[value1ID]) {
+        for(var value2ID in pairs[value1ID]) {
           let value2 = this.valuesMap[value2ID]
           let view = document.createElement("div")
           view.innerHTML = `<b>${value1.name}</b> <i>vs</i> <b>${value2.name}</b>`
-          this.valuesViewContainer.appendChild(view)
+          pairsHolder.appendChild(view)
         }
       }
+      this.valuesViewContainer.appendChild(pairsHolder)
     })
   }
 

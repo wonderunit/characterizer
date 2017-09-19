@@ -188,3 +188,11 @@
   display: flex;
   justify-content: space-around;
 }
+
+#favorite-pairs-holder {
+  margin: 20px;
+}
+
+#favorite-values-holder {
+  margin: 20px;
+}

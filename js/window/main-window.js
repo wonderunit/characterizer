@@ -42,7 +42,7 @@ var battlePairers = {} // cache battle pairers
 var characterBattlePairs = {} 
 var characterBattleCounts = {}
 var characterSessions = {}
-var characterBattleFavorites = {}
+var characterValueFavorites = {}
 var currentCharacterID
 var knex = remote.getGlobal('knex')
 var container = document.getElementById("container")
@@ -335,8 +335,8 @@ function updateBattlePairs(battleOutcome) {
  * @return {Object} objects have the form { value1ID: { value2ID: true, value2ID: true }, value1ID: {value2ID: true } }
  */
 function getCharacterBattleFavorites(characterID) {
-  if(characterBattleFavorites[characterID]) {
-    return Promise.resolve(characterBattleFavorites[characterID])
+  if(characterValueFavorites[characterID]) {
+    return Promise.resolve(characterValueFavorites[characterID])
   } else {
     return new Promise((fulfill, reject) => {
       let start = Date.now()
@@ -345,17 +345,31 @@ function getCharacterBattleFavorites(characterID) {
           if(!result) {
             result = []
           }
-          for(let record of result) {
-            if(!characterBattleFavorites[record.characterID]) {
-              characterBattleFavorites[characterID] = {}
+          if(!characterValueFavorites[characterID]) {
+            characterValueFavorites[characterID] = {
+              pairs: {},
+              values: []
             }
-            let favorites = characterBattleFavorites[characterID]
-            if(!favorites[record.value1ID]) {
-              favorites[record.value1ID] = {}
-            }
-            favorites[record.value1ID][record.value2ID] = true
           }
-          fulfill(characterBattleFavorites[characterID])
+          let characterFavorites = characterValueFavorites[characterID]
+
+          var favoritePairs = characterFavorites.pairs
+          var favoriteValues = characterFavorites.values 
+          for(let record of result) {
+            
+            if(!favoritePairs[record.value1ID]) {
+              favoritePairs[record.value1ID] = {}
+            }
+            favoritePairs[record.value1ID][record.value2ID] = true
+
+            if(favoriteValues.indexOf(record.value1ID) < 0) {
+              favoriteValues.push(record.value1ID)
+            }
+            if(favoriteValues.indexOf(record.value2ID) < 0) {
+              favoriteValues.push(record.value2ID)
+            }
+          }
+          fulfill(characterValueFavorites[characterID])
         })
         .catch(console.error)
     })
@@ -374,11 +388,15 @@ function updateCharacterBattleFavorites(battleData) {
     value2ID: battleData.value2.id,
     characterID: battleData.character.id
   }
-  if(!characterBattleFavorites[record.characterID]) {
-    characterBattleFavorites[record.characterID] = {}
+  if(!characterValueFavorites[record.characterID]) {
+    characterValueFavorites[record.characterID] = {
+      pairs: {},
+      values: []
+    }
   }
 
-  let battlePairs = characterBattleFavorites[record.characterID]
+  let battlePairs = characterValueFavorites[record.characterID].pairs
+  let favoriteValues = characterValueFavorites[record.characterID].values
   let value1Pairs
   let value2Pairs
   if(battlePairs.hasOwnProperty(record.value1ID)) {
@@ -388,22 +406,41 @@ function updateCharacterBattleFavorites(battleData) {
     value2Pairs = battlePairs[record.value2ID]
   }
 
+  function removeFromFavoriteValues(valueID) {
+    let index = favoriteValues.indexOf(valueID)
+    if(index >= 0) {
+      favoriteValues.splice(index, 1)
+    }
+  }
+
   let replacements = [record.characterID, record.value1ID, record.value2ID]
   if(value1Pairs && value1Pairs.hasOwnProperty(record.value2ID)) {
     delete value1Pairs[record.value2ID]
+    removeFromFavoriteValues(record.value1ID)
+    removeFromFavoriteValues(record.value2ID)
     knex.raw(`delete from ValuesBattleFavorites where "characterID" = ? and "value1ID" = ? and "value2ID" = ?`, replacements)
       .then(()=>{})
       .catch(console.error)
   } else if(value2Pairs && value2Pairs.hasOwnProperty(record.value1ID)) {
     delete value2Pairs[record.value1ID]
-    knex.raw(`delete from ValuesBattleFavorites where "characterID" = ? and "value1ID" = ? and "value2ID" = ?`, replacements)
+    knex.raw(`delete from ValuesBattleFavorites where "characterID" = ? and "value2ID" = ? and "value1ID" = ?`, replacements)
       .then(()=>{})
       .catch(console.error)
+    removeFromFavoriteValues(record.value1ID)
+    removeFromFavoriteValues(record.value2ID)
   } else {
     if(!value1Pairs) {
       battlePairs[record.value1ID] = {}
     }
     battlePairs[record.value1ID][record.value2ID] = true
+
+    if(favoriteValues.indexOf(record.value1ID) < 0) {
+      favoriteValues.push(record.value1ID)
+    }
+    if(favoriteValues.indexOf(record.value2ID) < 0) {
+      favoriteValues.push(record.value2ID)
+    }
+
     knex('ValuesBattleFavorites').insert(record)
       .then(()=>{})
       .catch(console.error)
