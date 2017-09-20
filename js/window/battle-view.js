@@ -149,6 +149,7 @@ module.exports = class BattleView extends EventEmitter {
     } else {
       this.favoriteButton.innerHTML = `✔ Favorite`
     }
+    this.setupBattle()
   }
 
   clearBattleTimer() {
