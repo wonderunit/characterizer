@@ -3,6 +3,7 @@ const CharacterView = require('./character-view.js')
 const CharacterTrainerView = require('./character-trainer-view.js')
 const ValueListView = require('./value-list-view.js')
 const CharacterComparisonView = require('./character-comparison-view.js')
+const CharacterComparisonConflictView = require('./character-comparison-conflict-view.js')
 const BattleFavoritesView = require('./battle-favorites-view.js')
 const MainViewSelector = require('./main-view-selector.js')
 
@@ -28,6 +29,10 @@ const mainViews = [
   {
     "type": "battleFavorites",
     "label": "Battle Favorites"
+  },
+  {
+    "type": "characterConflictComparison",
+    "label": "Conflict Comparison"
   }
 ]
 
@@ -122,6 +127,8 @@ function getContentView() {
       return BattleFavoritesView
     case "characterTrainer":
       return CharacterTrainerView
+    case "characterConflictComparison":
+      return CharacterComparisonConflictView
     case "manageCharacters":
     default:
       return CharacterView

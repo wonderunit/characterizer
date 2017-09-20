@@ -201,3 +201,12 @@
 #favorite-values-holder {
   margin: 20px;
 }
+
+.comparison-view-conflicts-header-container {
+  display: flex;
+}
+
+.comparison-view-conflict-container {
+  display: flex;
+  justify-content: space-around;
+}
