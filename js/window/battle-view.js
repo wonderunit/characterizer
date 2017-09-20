@@ -8,6 +8,7 @@ const EXPIRE_TIME = 10*1000
 module.exports = class BattleView extends EventEmitter {
   constructor(properties) {
     super()
+    this.showTimer = true
 
     if(!properties.character) throw new Error("Missing character")
     this.character = properties.character
@@ -32,22 +33,34 @@ module.exports = class BattleView extends EventEmitter {
 
     this.timerContainer = document.createElement("div")
     this.timerContainer.setAttribute("id", "battle-view-timer-container")
+    this.timerContainer.classList.add("battle-view-timer-container")
     this.root.appendChild(this.timerContainer)
     this.countdownTimer = document.createElement("div")
     this.countdownTimer.classList.add("countdown-progress-bar")
     this.timerContainer.appendChild(this.countdownTimer)
+
+    this.buttonContainer = document.createElement("div")
+    this.buttonContainer.setAttribute("id", "battle-view-button-container")
+    this.root.appendChild(this.buttonContainer)
     
     this.skipButton = document.createElement("div")
-    this.skipButton.setAttribute("class", "battle-view-skip")
+    this.skipButton.setAttribute("class", "battle-view-button")
     this.skipButton.addEventListener('click', this.onSkip.bind(this))
     this.skipButton.innerHTML = `Skip`
-    this.root.appendChild(this.skipButton)
+    this.buttonContainer.appendChild(this.skipButton)
     
     this.favoriteButton = document.createElement("div")
-    this.favoriteButton.setAttribute("class", "battle-view-skip")
+    this.favoriteButton.setAttribute("class", "battle-view-button")
     this.favoriteButton.addEventListener('click', this.onFavorite.bind(this))
     this.favoriteButton.innerHTML = `Favorite`
-    this.root.appendChild(this.favoriteButton)
+    this.buttonContainer.appendChild(this.favoriteButton)
+
+    this.showTimerSwitch = document.createElement("div")
+    this.showTimerSwitch.setAttribute("id", "battle-view-show-timer")
+    this.showTimerSwitch.setAttribute("class", "battle-view-button")
+    this.showTimerSwitch.innerHTML = "Hide Timer"
+    this.showTimerSwitch.addEventListener("click", this.toggleTimerView.bind(this))
+    this.buttonContainer.appendChild(this.showTimerSwitch)
 
     this.setupBattle()
   }
@@ -64,12 +77,8 @@ module.exports = class BattleView extends EventEmitter {
   }
 
   setupBattle() {
-    if(this.timerID) {
-      clearInterval(this.timerID)
-      this.timerID = null
-    }
+    this.clearBattleTimer()
     this.favoriteButton.innerHTML = `Favorite`
-    this.battleStartTime = Date.now()
 
     this.choiceContainer.innerHTML = ""
     let battleData = this.battlePairer.getBattle()
@@ -82,7 +91,9 @@ module.exports = class BattleView extends EventEmitter {
     this.choiceTwo = this.getChoiceButtonView(this.choiceDataTwo)
     this.choiceContainer.appendChild(this.choiceTwo)
 
-    this.startBattleTimerView()
+    if(this.showTimer) {
+      this.startBattleTimerView()
+    }
 
     this.emit('battle-start', battleData)
   }
@@ -140,7 +151,15 @@ module.exports = class BattleView extends EventEmitter {
     }
   }
 
+  clearBattleTimer() {
+    if(this.timerID) {
+      clearInterval(this.timerID)
+      this.timerID = null
+    }
+  }
+
   startBattleTimerView() {
+    this.battleStartTime = Date.now()
     this.timerID = setInterval(() => {
       let now = Date.now()
       let elapsed = now - this.battleStartTime
@@ -150,5 +169,19 @@ module.exports = class BattleView extends EventEmitter {
       this.countdownTimer.setAttribute("style", `width: ${((EXPIRE_TIME-elapsed)/EXPIRE_TIME)*100}%`)
     }, 1000/60)
   }
+
+  toggleTimerView(event) {
+    this.showTimer = !this.showTimer
+    if(this.showTimer) {
+      this.showTimerSwitch.innerHTML = "Hide Timer"
+      this.timerContainer.classList.remove("hidden")
+      this.clearBattleTimer()
+      this.startBattleTimerView()
+    } else {
+      this.showTimerSwitch.innerHTML = "Show Timer"
+      this.timerContainer.classList.add("hidden")
+      this.clearBattleTimer()
+    }
+  } 
 
 }

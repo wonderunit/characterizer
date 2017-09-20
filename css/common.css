@@ -15,3 +15,7 @@ body {
 .button:hover {
   background-color: #BBB;
 }
+
+.hidden {
+  visibility: hidden;
+}

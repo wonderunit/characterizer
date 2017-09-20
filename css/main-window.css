@@ -116,13 +116,18 @@
   position: relative;
 }
 
-.battle-view-skip {
+#battle-view-button-container {
+  display: flex;
+  margin-top: 45px;
+  justify-content: space-around;
+}
+
+.battle-view-button {
   border-width: 1px;
   border-color: black;
   border-radius: 8px;
   cursor: pointer;
   width: 100%;
-  margin-top: 45px;
   text-align: center;
 }
 
@@ -169,11 +174,11 @@
   background-color: #CCC;
 }
 
-#battle-view-timer-container {
+.battle-view-timer-container {
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 45px;
 }
 
 #value-list-footer {
