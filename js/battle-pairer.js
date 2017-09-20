@@ -43,6 +43,10 @@ module.exports = class BattlePairer {
         "weight": 40
       },
       {
+        "function": this.getFavoritesAndRandomBattle.bind(this),
+        "weight": 40
+      },
+      {
         "function": this.getFavoritesBattle.bind(this),
         "weight": 40
       }
@@ -57,14 +61,20 @@ module.exports = class BattlePairer {
     for(var i = 0; i<MIN_BATTTLE_COUNT; i++) {
       this.battleChoiceTiers.push([])
     }
-    let self = this
-    for(let i=0; i<this.battleChoiceTiers.length; i++) {
-      knex('CharacterValues').where({characterID: this.characterID, battleCount: i})
-        .then(function(values) {
-          self.battleChoiceTiers[i] = values
-        })
-        .catch(console.error)
-    }
+  }
+
+  init() {
+    return new Promise((fulfill, reject) => {
+      let self = this
+      for(let i=0; i<this.battleChoiceTiers.length; i++) {
+        knex('CharacterValues').where({characterID: this.characterID, battleCount: i})
+          .then(function(values) {
+            self.battleChoiceTiers[i] = values
+            fulfill()
+          })
+          .catch(reject)
+      }
+    })
   }
 
   getBattle(rechooseCount=0) {
@@ -73,18 +83,22 @@ module.exports = class BattlePairer {
     if(result && result.length > 1) {
       if(this.isDuplicate(result)) {
         console.log(`Found duplicate!`)
-        result = this.getBattle(++rechoiceNumber)
+        return this.getBattle(++rechooseCount)
       }
       console.log(`getFillDataBattle`)
     } else {
       let battleMode = this.chooseRandomBattleMode()
       result = battleMode()
     }
+    if(!result) {
+      console.log(`Didn't find valid candidates for battle mode.`)
+      return this.getBattle(rechooseCount)
+    }
     // TODO: check for the case where all matches have played out, and message it.
     // For now, let's just let it try to re-choose
     if(this.isDuplicate(result) && rechooseCount < 4) {
       console.log(`Found duplicate!`)
-      result = this.getBattle(++rechooseCount)
+      return this.getBattle(++rechooseCount)
     }
     
     let randomizedResult = []
@@ -247,6 +261,26 @@ module.exports = class BattlePairer {
 
 
     return [this.valuesMap[this.values[indexOne].valueID], this.valuesMap[this.values[indexTwo].valueID]]
+  }
+
+  getFavoritesAndRandomBattle() {
+    console.log(`getFavoritesAndTopPercentileBattle`)
+    let favoriteValues = this.favorites.values
+    if(favoriteValues.length < 1) {
+      return null
+    }
+    let favoritesIndex = Math.floor(Math.random() * favoriteValues.length)
+    let favoritesID = favoriteValues[favoritesIndex]
+    let topIndex = this.values.length * TOP_PERCENT_CUTOFF
+    if(topIndex < 2) {
+      return null
+    }
+    let randomID
+    do {
+      let randomIndex = Math.floor(Math.random() * this.choices.length)
+      randomID = this.values[randomIndex].valueID
+    } while(randomID === favoritesID)
+    return [this.valuesMap[favoritesID], this.valuesMap[randomID]]
   }
 
   getFavoritesAndTopPercentileBattle() {

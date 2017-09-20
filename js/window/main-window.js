@@ -46,7 +46,7 @@ var characterValueFavorites = {}
 var currentCharacterID
 var knex = remote.getGlobal('knex')
 var container = document.getElementById("container")
-var curViewType = "characterTrainer"
+var curViewType = ""
 var currentContentView
 
 const viewProperties = {
@@ -79,7 +79,13 @@ mainViewSelector.on('select-view', viewType => {
   onSelectView()
 })
 
-onSelectView()
+getCharacters()
+  .then(characters => {
+    if(characters && characters.length) {
+      curViewType = "characterTrainer"
+    }
+    onSelectView()
+  })
 
 /**
  * Switch 
@@ -108,8 +114,6 @@ function onSelectView() {
  */
 function getContentView() {
   switch(curViewType) {
-    case "manageCharacters":
-      return CharacterView
     case "characterComparison":
      return CharacterComparisonView
     case "valueList":
@@ -117,8 +121,10 @@ function getContentView() {
     case "battleFavorites":
       return BattleFavoritesView
     case "characterTrainer":
-    default:
       return CharacterTrainerView
+    case "manageCharacters":
+    default:
+      return CharacterView
   }
 }
 
@@ -271,8 +277,12 @@ function getBattlePairer(characterID) {
               battlePairs: characterBattlePairs
             }
             let battlePairer = new BattlePairer(properties)
-            battlePairers[characterID] = battlePairer
-            fulfill(battlePairers[characterID])
+            battlePairer.init()
+              .then(()=>{
+                battlePairers[characterID] = battlePairer
+                fulfill(battlePairers[characterID])
+              })
+              .catch(console.error)
           })
         })
       })
