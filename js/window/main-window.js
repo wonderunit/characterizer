@@ -380,16 +380,16 @@ function getCharacterValueFavorites(characterID) {
           var favoriteValues = characterFavorites.values 
           for(let record of result) {
             
-            if(!favoritePairs[record.value1ID]) {
-              favoritePairs[record.value1ID] = {}
+            if(!favoritePairs[record.value1]) {
+              favoritePairs[record.value1] = {}
             }
-            favoritePairs[record.value1ID][record.value2ID] = true
+            favoritePairs[record.value1][record.value2] = true
 
-            if(favoriteValues.indexOf(record.value1ID) < 0) {
-              favoriteValues.push(record.value1ID)
+            if(favoriteValues.indexOf(record.value1) < 0) {
+              favoriteValues.push(record.value1)
             }
-            if(favoriteValues.indexOf(record.value2ID) < 0) {
-              favoriteValues.push(record.value2ID)
+            if(favoriteValues.indexOf(record.value2) < 0) {
+              favoriteValues.push(record.value2)
             }
           }
           fulfill(characterValueFavorites[characterID])
