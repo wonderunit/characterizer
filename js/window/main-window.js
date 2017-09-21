@@ -5,6 +5,7 @@ const ValueListView = require('./value-list-view.js')
 const CharacterComparisonView = require('./character-comparison-view.js')
 const CharacterComparisonConflictView = require('./character-comparison-conflict-view.js')
 const BattleFavoritesView = require('./battle-favorites-view.js')
+const InternalConflictView = require('./internal-conflict-view.js')
 const MainViewSelector = require('./main-view-selector.js')
 
 const BattlePairer = require('../battle-pairer.js')
@@ -33,6 +34,10 @@ const mainViews = [
   {
     "type": "characterConflictComparison",
     "label": "Conflict Comparison"
+  },
+  {
+    "type": "internalConflict",
+    "label": "Internal Conflict"
   }
 ]
 
@@ -129,6 +134,8 @@ function getContentView() {
       return CharacterTrainerView
     case "characterConflictComparison":
       return CharacterComparisonConflictView
+    case "internalConflict":
+      return InternalConflictView
     case "manageCharacters":
     default:
       return CharacterView

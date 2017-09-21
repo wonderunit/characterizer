@@ -1,11 +1,13 @@
+const EventEmitter = require('events').EventEmitter
 const {remote} = require('electron')
 const knex = remote.getGlobal('knex')
 const MIN_BATTTLE_COUNT = 2
 const TOP_PERCENT_CUTOFF = .1
 const TOP_RANK_CUTOFF = 20
 
-module.exports = class BattlePairer {
+module.exports = class BattlePairer extends EventEmitter {
   constructor(properties) {
+    super()
     if(!properties.characterID) throw new Error("Missing characterID")
     this.characterID = properties.characterID
 
@@ -86,6 +88,7 @@ module.exports = class BattlePairer {
         return this.getBattle(++rechooseCount)
       }
       console.log(`getFillDataBattle`)
+      this.emit('battle-type-try', "Fill Data Battle")
     } else {
       let battleMode = this.chooseRandomBattleMode()
       result = battleMode()
@@ -118,6 +121,9 @@ module.exports = class BattlePairer {
     }
     var self = this
     var checkForPair = (contender1, contender2) => {
+      if(!contender1 || !contender2) {
+        throw new Error("missing contender")
+      }
       if(self.previousBattlePairs.hasOwnProperty(contender1.id)) {
         let contender1Pairs = self.previousBattlePairs[contender1.id]
         if(contender1Pairs.hasOwnProperty(contender2.id) && contender1Pairs[contender2.id] > 0) {
@@ -204,6 +210,7 @@ module.exports = class BattlePairer {
 
   getRandomBattle() {
     console.log(`getRandomBattle`)
+    this.emit('battle-type-try', "Random Battle")
     let indexOne = Math.floor(Math.random() * this.choices.length)
     let indexTwo
     do {
@@ -214,6 +221,7 @@ module.exports = class BattlePairer {
   }
 
   getTopRankBattle() {
+    this.emit('battle-type-try', "Top Rank Battle")
     console.log(`getTopRankBattle`)
     if(this.values.length < TOP_RANK_CUTOFF) {
       return
@@ -234,6 +242,7 @@ module.exports = class BattlePairer {
   
   getTopPercentileBattle() {
     console.log(`getTopPercentileBattle`)
+    this.emit('battle-type-try', "Top Percentile Battle")
     let topIndex = this.values.length * TOP_PERCENT_CUTOFF
     if(topIndex < 2) {
       return null
@@ -249,6 +258,7 @@ module.exports = class BattlePairer {
   
   getTopPercentileAndRandomBattle() {
     console.log(`getTopPercentileAndRandomBattle`)
+    this.emit('battle-type-try', "Top Percentile and Random Battle")
     let topIndex = this.values.length * TOP_PERCENT_CUTOFF
     if(topIndex < 2) {
       return null
@@ -265,6 +275,7 @@ module.exports = class BattlePairer {
 
   getFavoritesAndRandomBattle() {
     console.log(`getFavoritesAndTopPercentileBattle`)
+    this.emit('battle-type-try', "Favorite and Top Percentile Battle")
     let favoriteValues = this.favorites.values
     if(favoriteValues.length < 1) {
       return null
@@ -285,6 +296,7 @@ module.exports = class BattlePairer {
 
   getFavoritesAndTopPercentileBattle() {
     console.log(`getFavoritesAndTopPercentileBattle`)
+    this.emit('battle-type-try', "Favorite and Top Percentile Battle")
     let favoriteValues = this.favorites.values
     if(favoriteValues.length < 1) {
       return null
@@ -305,6 +317,7 @@ module.exports = class BattlePairer {
 
   getFavoritesBattle() {
     console.log(`getFavoritesBattle`)
+    this.emit('battle-type-try', "Favorites Battle")
 
     let favoriteValues = this.favorites.values
     if(favoriteValues.length < 2) {

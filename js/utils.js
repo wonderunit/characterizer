@@ -53,7 +53,13 @@ function getFriendlyMS(ms) {
   return converted
 }
 
+function semiRandomShuffle(array, factor) {
+  let f=factor
+  return array.map((e,i)=>{return [e,i+Math.random()*(f*2-f)]}).sort((a,b)=>{return a[1]-b[1]}).map(e=>{return e[0]})
+}
+
 module.exports = {
   convertMS,
-  getFriendlyMS
+  getFriendlyMS,
+  semiRandomShuffle
 }

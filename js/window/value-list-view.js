@@ -33,6 +33,8 @@ module.exports = class ValueListView extends MainBaseView {
   }
 
   updateView() {
+
+    // TODO: move this to completion of characters fetch.
     this.characterSelector.innerHTML = ``
     for(let character of this.characters) {
       let option = document.createElement("option")
@@ -52,6 +54,7 @@ module.exports = class ValueListView extends MainBaseView {
       }
     }
 
+    // TODO: move this to updateView, see internal-conflict-view
     if(!character) {
       return
     }

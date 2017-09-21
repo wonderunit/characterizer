@@ -141,6 +141,8 @@ module.exports = class CharacterTrainerView extends MainBaseView {
   }
 
   viewWillDisappear() {
-    this.battleView.viewWillDisappear()
+    if(typeof this.battleView.viewWillDisappear === 'function') {
+      this.battleView.viewWillDisappear()
+    }
   }
 }
