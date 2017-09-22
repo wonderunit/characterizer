@@ -20,11 +20,23 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     this.characters = []
     this.getCharacters()
       .then(inCharacters => {
-        this.characters = inCharacters
-        if(this.characters && this.characters.length) {
-          this.onSelectCharacter(this.characters[0].id)
+        this.characterSelector.innerHTML = ``
+        if(!inCharacters || !inCharacters.length) {
+          return
         }
-        this.updateView()
+        
+        this.character = inCharacters[0]
+        this.characters = inCharacters
+        for(let character of this.characters) {
+          let option = document.createElement("option")
+          option.setAttribute("value", character.id)
+          option.innerHTML = character.name
+          if(this.character.id === character.id) {
+            option.setAttribute("selected", true)
+          }
+          this.characterSelector.appendChild(option)
+        }
+        this.onSelectCharacter(this.character.id)
       })
       .catch(console.error)
 
@@ -48,15 +60,13 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     this.sessionTimeView = document.createElement("div")
     this.sessionView.appendChild(this.sessionTimeView)
     this.footerView.appendChild(this.sessionView)
+
+    this.characterSessionStartTime = Date.now()
   }
 
   onSelectCharacter(characterID) {
-    if(this.timerID) {
-      clearInterval(this.timerID)
-      this.timerID = null
-    }
-
-    let start = Date.now()
+    this.clearSessionTimer()
+    this.characterSessionStartTime = Date.now()
     this.curBattleTimeKeeper = new BattleTimeKeeper()
     this.currentCharacterID = characterID
     for(let aCharacter of this.characters) { 
@@ -65,12 +75,30 @@ module.exports = class CharacterTrainerView extends MainBaseView {
         break
       }
     }
+    this.updateView()
+  }
 
-    this.getBattlePairer(characterID).then(battlePairer =>{
-      this.getCharacterValues(characterID).then(characterValues =>{
+  handleBattleUpdate(battleOutcome) {
+    this.curBattleTimeKeeper.onBattleOutcome(battleOutcome)
+    this.updateView()
+  }
+
+  getView() {
+    return this.root
+  }
+
+  updateView() {
+    let existingBattleContainer = document.getElementById("battle-container")
+    if(existingBattleContainer) {
+      existingBattleContainer.innerHTML = ``
+    }
+    this.getBattlePairer(this.currentCharacterID).then(battlePairer =>{
+      this.getCharacterValues(this.currentCharacterID).then(characterValues =>{
         this.battleView = new BattleView({ character: this.character, battlePairer: battlePairer})
-        let existing = document.getElementById("battle-container")
-        this.root.replaceChild(this.battleView.getView(), existing)
+        if(!existingBattleContainer) {
+          return
+        }
+        this.root.replaceChild(this.battleView.getView(), existingBattleContainer)
         
         this.battleView.on('battle-update', battleOutcome => {
           this.emit('battle-update', battleOutcome)
@@ -90,48 +118,22 @@ module.exports = class CharacterTrainerView extends MainBaseView {
         })
   
         let end = Date.now()
-        this.updateView()
-        console.log(`Character select: ${end - start}`)
       })
     })
-  }
 
-  handleBattleUpdate(battleOutcome) {
-    this.curBattleTimeKeeper.onBattleOutcome(battleOutcome)
-    this.updateView()
-  }
-
-  getView() {
-    return this.root
-  }
-
-  updateView() {
-    this.characterSelector.innerHTML = ``
-    for(let character of this.characters) {
-      let option = document.createElement("option")
-      option.setAttribute("value", character.id)
-      option.innerHTML = character.name
-      if(this.character.id === character.id) {
-        option.setAttribute("selected", true)
-      }
-      this.characterSelector.appendChild(option)
-    }
-    
     this.battleCountView.innerHTML = `${this.character.name} // ${this.getCharacterBattleCount(this.character.id)} Questions`
 
     let session = this.getCharacterSession(this.character.id)
     this.sessionCountView.innerHTML = `${session.battleCount} Questions `
-    if(session.battleStart) {
-      if(!this.timerID) {
-        this.characterSessionStartTime = session.battleStart
-        this.startSessionTimerView()
-      }
+    if(this.characterSessionStartTime) {
+      this.startSessionTimerView()
     } else {
       this.sessionTimeView.innerHTML = ``
     }
   }
 
   startSessionTimerView() {
+    this.clearSessionTimer()
     this.timerID = setInterval(() => {
       let now = Date.now()
       let elapsed = getFriendlyMS(now - this.characterSessionStartTime)
@@ -140,9 +142,22 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     }, 500)
   }
 
+  clearSessionTimer() {
+    if(this.timerID) {
+      clearInterval(this.timerID)
+      this.timerID = null
+      this.sessionTimeView.innerHTML = ` // 00:00:00`
+    }
+  }
+
   viewWillDisappear() {
     if(typeof this.battleView.viewWillDisappear === 'function') {
       this.battleView.viewWillDisappear()
+    }
+
+    if(this.timerID) {
+      clearInterval(this.timerID)
+      this.timerID = null
     }
   }
 }

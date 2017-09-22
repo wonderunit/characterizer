@@ -214,11 +214,17 @@
 
 .comparison-view-conflicts-header-container {
   display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .comparison-view-conflict-container {
   display: flex;
   justify-content: space-around;
+  border-bottom: black;
+  border-bottom-style: solid;
+  margin-top: 10px;
+  border-bottom-width: thin;
 }
 
 .comparison-view-conflict-container-graph {
