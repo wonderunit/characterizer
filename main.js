@@ -9,18 +9,18 @@ const prefModule = require('./js/prefs.js')
 const utils = require('./js/utils.js')
 const trash = require('trash')
 
-let win
+let mainWindow
 
 function createWindow () {
-  win = new BrowserWindow({width: 800, height: 600})
-  win.loadURL(url.format({
+  mainWindow = new BrowserWindow({width: 800, height: 600})
+  mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'welcome-window.html'),
     protocol: 'file:',
     slashes: true
   }))
 
-  win.on('closed', () => {
-    win = null
+  mainWindow.on('closed', () => {
+    mainWindow = null
   })
 }
 
@@ -33,7 +33,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-  if (win === null) {
+  if (mainWindow === null) {
     createWindow()
   }
 })
@@ -115,18 +115,18 @@ function showMainWindow(dbFile) {
 
   initDB(knex, {valuesSeedDataPath})
     .then(()=>{
-      if(win) {
-        win.close()
+      if(mainWindow) {
+        mainWindow.close()
       }
-      win = new BrowserWindow({width: 800, height: 600})
-      win.loadURL(url.format({
+      mainWindow = new BrowserWindow({width: 800, height: 600})
+      mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'main-window.html'),
         protocol: 'file:',
         slashes: true
       }))
     
-      win.on('closed', () => {
-        win = null
+      mainWindow.on('closed', () => {
+        mainWindow = null
       })
 
     })
