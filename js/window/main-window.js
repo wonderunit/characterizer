@@ -1,4 +1,4 @@
-const {remote} = require('electron')
+const {ipcRenderer, remote} = require('electron')
 const CharacterView = require('./character-view.js')
 const CharacterTrainerView = require('./character-trainer-view.js')
 const ValueListView = require('./value-list-view.js')
@@ -89,12 +89,36 @@ mainViewSelector.on('select-view', viewType => {
   onSelectView()
 })
 
+// Initialize character data.
+ipcRenderer.send('log', {type: 'progress', message: `Initializing Characters`})
 getCharacters()
   .then(characters => {
+
+    var finishSetup = () => {
+      ipcRenderer.send('workspace-ready')
+      onSelectView()
+    }
     if(characters && characters.length) {
       curViewType = "characterTrainer"
+
+      // do the character data loads in series so we
+      // can update the loading screen on a per character basis.
+      var sequence = Promise.resolve();
+      characters.forEach(function(character) {
+        sequence = sequence.then(function() {
+          ipcRenderer.send('log', {type: 'progress', message: `Initializing ${character.name}`})
+          return getBattlePairer(character.id)
+        }).then(()=>{});
+      })
+      sequence.then(()=>{
+        finishSetup()
+      })
+
+      
+    } else {
+      finishSetup()
     }
-    onSelectView()
+    
   })
 
 /**

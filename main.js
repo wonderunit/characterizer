@@ -11,10 +11,11 @@ const trash = require('trash')
 
 let mainWindow
 
-function createWindow () {
+function createWelcomeWindow () {
   mainWindow = new BrowserWindow({width: 800, height: 600})
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'welcome-window.html'),
+    title: "Characterizer",
     protocol: 'file:',
     slashes: true
   }))
@@ -24,17 +25,11 @@ function createWindow () {
   })
 }
 
-app.on('ready', createWindow)
+app.on('ready', createWelcomeWindow)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
-  }
-})
-
-app.on('activate', () => {
-  if (mainWindow === null) {
-    createWindow()
   }
 })
 
@@ -68,6 +63,16 @@ function browseForProject() {
 ipcMain.on('new-project', (e, arg)=> {
   createNewProject()
 })
+
+ipcMain.on('log', (event, opt) => {
+  !loadingStatusWindow.isDestroyed() && loadingStatusWindow.webContents.send('log', opt)
+})
+
+ipcMain.on('workspace-ready', event => {
+  mainWindow && mainWindow.show()
+  !loadingStatusWindow.isDestroyed() && loadingStatusWindow.hide()
+})
+
 
 function createNewProject() {
   let properties = {
@@ -105,6 +110,22 @@ function createNewProject() {
 }
 
 function showMainWindow(dbFile) {
+  let basename = path.basename(dbFile)
+
+  loadingStatusWindow = new BrowserWindow({
+    width: 450,
+    height: 150,
+    backgroundColor: '#333333',
+    show: false,
+    frame: false,
+    resizable: false
+  })
+
+  loadingStatusWindow.loadURL(`file://${__dirname}/loading-status.html?name=${basename}`)
+  loadingStatusWindow.once('ready-to-show', () => {
+    loadingStatusWindow.show()
+  })
+
   var knex = require('knex')({
     client: 'sqlite3',
     connection: {
@@ -118,7 +139,12 @@ function showMainWindow(dbFile) {
       if(mainWindow) {
         mainWindow.close()
       }
-      mainWindow = new BrowserWindow({width: 800, height: 600})
+      mainWindow = new BrowserWindow({
+        width: 800, 
+        height: 600, 
+        show: false,
+        title: basename,
+      })
       mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'main-window.html'),
         protocol: 'file:',
