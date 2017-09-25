@@ -88,6 +88,7 @@ module.exports = class CharacterTrainerView extends MainBaseView {
   }
 
   updateView() {
+    this.viewWillDisappear()
     let existingBattleContainer = document.getElementById("battle-container")
     if(existingBattleContainer) {
       existingBattleContainer.innerHTML = ``
