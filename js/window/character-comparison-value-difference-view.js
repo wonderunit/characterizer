@@ -13,36 +13,30 @@ module.exports = class CharacterComparisonValueDifferencesView extends Character
     this.getSelectedCharacterValues()
       .then(charactersValues => {
 
-        let index = 0
-        let valuesMaps = []
-        for(let characterValues of charactersValues) {
-          let characterValuesMap = {}
-          for(let characterValue of characterValues) {
-            characterValuesMap[characterValue.valueID] = characterValue
-          }
-          valuesMaps.push(characterValuesMap)
-          index++
-        }
-
         let valuesGrouped = []
-        for(let characterValue of charactersValues[0]) {
-          let groupID = characterValue.valueID
+        for(let curCharacterValue of charactersValues[0]) {
+          let groupID = curCharacterValue.valueID
           let group = {
             groupID: groupID
           }
-          let groupValues = []
+          let groupValues = [curCharacterValue]
 
-          let max = 0, min = 1, diff = 0
-          for(let valuesMap of valuesMaps) {
-            let characterValue = valuesMap[groupID]
-            if(characterValue.score > max) {
-              max = characterValue.score
+          let max = curCharacterValue.score, min = curCharacterValue.score, diff = 0
+          for(let i = 1; i<charactersValues.length; i++) {
+            for(let characterValue of charactersValues[i]) {
+              if(characterValue.valueID === groupID) {
+                if(characterValue.score > max) {
+                  max = characterValue.score
+                }
+                if(characterValue.score < min) {
+                  min = characterValue.score
+                }
+                group.diff = max - min
+                groupValues.push(characterValue)
+                break
+              }
+
             }
-            if(characterValue.score < min) {
-              min = characterValue.score
-            }
-            group.diff = max - min
-            groupValues.push(valuesMap[groupID])
           }
           group.values = groupValues
           valuesGrouped.push(group)
