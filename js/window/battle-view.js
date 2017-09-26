@@ -15,9 +15,6 @@ module.exports = class BattleView extends EventEmitter {
     
     if(!properties.battlePairer) throw new Error("Missing battlePairer")
     this.battlePairer = properties.battlePairer
-    this.battlePairer.on("battle-type-try", (battleType) => {
-      this.battleTypeView.innerHTML = battleType
-    })
 
     this.root = document.createElement('div')
     this.root.setAttribute("id", "battle-container")
@@ -65,9 +62,15 @@ module.exports = class BattleView extends EventEmitter {
     this.showTimerSwitch.addEventListener("click", this.toggleTimerView.bind(this))
     this.buttonContainer.appendChild(this.showTimerSwitch)
 
-    this.battleTypeView = document.createElement("div")
+    let battleTypeView = document.createElement("div")
+    this.battleTypeView = battleTypeView
     this.battleTypeView.classList.add("battle-type-view")
     this.root.appendChild(this.battleTypeView)
+
+    this.battlePaiererTypeHandler = (battleType)=>{
+      this.battleTypeView.innerHTML = battleType
+    }
+    this.battlePairer.on("battle-type-try", this.battlePaiererTypeHandler)
 
     this.setupBattle()
   }
@@ -78,6 +81,7 @@ module.exports = class BattleView extends EventEmitter {
 
   viewWillDisappear() {
     this.clearBattleTimer()
+    this.battlePairer.removeListener("battle-type-try", this.battlePaiererTypeHandler)
   }
 
   setupBattle() {
