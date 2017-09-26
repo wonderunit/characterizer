@@ -117,6 +117,14 @@ module.exports = class CharacterTrainerView extends MainBaseView {
         this.battleView.on('battle-favorite', (data) => {
           this.emit('battle-favorite', data)
         })
+
+        this.battleView.on('hide-timer', () => {
+          this.clearSessionTimer()
+          this.sessionTimeView.innerHTML = ``
+        })
+        this.battleView.on('show-timer', () => {
+          this.startSessionTimerView()
+        })
   
         let end = Date.now()
       })
@@ -135,12 +143,16 @@ module.exports = class CharacterTrainerView extends MainBaseView {
 
   startSessionTimerView() {
     this.clearSessionTimer()
-    this.timerID = setInterval(() => {
+    this.timerID = setInterval( () => {
+      this.updateTimerView()
+    }, 500)
+    this.updateTimerView()
+  }
+
+  updateTimerView() {
       let now = Date.now()
       let elapsed = getFriendlyMS(now - this.characterSessionStartTime)
-
       this.sessionTimeView.innerHTML = ` // ${elapsed.h ? elapsed.h+':' : ''}${elapsed.m}:${elapsed.s}`
-    }, 500)
   }
 
   clearSessionTimer() {

@@ -182,10 +182,12 @@ module.exports = class BattleView extends EventEmitter {
       this.timerContainer.classList.remove("hidden")
       this.clearBattleTimer()
       this.startBattleTimerView()
+      this.emit("show-timer")
     } else {
       this.showTimerSwitch.innerHTML = "Show Timer"
       this.timerContainer.classList.add("hidden")
       this.clearBattleTimer()
+      this.emit("hide-timer")
     }
   } 
 
