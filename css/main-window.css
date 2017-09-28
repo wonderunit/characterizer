@@ -252,3 +252,7 @@
 #value-difference-view {
   margin: 10px 0px 10px 0px;
 }
+
+.character-selection-view-selected {
+  background-color: #AAA;
+}

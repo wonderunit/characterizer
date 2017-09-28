@@ -53,6 +53,7 @@ module.exports = class CharacterComparisonBaseView extends MainBaseView {
 
     this.emit('selected-characters', this.selectedCharacters)
     
+    this.characterView.updateView()
     this.updateView()
   }
 

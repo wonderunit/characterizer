@@ -40,9 +40,12 @@ module.exports = class CharacterView extends MainBaseView {
     })
   }
 
-  addCharacterView(characterName, characterID) {
+  addCharacterView(characterName, characterID, isSelected) {
     let characterView = document.createElement('div')
     characterView.classList.add("button")
+    if(isSelected) {
+      characterView.classList.add("character-selection-view-selected")
+    }
     characterView.setAttribute("data-id", characterID || 1)
     characterView.innerHTML = characterName
     characterView.addEventListener('click', this.onCharacterClick.bind(this));
@@ -68,9 +71,17 @@ module.exports = class CharacterView extends MainBaseView {
   }
 
   updateView() {
+    let selectedCharacters = this.getSelectedCharacters()
     this.characterList.innerHTML = ''
     for(let character of this.characters) {
-      this.addCharacterView(character.name, character.id)
+      let isSelected = false
+      for(let selectedCharacter of selectedCharacters) {
+        if(selectedCharacter.id === character.id) {
+          isSelected = true
+          break
+        }
+      }
+      this.addCharacterView(character.name, character.id, isSelected)
     }
   }
 }
