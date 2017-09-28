@@ -7,9 +7,15 @@ module.exports = class CharacterComparisonValueDifferencesView extends Character
     this.comparisonView = document.createElement("div")
     this.comparisonView.setAttribute("id", "conflict-comparison-view")
     this.root.appendChild(this.comparisonView)
+    this.updateView()
   }
 
   updateView() {
+    this.comparisonView.innerHTML = ``
+    
+    if(this.selectedCharacters.length < 2) {
+      return
+    }
     this.getSelectedCharacterValues()
       .then(charactersValues => {
 
@@ -61,7 +67,7 @@ module.exports = class CharacterComparisonValueDifferencesView extends Character
           let index = 0
           for(let characterValue of valueGrouped.values) {
             let characterScoreView = document.createElement('div')
-            characterScoreView.innerHTML = `${this.charactersMap[this.selectedCharacters[index]].name} score: ${characterValue.score}`
+            characterScoreView.innerHTML = `${this.selectedCharacters[index].name} score: ${characterValue.score}`
             view.appendChild(characterScoreView)
             index++
           }

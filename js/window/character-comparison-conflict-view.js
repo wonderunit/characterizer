@@ -1,76 +1,23 @@
-const MainBaseView = require('./main-base-view.js')
+const CharacterComparisonBaseView = require('./character-comparison-base-view.js')
 const CharacterView = require('./character-view.js')
 const { semiRandomShuffle } = require('../utils.js')
 const NUM_COMPARISON_ITEMS = 30
 const RANDOM_SHUFFLE_FACTOR = 4
 
-module.exports = class CharacterComparisonConflictView extends MainBaseView {
+module.exports = class CharacterComparisonConflictView extends CharacterComparisonBaseView {
   constructor(properties) {
     super(properties)
-    this.root = document.createElement("div")
-
-    this.selectedCharacters = []
     this.valuesViewType = "table"
-
-    this.root = document.createElement("div")
-    this.root.setAttribute("id", "character-comparison-container")
-    
-    this.characterView = new CharacterView(properties)
-    this.root.appendChild(this.characterView.getView())
-    this.getCharacters()
-      .then(inCharacters => {
-        this.characters = inCharacters
-        this.characterView.on('select-character', data => {
-          this.onSelectCharacter(data.characterID)
-        })
-        this.characterView.on('add-character', data => {
-          this.emit('add-character', data)
-        })
-        this.characterView.updateView()
-      })
-      .catch(console.error)
     
     this.comparisonView = document.createElement("div")
     this.comparisonView.setAttribute("id", "conflict-comparison-view")
     this.root.appendChild(this.comparisonView)
-  }
-
-  onSelectCharacter(characterID) {
-    let start = Date.now()
-    let isExisting = false
-    for(let i = 0; i<this.selectedCharacters.length; i++) {
-      let curCharacterID = this.selectedCharacters[i]
-      if(curCharacterID === characterID) {
-        this.selectedCharacters.splice(i, 1)
-        isExisting = true
-        break
-      }
-    }
-    if(!isExisting) {
-      this.selectedCharacters.push(characterID)
-    }
-    if(this.selectedCharacters.length > 1) {
-      this.updateView()
-    }
+    this.updateView()
   }
 
   updateView() {
-    let characterValuePromises = []
-    let selectedCharacters = []
-    for(let aCharacterID of this.selectedCharacters) {
-      for(let aCharacter of this.characters) { 
-        if(aCharacter.id === aCharacterID) {
-          selectedCharacters.push({
-            "character": aCharacter
-          })
-          break
-        }
-      }
-      characterValuePromises.push(this.getCharacterValues(aCharacterID))
-    }
-
-    Promise.all(characterValuePromises)
-      .then(inCharacterValueResults => {
+    this.getSelectedCharacterValues()
+    .then(inCharacterValueResults => {
         let characterValueResults = []
         for(let i = 0; i < inCharacterValueResults.length; i++) {
           let values = inCharacterValueResults[i].slice(0, NUM_COMPARISON_ITEMS)
@@ -84,7 +31,7 @@ module.exports = class CharacterComparisonConflictView extends MainBaseView {
 
         let container = document.createElement("div")
         container.classList.add("comparison-view-conflicts-values-container")
-        for(let i = 0; i<selectedCharacters.length; i++) {
+        for(let i = 0; i<this.selectedCharacters.length; i++) {
           if(i > 0) {
             let vsView = document.createElement("div")
             vsView.innerHTML = `vs`
@@ -92,12 +39,12 @@ module.exports = class CharacterComparisonConflictView extends MainBaseView {
           }
           let characterName = document.createElement("h2")
           characterName.classList.add("comparison-view-conflicts-header")
-          characterName.innerHTML = selectedCharacters[i].character.name
+          characterName.innerHTML = this.selectedCharacters[i].name
           headersContainer.appendChild(characterName)
         }
 
         for(let i = 0; i < NUM_COMPARISON_ITEMS; i++) {
-          let conflictContainer = this.getValuesView(i, characterValueResults, selectedCharacters)
+          let conflictContainer = this.getValuesView(i, characterValueResults, this.selectedCharacters)
           conflictContainer.style.left = `${i/NUM_COMPARISON_ITEMS*100}%`
           container.appendChild(conflictContainer)
         }
@@ -106,17 +53,17 @@ module.exports = class CharacterComparisonConflictView extends MainBaseView {
       .catch(console.error)
   }
 
-  getValuesView(valueIndex, characterValueResults, selectedCharacters) {
+  getValuesView(valueIndex, characterValueResults) {
     switch(this.valuesViewType) {
       case "graph":
-        return this.getGraphView(valueIndex, characterValueResults, selectedCharacters)
+        return this.getGraphView(valueIndex, characterValueResults)
       case "table":
       default:
-        return this.getTableView(valueIndex, characterValueResults, selectedCharacters)
+        return this.getTableView(valueIndex, characterValueResults)
     }
   }
 
-  getTableView(valueIndex, characterValueResults, selectedCharacters) {
+  getTableView(valueIndex, characterValueResults) {
     let conflictContainer = document.createElement("div")
     conflictContainer.classList.add("comparison-view-conflict-container")
     for(var j = 0; j < characterValueResults.length; j++) {
@@ -135,7 +82,7 @@ module.exports = class CharacterComparisonConflictView extends MainBaseView {
     return conflictContainer
   }
   
-  getGraphView(valueIndex, characterValueResults, selectedCharacters) {
+  getGraphView(valueIndex, characterValueResults) {
     let conflictContainer = document.createElement("div")
     conflictContainer.classList.add("comparison-view-conflict-container-graph")
     let dotView = document.createElement("div")

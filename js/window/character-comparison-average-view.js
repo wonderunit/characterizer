@@ -6,6 +6,7 @@ module.exports = class CharacterComparisonAverageView extends EventEmitter {
     super()
     this.characters = properties.characters
     this.valuesMap = properties.valuesMap
+    this.values = properties.values
     this.root = document.createElement("div")
     this.root.setAttribute("id", "character-comparison-view")
     this.updateView()
@@ -17,20 +18,22 @@ module.exports = class CharacterComparisonAverageView extends EventEmitter {
 
   updateView() {
     let targetWidth = 100/this.characters.length
+    let index = 0
     for(let character of this.characters) {
       let containerDiv = document.createElement("div")
       containerDiv.classList.add("comparison-character-view-container")
       containerDiv.setAttribute("style", `width: ${targetWidth}%;`)
       let nameContainer = document.createElement("h2")
-      nameContainer.innerHTML = character.character.name
+      nameContainer.innerHTML = character.name
       containerDiv.appendChild(nameContainer)
       let properties = { 
         valuesMap: this.valuesMap, 
-        values: character.values
+        values: this.values[index]
       }
       let curValuesView = new ValuesViewAverage(properties)
       containerDiv.appendChild(curValuesView.getView())
       this.root.appendChild(containerDiv)
+      index++
     }
   }
 }

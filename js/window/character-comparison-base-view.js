@@ -4,9 +4,7 @@ const CharacterView = require('./character-view.js')
 module.exports = class CharacterComparisonBaseView extends MainBaseView {
   constructor(properties) {
     super(properties)
-    this.root = document.createElement("div")
-
-    this.selectedCharacters = []
+    this.selectedCharacters = this.selectedCharacters = this.getSelectedCharacters()
     this.valuesViewType = "table"
 
     this.root = document.createElement("div")
@@ -34,37 +32,35 @@ module.exports = class CharacterComparisonBaseView extends MainBaseView {
   }
 
   onSelectCharacter(characterID) {
-    let start = Date.now()
     let isExisting = false
     for(let i = 0; i<this.selectedCharacters.length; i++) {
-      let curCharacterID = this.selectedCharacters[i]
-      if(curCharacterID === characterID) {
+      let curCharacter = this.selectedCharacters[i]
+      if(curCharacter.id === characterID) {
         this.selectedCharacters.splice(i, 1)
         isExisting = true
         break
       }
     }
+
     if(!isExisting) {
-      this.selectedCharacters.push(characterID)
+      for(let aCharacter of this.characters) { 
+        if(aCharacter.id === characterID) {
+          this.selectedCharacters.push(aCharacter)
+          break
+        }
+      }
     }
-    if(this.selectedCharacters.length > 1) {
-      this.updateView()
-    }
+
+    this.emit('selected-characters', this.selectedCharacters)
+    
+    this.updateView()
   }
 
   getSelectedCharacterValues() {
     let characterValuePromises = []
     let selectedCharacters = []
-    for(let aCharacterID of this.selectedCharacters) {
-      for(let aCharacter of this.characters) { 
-        if(aCharacter.id === aCharacterID) {
-          selectedCharacters.push({
-            "character": aCharacter
-          })
-          break
-        }
-      }
-      characterValuePromises.push(this.getCharacterValues(aCharacterID))
+    for(let aCharacter of this.selectedCharacters) {
+      characterValuePromises.push(this.getCharacterValues(aCharacter.id))
     }
 
     return Promise.all(characterValuePromises)

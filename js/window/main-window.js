@@ -48,6 +48,7 @@ const mainViews = [
 
 var valuesLib
 var characters
+var charactersMap = {}
 var valuesMap = {} // key: valueID, value: value data
 var characterValues = {} // key: character ID, value: array of their values with scores
 var battlePairers = {} // cache battle pairers
@@ -63,6 +64,7 @@ var knex = remote.getGlobal('knex')
 var container = document.getElementById("container")
 var curViewType = ""
 var currentContentView
+var selectedCharacters = []
 
 const viewProperties = {
   "getBattlePairer": getBattlePairer,
@@ -71,7 +73,8 @@ const viewProperties = {
   "getCharacterBattleCount": getCharacterBattleCount,
   "getCharacterSession": getCharacterSession,
   "getCharacterValueFavorites": getCharacterValueFavorites,
-  "valuesMap": valuesMap
+  "getSelectedCharacters": getSelectedCharacters,
+  "valuesMap": valuesMap,
 }
 
 // Cache the system values
@@ -145,6 +148,9 @@ function onSelectView() {
   })
   currentContentView.on('add-character', data => {
     addCharacter(data)
+  })
+  currentContentView.on('selected-characters', data => {
+    selectedCharacters = data
   })
 }
 
@@ -533,4 +539,8 @@ function getCharacterSession(characterID) {
     }
   }
   return characterSessions[characterID]
+}
+
+function getSelectedCharacters() {
+  return selectedCharacters
 }
