@@ -1,5 +1,5 @@
 const MainBaseView = require('./main-base-view.js')
-const CharacterView = require('./character-view.js')
+const CharacterView = require('./character-selector-multiple.js')
 
 module.exports = class CharacterComparisonBaseView extends MainBaseView {
   constructor(properties) {

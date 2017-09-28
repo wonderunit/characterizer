@@ -1,5 +1,5 @@
 const CharacterComparisonBaseView = require('./character-comparison-base-view.js')
-const CharacterView = require('./character-view.js')
+const CharacterView = require('./character-selector-multiple.js')
 const CharacterComparisonAverageView = require('./character-comparison-average-view.js')
 
 module.exports = class CharacterComparisonView extends CharacterComparisonBaseView {
@@ -10,7 +10,7 @@ module.exports = class CharacterComparisonView extends CharacterComparisonBaseVi
     this.comparisonView = document.createElement("div")
     this.comparisonView.setAttribute("id", "character-comparison-view")
     this.root.appendChild(this.comparisonView)
-    
+
     this.updateView()
   }
 

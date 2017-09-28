@@ -1,5 +1,5 @@
 const {ipcRenderer, remote} = require('electron')
-const CharacterView = require('./character-view.js')
+const CharacterView = require('./character-selector-multiple.js')
 const CharacterTrainerView = require('./character-trainer-view.js')
 const ValueListView = require('./value-list-view.js')
 const CharacterComparisonView = require('./character-comparison-view.js')
