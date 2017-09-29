@@ -5,9 +5,13 @@
   "scripts": {
     "start": "electron .",
     "postinstall-dev": "install-app-deps",
+    "postinstall-mac": "electron-builder install-app-deps",
+    "postinstall-win": "cd node_modules/sqlite3 && npm run prepublish && node-gyp configure --module_name=node_sqlite3 --module_path=../lib/binding/node-v48-win32-x64 && node-gyp node-gyp rebuild --target=0.36.0 --arch=x64 --target_platform=win32 --dist-url=https://atom.io/download/atom-shell --module_name=node_sqlite3 --module_path=../lib/binding/node-v48-win32-x64",
     "postinstall": "electron-builder install-app-deps",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "dist:mac": "build -m",
+    "dist:win": "build -w"
   },
   "devDependencies": {
     "electron": "1.7.2",
@@ -15,13 +19,26 @@
   },
   "dependencies": {
     "knex": "^0.13.0",
+    "nan": "^2.7.0",
     "sqlite3": "^3.1.9",
     "trash": "^4.0.1"
   },
   "build": {
+    "asar": true,
     "appId": "com.wonderunit.characterizer",
     "mac": {
       "icon": "build/icon.icns"
+    },
+    "win": {
+      "icon": "build/icon.ico"
+    },
+    "files": [
+      "**/*",
+      "!*.md",
+      "!README.md"
+    ],
+    "nsis": {
+      "perMachine": true
     }
   }
 }

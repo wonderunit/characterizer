@@ -9,18 +9,20 @@ const prefModule = require('./js/prefs.js')
 const utils = require('./js/utils.js')
 const trash = require('trash')
 
+let welcomeWindow
+let loadingStatusWindow
 let mainWindow
 
 function createWelcomeWindow () {
-  mainWindow = new BrowserWindow({width: 800, height: 600})
-  mainWindow.loadURL(url.format({
+  welcomeWindow = new BrowserWindow({width: 800, height: 600})
+  welcomeWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'welcome-window.html'),
     title: "Characterizer",
     protocol: 'file:',
     slashes: true
   }))
 
-  mainWindow.on('closed', () => {
+  welcomeWindow.on('closed', () => {
     mainWindow = null
   })
 }
@@ -126,15 +128,16 @@ function showMainWindow(dbFile) {
     loadingStatusWindow.show()
   })
 
-  var knex = require('knex')({
-    client: 'sqlite3',
-    connection: {
-      filename: dbFile
-    }
-  })
-  global.knex = knex
-
-  initDB(knex, {valuesSeedDataPath})
+  try {
+    var knex = require('knex')({
+      client: 'sqlite3',
+      connection: {
+        filename: dbFile
+      }
+    })
+    global.knex = knex
+    
+    initDB(knex, {valuesSeedDataPath})
     .then(()=>{
       if(mainWindow) {
         mainWindow.close()
@@ -150,13 +153,17 @@ function showMainWindow(dbFile) {
         protocol: 'file:',
         slashes: true
       }))
-    
+      
       mainWindow.on('closed', () => {
         mainWindow = null
       })
-
+      
     })
     .catch(console.error)
+  } catch(e) {
+    loadingStatusWindow.webContents.send('log', {message: e.toString()})
+  }
+
 }
 
 let addToRecentDocs = (filename, metadata={}) => {
