@@ -1,9 +1,9 @@
 const {ipcRenderer, shell, remote} = require('electron')
 const knex = remote.getGlobal('knex')
 const prefsModule = require('electron').remote.require('./js/prefs.js')
+const fs = require('fs')
 
 let container = document.getElementById("container")
-
 let recentContainer = document.createElement("div")
 recentContainer.setAttribute("id", "recent-container")
 let recentHeader = document.createElement("h2")
@@ -18,6 +18,12 @@ recentContainer.appendChild(recentDocumentsList)
 let recentDocuments = prefsModule.getPrefs('welcome')['recentDocuments']
 if (recentDocuments && recentDocuments.length>0) {
   for (var recentDocument of recentDocuments) {
+    try {
+      fs.accessSync(recentDocument.filename, fs.R_OK)
+    } catch (e) {
+      // It isn't accessible
+      continue
+    }
     let recent = document.createElement("div")
     recent.classList.add("recent-document")
     recent.classList.add("button")

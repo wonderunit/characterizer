@@ -113,15 +113,16 @@ function createNewProject() {
 
 function showMainWindow(dbFile) {
   let basename = path.basename(dbFile)
-
-  loadingStatusWindow = new BrowserWindow({
-    width: 450,
-    height: 150,
-    backgroundColor: '#333333',
-    show: false,
-    frame: false,
-    resizable: false
-  })
+  if(!loadingStatusWindow) {
+    loadingStatusWindow = new BrowserWindow({
+      width: 450,
+      height: 150,
+      backgroundColor: '#333333',
+      show: false,
+      frame: false,
+      resizable: false
+    })
+  }
 
   loadingStatusWindow.loadURL(`file://${__dirname}/loading-status.html?name=${basename}`)
   loadingStatusWindow.once('ready-to-show', () => {
@@ -159,9 +160,16 @@ function showMainWindow(dbFile) {
       })
       
     })
-    .catch(console.error)
-  } catch(e) {
-    loadingStatusWindow.webContents.send('log', {message: e.toString()})
+    .catch(error => {
+      // The loading status window doesn't receive the message unless it's delayed a little
+      setTimeout(()=>{
+        loadingStatusWindow.webContents.send('log', { type: "progress", message: error.toString()})
+      }, 500)
+    })
+  } catch(error) {
+    setTimeout(()=>{
+      loadingStatusWindow.webContents.send('log', { type: "progress", message: error.toString()})
+    }, 500)
   }
 
 }
