@@ -11,6 +11,7 @@ const prefFile = path.join(app.getPath('userData'), 'characterizer-preferences.j
 
 const defaultPrefs = {
   version: pkg.version,
+  skipTimerLength: 10000
 }
 
 let prefs

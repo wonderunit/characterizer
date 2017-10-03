@@ -3,7 +3,8 @@ const {remote} = require('electron')
 
 let knex = remote.getGlobal('knex')
 
-const EXPIRE_TIME = 10*1000
+const prefsModule = require('electron').remote.require('./js/prefs')
+const EXPIRE_TIME = prefsModule.getPrefs()['skipTimerLength'] || 10*1000
 
 module.exports = class BattleView extends EventEmitter {
   constructor(properties) {
