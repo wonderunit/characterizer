@@ -14,7 +14,7 @@ const BattlePairer = require('../battle-pairer.js')
 const mainViews = [
   {
     "type": "manageCharacters",
-    "label": "Manage Characters"
+    "label": "Characters"
   },
   {
     "type": "characterTrainer",
@@ -107,8 +107,6 @@ getCharacters()
       onSelectView()
     }
     if(characters && characters.length) {
-      curViewType = "characterTrainer"
-
       // do the character data loads in series so we
       // can update the loading screen on a per character basis.
       var sequence = Promise.resolve();
