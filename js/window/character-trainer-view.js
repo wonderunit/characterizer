@@ -123,6 +123,7 @@ module.exports = class CharacterTrainerView extends MainBaseView {
       }
     }
     this.setupBattleView()
+    this.updateView()
   }
 
   handleBattleUpdate(battleOutcome) {
