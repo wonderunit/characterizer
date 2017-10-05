@@ -4,7 +4,7 @@ const url = require('url')
 const fs = require('fs')
 const userDataPath = app.getPath('userData')
 const valuesSeedDataPath = path.join(__dirname, "data", "values.txt")
-const {initDB} = require('./js/database-init.js')
+const {seedDB} = require('./js/database-init.js')
 const prefModule = require('./js/prefs.js')
 const utils = require('./js/utils.js')
 const trash = require('trash')
@@ -137,35 +137,36 @@ function showMainWindow(dbFile) {
       }
     })
     global.knex = knex
-    
-    initDB(knex, {valuesSeedDataPath})
-    .then(()=>{
-      if(mainWindow) {
-        mainWindow.close()
-      }
-      mainWindow = new BrowserWindow({
-        width: 800, 
-        height: 600, 
-        show: false,
-        title: basename,
+
+    knex.migrate.latest()
+      .then(()=> {
+        return seedDB(knex, {valuesSeedDataPath})
       })
-      mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'main-window.html'),
-        protocol: 'file:',
-        slashes: true
-      }))
-      
-      mainWindow.on('closed', () => {
-        mainWindow = null
+      .then(()=>{
+        if(mainWindow) {
+          mainWindow.close()
+        }
+        mainWindow = new BrowserWindow({
+          width: 800, 
+          height: 600, 
+          show: false,
+          title: basename,
+        })
+        mainWindow.loadURL(url.format({
+          pathname: path.join(__dirname, 'main-window.html'),
+          protocol: 'file:',
+          slashes: true
+        }))
+        mainWindow.on('closed', () => {
+          mainWindow = null
+        })  
       })
-      
-    })
-    .catch(error => {
-      // The loading status window doesn't receive the message unless it's delayed a little
-      setTimeout(()=>{
-        loadingStatusWindow.webContents.send('log', { type: "progress", message: error.toString()})
-      }, 500)
-    })
+      .catch(error => {
+        // The loading status window doesn't receive the message unless it's delayed a little
+        setTimeout(()=>{
+          loadingStatusWindow.webContents.send('log', { type: "progress", message: error.toString()})
+        }, 500)
+      })
   } catch(error) {
     setTimeout(()=>{
       loadingStatusWindow.webContents.send('log', { type: "progress", message: error.toString()})
