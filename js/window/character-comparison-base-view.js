@@ -4,6 +4,7 @@ const CharacterView = require('./character-selector-multiple.js')
 module.exports = class CharacterComparisonBaseView extends MainBaseView {
   constructor(properties) {
     super(properties)
+    this.selectionsAllowedCount = 2 // the allowed number of selections
     this.selectedCharacters = this.selectedCharacters = this.getSelectedCharacters()
     this.valuesViewType = "table"
 
@@ -49,6 +50,10 @@ module.exports = class CharacterComparisonBaseView extends MainBaseView {
           break
         }
       }
+    }
+
+    if(this.selectedCharacters.length > this.selectionsAllowedCount) {
+      this.selectedCharacters.splice(0, this.selectedCharacters.length - this.selectionsAllowedCount)
     }
 
     this.emit('selected-characters', this.selectedCharacters)
