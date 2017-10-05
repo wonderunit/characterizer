@@ -150,6 +150,9 @@ function onSelectView() {
   currentContentView.on('selected-characters', data => {
     selectedCharacters = data
   })
+  currentContentView.on('add-comparison-favorite', data => {
+    addValueComparisonFavorite(data)
+  })
 }
 
 /**
@@ -541,4 +544,12 @@ function getCharacterSession(characterID) {
 
 function getSelectedCharacters() {
   return selectedCharacters
+}
+
+function addValueComparisonFavorite(data) {
+  knex('ValueComparisonFavorites').returning('id').insert(data)
+    .then((result) => {
+      console.log(`added: ${JSON.stringify(data)}`)
+    })
+    .catch(console.error)
 }

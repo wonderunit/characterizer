@@ -56,6 +56,10 @@ module.exports = class CharacterComparisonValueDifferencesView extends Character
           let view = document.createElement('div')
           view.setAttribute("id", "value-difference-view")
 
+          let favButton = document.createElement('div')
+          favButton.innerHTML = `add favorite`
+          view.appendChild(favButton)
+
           let valueView = document.createElement('div')
           valueView.innerHTML = `<b>${this.valuesMap[valueGrouped.groupID].name}</b>`
           view.appendChild(valueView)
@@ -65,12 +69,21 @@ module.exports = class CharacterComparisonValueDifferencesView extends Character
           view.appendChild(scoreView)
 
           let index = 0
+          let favoriteData = {}
           for(let characterValue of valueGrouped.values) {
             let characterScoreView = document.createElement('div')
             characterScoreView.innerHTML = `${this.selectedCharacters[index].name} score: ${characterValue.score}`
             view.appendChild(characterScoreView)
+            favoriteData[`character${index+1}ID`] = characterValue.characterID
+            favoriteData[`value${index+1}ID`] = characterValue.valueID
             index++
           }
+
+          var self = this
+          favButton.addEventListener('mouseup', function(event) {
+            self.emit('add-comparison-favorite', favoriteData)
+          })
+
           this.comparisonView.appendChild(view)
         }
       })
