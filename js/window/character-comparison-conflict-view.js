@@ -92,13 +92,17 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
       favoritesPaths.push([value.characterID, value.valueID])
     }
 
-    let isFavorite = utils.checkObjectPath(favoritesPaths[0].concat(favoritesPaths[1]), this.valueComparisonFavorites) 
-      || utils.checkObjectPath(favoritesPaths[1].concat(favoritesPaths[0]), this.valueComparisonFavorites)
+    let isFavorite = false
+    if(favoritesPaths.length > 1) {
+      isFavorite = utils.checkObjectPath(favoritesPaths[0].concat(favoritesPaths[1]), this.valueComparisonFavorites) 
+        || utils.checkObjectPath(favoritesPaths[1].concat(favoritesPaths[0]), this.valueComparisonFavorites)
+    }
     if(isFavorite) {
       favButton.innerHTML = `favorited`
     } else {
       var self = this
       favButton.addEventListener('mouseup', function(event) {
+        event.target.innerHTML = `favorited`
         self.emit('add-comparison-favorite', favoriteData)
       })
     }

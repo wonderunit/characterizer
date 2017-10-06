@@ -59,6 +59,8 @@ var characterBattlePairs = {}
 var characterBattleCounts = {}
 var characterSessions = {}
 var characterValueFavorites = {}
+
+// objects of the form { character1ID: { value1ID: character2ID: {value2:ID } } }
 var valueComparisonFavorites = {}
 var currentCharacterID
 var knex = remote.getGlobal('knex')
