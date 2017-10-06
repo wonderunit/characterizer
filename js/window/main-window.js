@@ -59,6 +59,7 @@ var characterBattlePairs = {}
 var characterBattleCounts = {}
 var characterSessions = {}
 var characterValueFavorites = {}
+var valueComparisonFavorites = {}
 var currentCharacterID
 var knex = remote.getGlobal('knex')
 var container = document.getElementById("container")
@@ -75,6 +76,7 @@ const viewProperties = {
   "getCharacterValueFavorites": getCharacterValueFavorites,
   "getSelectedCharacters": getSelectedCharacters,
   "valuesMap": valuesMap,
+  "valueComparisonFavorites": valueComparisonFavorites,
 }
 
 // Cache the system values
@@ -98,8 +100,12 @@ mainViewSelector.on('select-view', viewType => {
 })
 
 // Initialize character data.
-ipcRenderer.send('log', {type: 'progress', message: `Initializing Characters`})
-getCharacters()
+ipcRenderer.send('log', {type: 'progress', message: `Initializing Project`})
+
+loadValueComparisonFavorites()
+  .then(()=>{
+    return getCharacters()
+  })
   .then(characters => {
 
     var finishSetup = () => {
@@ -109,7 +115,8 @@ getCharacters()
     if(characters && characters.length) {
       // do the character data loads in series so we
       // can update the loading screen on a per character basis.
-      var sequence = Promise.resolve();
+      // from: https://stackoverflow.com/a/36672042/1535171
+      var sequence = Promise.resolve()
       characters.forEach(function(character) {
         sequence = sequence.then(function() {
           ipcRenderer.send('log', {type: 'progress', message: `Initializing ${character.name}`})
@@ -119,12 +126,13 @@ getCharacters()
       sequence.then(()=>{
         finishSetup()
       })
-
-      
     } else {
       finishSetup()
     }
     
+  })
+  .catch(error => {
+    ipcRenderer.send('log', {type: 'progress', message: `Error: ${error}`})
   })
 
 /**
@@ -546,7 +554,37 @@ function getSelectedCharacters() {
   return selectedCharacters
 }
 
+function loadValueComparisonFavorites() {
+  return new Promise((fulfill, reject) => {
+    let start = Date.now()
+    knex.raw(`select * from ValueComparisonFavorites`)
+      .then(records => {
+        for(let record of records) {
+          cacheValueComparisonFavorite(record)
+        }
+        fulfill(records)
+      })
+      .catch(reject)
+  })
+}
+
+function cacheValueComparisonFavorite(record) {
+  if(!valueComparisonFavorites[record.character1ID]) {
+    valueComparisonFavorites[record.character1ID] = {}
+  }
+  if(!valueComparisonFavorites[record.character1ID][record.value1ID]) {
+    valueComparisonFavorites[record.character1ID][record.value1ID] = {}
+  }
+  if(!valueComparisonFavorites[record.character1ID][record.value1ID][record.character2ID]) {
+    valueComparisonFavorites[record.character1ID][record.value1ID][record.character2ID] = {}
+  }
+  if(!valueComparisonFavorites[record.character1ID][record.value1ID][record.character2ID][record.value2ID]) {
+    valueComparisonFavorites[record.character1ID][record.value1ID][record.character2ID][record.value2ID] = {}
+  }
+}
+
 function addValueComparisonFavorite(data) {
+  cacheValueComparisonFavorite(data)
   knex('ValueComparisonFavorites').returning('id').insert(data)
     .then((result) => {
       console.log(`added: ${JSON.stringify(data)}`)

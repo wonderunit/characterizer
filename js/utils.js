@@ -76,9 +76,21 @@ const truncateMiddle = (string, maxLength = 30, separator = '…') => {
          string.substring(midpoint + rstrip)
 }
 
+function checkObjectPath(keys, object) {
+  let curObject = object
+  for(let key of keys) {
+    if(!curObject[key]) {
+      return false
+    }
+    curObject = curObject[key]
+  }
+  return true
+}
+
 module.exports = {
   convertMS,
   getFriendlyMS,
   semiRandomShuffle,
+  checkObjectPath,
   truncateMiddle
 }

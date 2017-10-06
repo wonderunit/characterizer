@@ -1,3 +1,4 @@
+const utils = require('../utils.js')
 const CharacterComparisonBaseView = require('./character-comparison-base-view.js')
 
 module.exports = class CharacterComparisonValueDifferencesView extends CharacterComparisonBaseView {
@@ -70,19 +71,27 @@ module.exports = class CharacterComparisonValueDifferencesView extends Character
 
           let index = 0
           let favoriteData = {}
+          let favoritesPath = []
           for(let characterValue of valueGrouped.values) {
             let characterScoreView = document.createElement('div')
             characterScoreView.innerHTML = `${this.selectedCharacters[index].name} score: ${characterValue.score}`
             view.appendChild(characterScoreView)
             favoriteData[`character${index+1}ID`] = characterValue.characterID
             favoriteData[`value${index+1}ID`] = characterValue.valueID
+            favoritesPath.push(characterValue.characterID)
+            favoritesPath.push(characterValue.valueID)
             index++
           }
 
-          var self = this
-          favButton.addEventListener('mouseup', function(event) {
-            self.emit('add-comparison-favorite', favoriteData)
-          })
+          let isFavorite = utils.checkObjectPath(favoritesPath, this.valueComparisonFavorites)
+          if(isFavorite) {
+            favButton.innerHTML = `favorited`
+          } else {
+            var self = this
+            favButton.addEventListener('mouseup', function(event) {
+              self.emit('add-comparison-favorite', favoriteData)
+            })
+          }
 
           this.comparisonView.appendChild(view)
         }

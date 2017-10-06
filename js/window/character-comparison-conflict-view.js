@@ -1,3 +1,4 @@
+const utils = require('../utils.js')
 const CharacterComparisonBaseView = require('./character-comparison-base-view.js')
 const CharacterView = require('./character-selector-multiple.js')
 const { semiRandomShuffle } = require('../utils.js')
@@ -66,6 +67,13 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
   getTableView(valueIndex, characterValueResults) {
     let conflictContainer = document.createElement("div")
     conflictContainer.classList.add("comparison-view-conflict-container")
+
+    let favButton = document.createElement('div')
+    favButton.innerHTML = `add favorite`
+    conflictContainer.appendChild(favButton)
+
+    let favoriteData = {}
+    let favoritesPath = []
     for(var j = 0; j < characterValueResults.length; j++) {
       if(j > 0) {
         let vsView = document.createElement("div")
@@ -78,7 +86,23 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
       let nameView = document.createElement("div")
       nameView.innerHTML = name
       conflictContainer.appendChild(nameView)
+
+      favoriteData[`character${j+1}ID`] = value.characterID
+      favoriteData[`value${j+1}ID`] = value.valueID
+      favoritesPath.push(value.characterID)
+      favoritesPath.push(value.valueID)
     }
+
+    let isFavorite = utils.checkObjectPath(favoritesPath, this.valueComparisonFavorites)
+    if(isFavorite) {
+      favButton.innerHTML = `favorited`
+    } else {
+      var self = this
+      favButton.addEventListener('mouseup', function(event) {
+        self.emit('add-comparison-favorite', favoriteData)
+      })
+    }
+
     return conflictContainer
   }
   
