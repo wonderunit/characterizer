@@ -73,7 +73,7 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
     conflictContainer.appendChild(favButton)
 
     let favoriteData = {}
-    let favoritesPath = []
+    let favoritesPaths = []
     for(var j = 0; j < characterValueResults.length; j++) {
       if(j > 0) {
         let vsView = document.createElement("div")
@@ -89,11 +89,11 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
 
       favoriteData[`character${j+1}ID`] = value.characterID
       favoriteData[`value${j+1}ID`] = value.valueID
-      favoritesPath.push(value.characterID)
-      favoritesPath.push(value.valueID)
+      favoritesPaths.push([value.characterID, value.valueID])
     }
 
-    let isFavorite = utils.checkObjectPath(favoritesPath, this.valueComparisonFavorites)
+    let isFavorite = utils.checkObjectPath(favoritesPaths[0].concat(favoritesPaths[1]), this.valueComparisonFavorites) 
+      || utils.checkObjectPath(favoritesPaths[1].concat(favoritesPaths[0]), this.valueComparisonFavorites)
     if(isFavorite) {
       favButton.innerHTML = `favorited`
     } else {
