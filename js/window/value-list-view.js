@@ -1,5 +1,4 @@
 const MainBaseView = require('./main-base-view.js')
-const ValuesViewAverage = require('./values-views/values-view-average.js')
 
 module.exports = class ValueListView extends MainBaseView {
   constructor(properties) {
@@ -24,7 +23,15 @@ module.exports = class ValueListView extends MainBaseView {
     this.getCharacters()
       .then(inCharacters => {
         this.characters = inCharacters
-        this.updateView()
+
+        this.characterSelector.innerHTML = ``
+        for(let character of this.characters) {
+          let option = document.createElement("option")
+          option.setAttribute("value", character.id)
+          option.innerHTML = character.name
+          this.characterSelector.appendChild(option)
+        }
+
         if(this.characters && this.characters.length) {
           this.onSelectCharacter(this.characters[0].id)
         }
@@ -33,38 +40,43 @@ module.exports = class ValueListView extends MainBaseView {
   }
 
   updateView() {
-
-    // TODO: move this to completion of characters fetch.
-    this.characterSelector.innerHTML = ``
-    for(let character of this.characters) {
-      let option = document.createElement("option")
-      option.setAttribute("value", character.id)
-      option.innerHTML = character.name
-      this.characterSelector.appendChild(option)
-    }
-  }
-
-  onSelectCharacter(characterID) {
-    this.currentCharacterID = characterID
-    let character
-    for(let aCharacter of this.characters) { 
-      if(aCharacter.id === this.currentCharacterID) {
-        character = aCharacter
-        break
-      }
-    }
-
-    // TODO: move this to updateView, see internal-conflict-view
-    if(!character) {
+    if(!this.currentCharacterID) {
       return
     }
 
     this.valuesViewContainer.innerHTML = ``
 
-    this.getCharacterValues(characterID).then(characterValues => {
-      this.valuesView = new ValuesViewAverage({values: characterValues, valuesMap: this.valuesMap})
-      this.valuesViewContainer.appendChild(this.valuesView.getView())
-    })
+    this.getCharacterValues(this.currentCharacterID)
+      .then(characterValues => {
+        this.valuesView = this.getValuesView(characterValues)
+        this.valuesViewContainer.appendChild(this.valuesView)
+      })
+      .catch(console.error)
+  }
+
+  onSelectCharacter(characterID) {
+    this.currentCharacterID = characterID
+    this.updateView()
+  }
+
+  getValuesView(values) {
+    let result = document.createElement('div')
+    result.setAttribute("id", "values-view")
+
+    for(let value of values) {
+      let valueView = document.createElement('div')
+      valueView.setAttribute("class", "value-list-name")
+      let progressView = document.createElement('div')
+      progressView.setAttribute("class", "value-list-progress")
+      progressView.setAttribute("style", `width: ${value.score*100}%`)
+      valueView.appendChild(progressView)
+      let nameView = document.createElement('div')
+      nameView.setAttribute("class", "value-list-label")
+      nameView.innerHTML = `${this.valuesMap[value.valueID.toString()].name} | ${value.score} | Wins: ${value.wins}, Losses: ${value.losses} | Battles: ${value.battleCount}`
+      valueView.appendChild(nameView)
+      result.appendChild(valueView)
+    }
+    return result
   }
 
 }
