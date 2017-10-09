@@ -16,8 +16,22 @@ module.exports.up = function(knex, Promise) {
     }
   })
 
+  let CharacterValueFavorites = knex.schema.hasTable('CharacterValueFavorites').then((exists) => {
+    if(!exists) {
+      return knex.schema.createTable('CharacterValueFavorites', function(table) { 
+        table.integer('characterID').references('id').inTable('Characters')
+        table.integer('valueID').references('id').inTable('Values')
+        table.timestamps(false, true)
+        table.increments('id').primary()
+      })
+    } else {
+      return Promise.resolve(true)
+    }
+  })
+
   return Promise.all([
-    ValueComparisonFavorites
+    ValueComparisonFavorites, 
+    CharacterValueFavorites
   ])
 }
 

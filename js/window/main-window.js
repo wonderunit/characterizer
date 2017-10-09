@@ -60,8 +60,11 @@ var characterBattleCounts = {}
 var characterSessions = {}
 var characterValueFavorites = {}
 
-// objects of the form { character1ID: { value1ID: character2ID: {value2:ID } } }
+// object of the form { character1ID: { value1ID: character2ID: {value2:ID } } }
 var valueComparisonFavorites = {}
+
+// object of the form { characterID: {valueID: true}}
+var charactersValueFavorites = {}
 var currentCharacterID
 var knex = remote.getGlobal('knex')
 var container = document.getElementById("container")
@@ -79,6 +82,7 @@ const viewProperties = {
   "getSelectedCharacters": getSelectedCharacters,
   "valuesMap": valuesMap,
   "valueComparisonFavorites": valueComparisonFavorites,
+  "charactersValueFavorites": charactersValueFavorites,
 }
 
 // Cache the system values
@@ -104,7 +108,10 @@ mainViewSelector.on('select-view', viewType => {
 // Initialize character data.
 ipcRenderer.send('log', {type: 'progress', message: `Initializing Project`})
 
-loadValueComparisonFavorites()
+loadCharactersValueFavorites()
+  .then(()=> {
+    return loadValueComparisonFavorites()
+  })
   .then(()=>{
     return getCharacters()
   })
@@ -162,6 +169,9 @@ function onSelectView() {
   })
   currentContentView.on('add-comparison-favorite', data => {
     addValueComparisonFavorite(data)
+  })
+  currentContentView.on('add-character-value-favorite', data => {
+    addCharacterValueFavorite(data)
   })
 }
 
@@ -597,6 +607,36 @@ function addValueComparisonFavorite(data) {
       console.log(`added: ${JSON.stringify(data)}`)
     })
     .catch(console.error)
+}
+
+function cacheCharacterValueFavorite(record) {
+  if(!charactersValueFavorites[record.characterID]) {
+    charactersValueFavorites[record.characterID] = {}
+  }
+  charactersValueFavorites[record.characterID][record.valueID] = true
+}
+
+function addCharacterValueFavorite(data) {
+  cacheCharacterValueFavorite(data)
+  knex('CharacterValueFavorites').returning('id').insert(data)
+    .then((result) => {
+      console.log(`added: ${JSON.stringify(data)}`)
+    })
+    .catch(console.error)
+}
+
+function loadCharactersValueFavorites() {
+  return new Promise((fulfill, reject) => {
+    let start = Date.now()
+    knex.raw(`select * from CharacterValueFavorites`)
+      .then(records => {
+        for(let record of records) {
+          cacheCharacterValueFavorite(record)
+        }
+        fulfill(records)
+      })
+      .catch(reject)
+  })
 }
 
 function displayMessage(message) {
