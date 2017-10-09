@@ -202,9 +202,7 @@ function addCharacter(record) {
       characters.push(record)
       
       let newCharacterValueInserts = valuesLib.map((value)=>{
-        knex('CharacterValues').insert({characterID: newID, valueID: value.id, score: 0.0, wins: 0, losses: 0, battleCount: 0})
-          .then(()=>{})
-          .catch(console.error)
+        return knex('CharacterValues').insert({characterID: newID, valueID: value.id, score: 0.0, wins: 0, losses: 0, battleCount: 0})
       })
       Promise.all(newCharacterValueInserts)
         .then(()=>{ 
@@ -213,9 +211,16 @@ function addCharacter(record) {
             currentContentView.onSelectCharacter(newID) 
           }
         })
-        .catch(console.error)
+        .catch(error => {
+          displayMessage(`Error adding character value: ${error}`)
+          knex.raw(`delete from Characters where "id" = ?`, [newID])
+            .then(()=>{})
+            .catch(console.error)
+        })
     })
-    .catch(console.error)
+    .catch(error => {
+      displayMessage(`Error adding character value: ${error}`)
+    })
 }
 
 /**
@@ -592,4 +597,9 @@ function addValueComparisonFavorite(data) {
       console.log(`added: ${JSON.stringify(data)}`)
     })
     .catch(console.error)
+}
+
+function displayMessage(message) {
+  let messageDiv = document.getElementById("message")
+  messageDiv.innerHTML = message
 }
