@@ -66,9 +66,9 @@ module.exports = class ValueListView extends MainBaseView {
     for(let value of values) {
       let valueView = document.createElement('div')
       valueView.setAttribute("class", "value-list-name")
+
       let favButton = document.createElement('div')
       favButton.innerHTML = `add favorite`
-      
       if(this.charactersValueFavorites[this.currentCharacterID] && this.charactersValueFavorites[this.currentCharacterID][value.id]) {
         favButton.innerHTML = `favorited`
       } else {
