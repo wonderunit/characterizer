@@ -69,15 +69,20 @@ module.exports = class ValueListView extends MainBaseView {
 
       let favButton = document.createElement('div')
       favButton.innerHTML = `add favorite`
-      if(this.charactersValueFavorites[this.currentCharacterID] && this.charactersValueFavorites[this.currentCharacterID][value.id]) {
-        favButton.innerHTML = `favorited`
-      } else {
-        var self = this
-        favButton.addEventListener('mouseup', function(event) {
-          event.target.innerHTML = `favorited`
-          self.emit('add-character-value-favorite', {valueID: value.id, characterID: self.currentCharacterID})
+      this.getCharacterValueFavorites(this.currentCharacterID)
+        .then(characterValueFavorites => {
+          var favoriteValues = characterValueFavorites.values 
+          if(favoriteValues.indexOf(value.valueID) >= 0) {
+            favButton.innerHTML = `favorited`
+          } else {
+            var self = this
+            favButton.addEventListener('mouseup', function(event) {
+              event.target.innerHTML = `favorited`
+              self.emit('add-character-value-favorite', {valueID: value.valueID, characterID: self.currentCharacterID})
+            })
+          }
         })
-      }
+        .catch(console.error)
       result.appendChild(favButton)
 
       let progressView = document.createElement('div')

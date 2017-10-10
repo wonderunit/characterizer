@@ -30,7 +30,7 @@ const mainViews = [
   },
   {
     "type": "battleFavorites",
-    "label": "Battle Favorites"
+    "label": "Character Favorites"
   },
   {
     "type": "characterConflictComparison",
@@ -64,7 +64,6 @@ var characterValueFavorites = {}
 var valueComparisonFavorites = {}
 
 // object of the form { characterID: {valueID: true}}
-var charactersValueFavorites = {}
 var currentCharacterID
 var knex = remote.getGlobal('knex')
 var container = document.getElementById("container")
@@ -82,7 +81,6 @@ const viewProperties = {
   "getSelectedCharacters": getSelectedCharacters,
   "valuesMap": valuesMap,
   "valueComparisonFavorites": valueComparisonFavorites,
-  "charactersValueFavorites": charactersValueFavorites,
 }
 
 // Cache the system values
@@ -108,7 +106,10 @@ mainViewSelector.on('select-view', viewType => {
 // Initialize character data.
 ipcRenderer.send('log', {type: 'progress', message: `Initializing Project`})
 
-loadCharactersValueFavorites()
+loadValueBattleFavorites()
+  .then(()=>{
+    return loadCharactersValueFavorites()
+  })
   .then(()=> {
     return loadValueComparisonFavorites()
   })
@@ -380,7 +381,6 @@ function getCharacterBattlePairs(characterID) {
     return Promise.resolve(characterBattlePairs[characterID])
   } else {
     return new Promise((fulfill, reject) => {
-      let start = Date.now()
       knex.raw(`select * from ValuesBattleOutcomes where "characterID" = ?`, [characterID])
         .then((result) => {
           if(!result || result.length < 1 || !characterBattlePairs[characterID]) {
@@ -431,41 +431,11 @@ function getCharacterValueFavorites(characterID) {
   if(characterValueFavorites[characterID]) {
     return Promise.resolve(characterValueFavorites[characterID])
   } else {
-    return new Promise((fulfill, reject) => {
-      let start = Date.now()
-      knex.raw(`select * from ValuesBattleFavorites where "characterID" = ?`, [characterID])
-        .then((result) => {
-          if(!result) {
-            result = []
-          }
-          if(!characterValueFavorites[characterID]) {
-            characterValueFavorites[characterID] = {
-              pairs: {},
-              values: []
-            }
-          }
-          let characterFavorites = characterValueFavorites[characterID]
-
-          var favoritePairs = characterFavorites.pairs
-          var favoriteValues = characterFavorites.values 
-          for(let record of result) {
-            
-            if(!favoritePairs[record.value1ID]) {
-              favoritePairs[record.value1ID] = {}
-            }
-            favoritePairs[record.value1ID][record.value2ID] = true
-
-            if(favoriteValues.indexOf(record.value1ID) < 0) {
-              favoriteValues.push(record.value1ID)
-            }
-            if(favoriteValues.indexOf(record.value2ID) < 0) {
-              favoriteValues.push(record.value2ID)
-            }
-          }
-          fulfill(characterValueFavorites[characterID])
-        })
-        .catch(console.error)
-    })
+    characterValueFavorites[characterID] = {
+      pairs: {},
+      values: []
+    }
+    return Promise.resolve(characterValueFavorites[characterID])
   }
 }
 
@@ -571,11 +541,52 @@ function getSelectedCharacters() {
   return selectedCharacters
 }
 
+function cacheValueBattleFavorite(record) {
+  if(!characterValueFavorites[record.characterID]) {
+    characterValueFavorites[record.characterID] = {
+      pairs: {},
+      values: []
+    }
+  }
+
+  var favoritePairs = characterValueFavorites[record.characterID].pairs
+  var favoriteValues = characterValueFavorites[record.characterID].values 
+  if(!favoritePairs[record.value1ID]) {
+    favoritePairs[record.value1ID] = {}
+  }
+  favoritePairs[record.value1ID][record.value2ID] = true
+
+  if(favoriteValues.indexOf(record.value1ID) < 0) {
+    favoriteValues.push(record.value1ID)
+  }
+  if(favoriteValues.indexOf(record.value2ID) < 0) {
+    favoriteValues.push(record.value2ID)
+  }
+}
+
+function loadValueBattleFavorites() {
+  return new Promise((fulfill, reject) => {
+    knex.raw(`select * from ValuesBattleFavorites`)
+      .then((records) => {
+        if(!records) {
+          fulfill([])
+        }
+        for(let record of records) {
+          cacheValueBattleFavorite(record)
+        }
+        fulfill(records)
+      })
+      .catch(reject)
+  })
+}
+
 function loadValueComparisonFavorites() {
   return new Promise((fulfill, reject) => {
-    let start = Date.now()
     knex.raw(`select * from ValueComparisonFavorites`)
       .then(records => {
+        if(!records) {
+          return fulfill([])
+        }
         for(let record of records) {
           cacheValueComparisonFavorite(record)
         }
@@ -598,6 +609,30 @@ function cacheValueComparisonFavorite(record) {
   if(!valueComparisonFavorites[record.character1ID][record.value1ID][record.character2ID][record.value2ID]) {
     valueComparisonFavorites[record.character1ID][record.value1ID][record.character2ID][record.value2ID] = {}
   }
+
+  getCharacterValueFavorites(record.character1ID)
+    .then((characterValueFavorites) => {
+      var favoriteValues = characterValueFavorites.values 
+      if(favoriteValues.indexOf(record.value1ID) < 0) {
+        favoriteValues.push(record.value1ID)
+      }
+
+      if(record.character1ID === record.character1ID) {
+        var favoritePairs = characterValueFavorites.pairs
+        if(!favoritePairs[record.value1ID]) {
+          favoritePairs[record.value1ID] = {}
+        }
+        favoritePairs[record.value1ID][record.value2ID] = true
+      }
+    })
+  
+  getCharacterValueFavorites(record.character2ID)
+    .then((characterValueFavorites) => {
+      var favoriteValues = characterValueFavorites.values 
+      if(favoriteValues.indexOf(record.value2ID) < 0) {
+        favoriteValues.push(record.value2ID)
+      }
+    })
 }
 
 function addValueComparisonFavorite(data) {
@@ -610,10 +645,13 @@ function addValueComparisonFavorite(data) {
 }
 
 function cacheCharacterValueFavorite(record) {
-  if(!charactersValueFavorites[record.characterID]) {
-    charactersValueFavorites[record.characterID] = {}
-  }
-  charactersValueFavorites[record.characterID][record.valueID] = true
+  getCharacterValueFavorites(record.characterID)
+    .then((characterValueFavorites) => {
+      var favoriteValues = characterValueFavorites.values 
+      if(favoriteValues.indexOf(record.valueID) < 0) {
+        favoriteValues.push(record.valueID)
+      }
+    })
 }
 
 function addCharacterValueFavorite(data) {
@@ -627,7 +665,6 @@ function addCharacterValueFavorite(data) {
 
 function loadCharactersValueFavorites() {
   return new Promise((fulfill, reject) => {
-    let start = Date.now()
     knex.raw(`select * from CharacterValueFavorites`)
       .then(records => {
         for(let record of records) {
