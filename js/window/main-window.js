@@ -63,6 +63,9 @@ var characterValueFavorites = {}
 // object of the form { character1ID: { value1ID: character2ID: {value2:ID } } }
 var valueComparisonFavorites = {}
 
+// object of the form { character1ID: { value1ID: character2ID: {value2:ID } } }
+var characterComparisonFavorites = {}
+
 // object of the form { characterID: {valueID: true}}
 var currentCharacterID
 var knex = remote.getGlobal('knex')
@@ -81,6 +84,7 @@ const viewProperties = {
   "getSelectedCharacters": getSelectedCharacters,
   "valuesMap": valuesMap,
   "valueComparisonFavorites": valueComparisonFavorites,
+  "characterComparisonFavorites": characterComparisonFavorites,
 }
 
 // Cache the system values
@@ -611,6 +615,18 @@ function cacheValueComparisonFavorite(record) {
   if(!valueComparisonFavorites[record.character1ID][record.value1ID][record.character2ID][record.value2ID]) {
     valueComparisonFavorites[record.character1ID][record.value1ID][record.character2ID][record.value2ID] = {}
   }
+
+  if(!characterComparisonFavorites[record.character1ID]) {
+    characterComparisonFavorites[record.character1ID] = {}
+  }
+  if(!characterComparisonFavorites[record.character1ID][record.character2ID]) {
+    characterComparisonFavorites[record.character1ID][record.character2ID] = []
+  }
+
+  let comparisonRecord = {}
+  comparisonRecord[record.character1ID] = record.value1ID
+  comparisonRecord[record.character2ID] = record.value2ID
+  characterComparisonFavorites[record.character1ID][record.character2ID].push(comparisonRecord)
 
   getCharacterValueFavorites(record.character1ID)
     .then((characterValueFavorites) => {

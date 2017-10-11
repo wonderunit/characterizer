@@ -12,6 +12,7 @@ module.exports = class MainBaseView extends EventEmitter {
     this.getSelectedCharacters = properties.getSelectedCharacters
     this.valuesMap = properties.valuesMap
     this.valueComparisonFavorites = properties.valueComparisonFavorites
+    this.characterComparisonFavorites = properties.characterComparisonFavorites
     
     this.root = document.createElement("div")
   }

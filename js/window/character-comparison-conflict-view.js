@@ -58,66 +58,117 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
           headersContainer.appendChild(characterName)
         }
 
-        for(let i = 0; i < NUM_COMPARISON_ITEMS; i++) {
-          let conflictContainer = this.getValuesView(i, characterValueResults, this.selectedCharacters)
+        if(!this.isFiltering) {
+          let conflictContainer = this.getValuesView(characterValueResults)
           if(conflictContainer) {
-            conflictContainer.style.left = `${i/NUM_COMPARISON_ITEMS*100}%`
             container.appendChild(conflictContainer)
           }
+        } else {
+          let conflictContainer = this.getFavoritesValuesView() 
+          container.appendChild(conflictContainer)
         }
+
         this.comparisonView.appendChild(container)
       })
       .catch(console.error)
   }
 
-  getValuesView(valueIndex, characterValueResults) {
-    let conflictContainer = document.createElement("div")
-    conflictContainer.classList.add("comparison-view-conflict-container")
-
-    let favButton = document.createElement('div')
-    favButton.innerHTML = `add favorite`
-    conflictContainer.appendChild(favButton)
-
-    let favoriteData = {}
-    let favoritesPaths = []
-    for(var j = 0; j < characterValueResults.length; j++) {
-      if(j > 0) {
-        let vsView = document.createElement("div")
-        vsView.innerHTML = `vs`
-        conflictContainer.appendChild(vsView)
+  getValuesView(characterValueResults) {
+    let result = document.createElement("div")
+    for(let valueIndex = 0; valueIndex < NUM_COMPARISON_ITEMS; valueIndex++) {
+      let conflictContainer = document.createElement("div")
+      conflictContainer.classList.add("comparison-view-conflict-container")
+  
+      let favButton = document.createElement('div')
+      favButton.innerHTML = `add favorite`
+      conflictContainer.appendChild(favButton)
+  
+      let favoriteData = {}
+      let favoritesPaths = []
+      for(var j = 0; j < characterValueResults.length; j++) {
+        if(j > 0) {
+          let vsView = document.createElement("div")
+          vsView.innerHTML = `vs`
+          conflictContainer.appendChild(vsView)
+        }
+        let characterValues = characterValueResults[j]
+        let value = characterValues[valueIndex]
+        let name = this.valuesMap[value.valueID].name
+        let nameView = document.createElement("div")
+        nameView.innerHTML = name
+        conflictContainer.appendChild(nameView)
+  
+        favoriteData[`character${j+1}ID`] = value.characterID
+        favoriteData[`value${j+1}ID`] = value.valueID
+        favoritesPaths.push([value.characterID, value.valueID])
       }
-      let characterValues = characterValueResults[j]
-      let value = characterValues[valueIndex]
-      let name = this.valuesMap[value.valueID].name
+  
+      let isFavorite = false
+      if(favoritesPaths.length > 1) {
+        isFavorite = utils.checkObjectPath(favoritesPaths[0].concat(favoritesPaths[1]), this.valueComparisonFavorites) 
+          || utils.checkObjectPath(favoritesPaths[1].concat(favoritesPaths[0]), this.valueComparisonFavorites)
+      }
+      if(isFavorite) {
+        favButton.innerHTML = `favorited`
+      } else {
+        var self = this
+        favButton.addEventListener('mouseup', function(event) {
+          event.target.innerHTML = `favorited`
+          self.emit('add-comparison-favorite', favoriteData)
+        })
+      }
+  
+      if(this.isFiltering && isFavorite) {
+        result.appendChild(conflictContainer)
+      } else if(!this.isFiltering) {
+        result.appendChild(conflictContainer)
+      }
+    }
+    return result
+  }
+  
+  getFavoritesValuesView() {
+    let result = document.createElement("div")
+    let character1ID = this.selectedCharacters[0].id
+    let character2ID = this.selectedCharacters[1].id
+
+    let favoritePairs = []
+    if(this.characterComparisonFavorites[character1ID] 
+      && this.characterComparisonFavorites[character1ID][character2ID]) {
+
+        favoritePairs = this.characterComparisonFavorites[character1ID][character2ID]
+    }
+
+    for(let j = 0; j<favoritePairs.length; j++) {
+      let conflictContainer = document.createElement("div")
+      conflictContainer.classList.add("comparison-view-conflict-container")
+
+      let favButton = document.createElement('div')
+      favButton.innerHTML = `favorited`
+      conflictContainer.appendChild(favButton)
+
+      let favoritePair = favoritePairs[j]
+      let value1ID = favoritePair[character1ID]
+      let value2ID = favoritePair[character2ID]
+      let value1 = this.valuesMap[value1ID]
+      let value2 = this.valuesMap[value2ID]
+
       let nameView = document.createElement("div")
-      nameView.innerHTML = name
+      nameView.innerHTML = value1.name
       conflictContainer.appendChild(nameView)
 
-      favoriteData[`character${j+1}ID`] = value.characterID
-      favoriteData[`value${j+1}ID`] = value.valueID
-      favoritesPaths.push([value.characterID, value.valueID])
+      let vsView = document.createElement("div")
+      vsView.innerHTML = `vs`
+      conflictContainer.appendChild(vsView)
+
+      nameView = document.createElement("div")
+      nameView.innerHTML = value2.name
+      conflictContainer.appendChild(nameView)
+
+      result.appendChild(conflictContainer)
     }
 
-    let isFavorite = false
-    if(favoritesPaths.length > 1) {
-      isFavorite = utils.checkObjectPath(favoritesPaths[0].concat(favoritesPaths[1]), this.valueComparisonFavorites) 
-        || utils.checkObjectPath(favoritesPaths[1].concat(favoritesPaths[0]), this.valueComparisonFavorites)
-    }
-    if(isFavorite) {
-      favButton.innerHTML = `favorited`
-    } else {
-      var self = this
-      favButton.addEventListener('mouseup', function(event) {
-        event.target.innerHTML = `favorited`
-        self.emit('add-comparison-favorite', favoriteData)
-      })
-    }
-
-    if(this.isFiltering && isFavorite) {
-      return conflictContainer
-    } else if(!this.isFiltering) {
-      return conflictContainer
-    }
+    return result
   }
 }
 
