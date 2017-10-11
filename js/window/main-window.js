@@ -1,5 +1,5 @@
 const {ipcRenderer, remote} = require('electron')
-const CharacterView = require('./character-selector-multiple.js')
+const CharactersView = require('./characters-view.js')
 const CharacterTrainerView = require('./character-trainer-view.js')
 const ValueListView = require('./value-list-view.js')
 const CharacterComparisonView = require('./character-comparison-view.js')
@@ -180,6 +180,16 @@ function onSelectView() {
   currentContentView.on('add-character-value-favorite', data => {
     addCharacterValueFavorite(data)
   })
+  currentContentView.on('train', data => {
+    curViewType = "characterTrainer"
+    mainViewSelector.setSelectedViewType(curViewType)
+    onSelectView()
+  })
+  currentContentView.on('viewValues', data => {
+    curViewType = "valueList"
+    mainViewSelector.setSelectedViewType(curViewType)
+    onSelectView()
+  })
 }
 
 /**
@@ -203,7 +213,7 @@ function getContentView() {
       return CharacterComparisonValueDifferenceView
     case "manageCharacters":
     default:
-      return CharacterView
+      return CharactersView
   }
 }
 

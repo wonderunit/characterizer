@@ -1,9 +1,8 @@
 const MainBaseView = require('./main-base-view.js')
 
-module.exports = class CharacterView extends MainBaseView {
+module.exports = class CharactersView extends MainBaseView {
   constructor(properties) {
     super(properties)
-
     this.root = document.createElement('div')
     this.root.setAttribute("id", "characters-container")
     let header = document.createElement("h2")
@@ -26,7 +25,7 @@ module.exports = class CharacterView extends MainBaseView {
     this.characterInputAddButton.innerHTML = `Add Character`
     this.characterInputAddButton.addEventListener('click', this.addCharacterFronInput.bind(this))
     this.characterInputContainer.appendChild(this.characterInputAddButton)
-
+    
     this.characterList = document.createElement("div")
     this.characterList.setAttribute("id", "character-list")
     this.root.appendChild(this.characterList)
@@ -37,19 +36,42 @@ module.exports = class CharacterView extends MainBaseView {
       this.updateView()
     })
   }
-
+  
   addCharacterView(characterName, characterID, isSelected) {
+    let self = this
+
     let characterView = document.createElement('div')
-    characterView.classList.add("button")
-    if(isSelected) {
-      characterView.classList.add("character-selection-view-selected")
-    }
+    characterView.classList.add("manage-character-container")
     characterView.setAttribute("data-id", characterID || 1)
-    characterView.innerHTML = characterName
+
+    let nameView = document.createElement("div")
+    nameView.innerHTML = characterName
+    characterView.appendChild(nameView)
+
+    let battleCountView = document.createElement("div")
+    battleCountView.innerHTML = `${this.getCharacterBattleCount(characterID)} Battles`
+    characterView.appendChild(battleCountView)
+
+    let trainButton = document.createElement("div")
+    trainButton.classList.add("manage-character-button")
+    trainButton.innerHTML = "Train"
+    trainButton.addEventListener("click", function(event) {
+      self.emit("train", {characterID})
+    })
+    characterView.appendChild(trainButton)
+    
+    let viewValuesButton = document.createElement("div")
+    viewValuesButton.classList.add("manage-character-button")
+    viewValuesButton.innerHTML = "Values"
+    viewValuesButton.addEventListener("click", function(event) {
+      self.emit("viewValues", {characterID})
+    })
+    characterView.appendChild(viewValuesButton)
+
     characterView.addEventListener('click', this.onCharacterClick.bind(this));
     this.characterList.appendChild(characterView)
   }
-
+  
   addCharacterFronInput(event) {
     let newNameInput = document.querySelector("#input-add-character-name")
     let newName = newNameInput.value
@@ -63,11 +85,11 @@ module.exports = class CharacterView extends MainBaseView {
   onCharacterClick(event) {
     this.emit('select-character', {characterID: parseInt(event.target.dataset.id)})
   }
-
+  
   getView() {
     return this.root
   }
-
+  
   updateView() {
     let selectedCharacters = this.getSelectedCharacters()
     this.characterList.innerHTML = ''

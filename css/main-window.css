@@ -250,3 +250,22 @@
   padding: 20px 0px;
   cursor: pointer;
 }
+
+.manage-character-container  div {
+  margin-bottom: 10px;
+}
+
+.manage-character-container {
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  border-style: solid;
+  margin: 10px;
+  border-width: 1px;
+}
+
+.manage-character-button {
+  padding: 10px;
+  background-color: #AAA;
+  cursor: pointer;
+}
