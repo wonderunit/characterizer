@@ -67,7 +67,7 @@ var valueComparisonFavorites = {}
 var currentCharacterID
 var knex = remote.getGlobal('knex')
 var container = document.getElementById("container")
-var curViewType = ""
+var curViewType = "manageCharacters"
 var currentContentView
 var selectedCharacters = []
 
