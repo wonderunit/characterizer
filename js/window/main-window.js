@@ -105,7 +105,7 @@ mainViewSelector.on('select-view', viewType => {
 
 // Initialize character data.
 ipcRenderer.send('log', {type: 'progress', message: `Initializing Project`})
-
+displayMessage(`Initializing Project`)
 loadValueBattleFavorites()
   .then(()=>{
     return loadCharactersValueFavorites()
@@ -119,6 +119,7 @@ loadValueBattleFavorites()
   .then(characters => {
 
     var finishSetup = () => {
+      displayMessage(``)
       ipcRenderer.send('workspace-ready')
       onSelectView()
     }
@@ -129,6 +130,7 @@ loadValueBattleFavorites()
       var sequence = Promise.resolve()
       characters.forEach(function(character) {
         sequence = sequence.then(function() {
+          displayMessage(`Initializing ${character.name}`)
           ipcRenderer.send('log', {type: 'progress', message: `Initializing ${character.name}`})
           return getBattlePairer(character.id)
         }).then(()=>{});
@@ -223,14 +225,14 @@ function addCharacter(record) {
           }
         })
         .catch(error => {
-          displayMessage(`Error adding character value: ${error}`)
+          displayError(`Error adding character value: ${error}`)
           knex.raw(`delete from Characters where "id" = ?`, [newID])
             .then(()=>{})
             .catch(console.error)
         })
     })
     .catch(error => {
-      displayMessage(`Error adding character value: ${error}`)
+      displayError(`Error adding character value: ${error}`)
     })
 }
 
@@ -678,5 +680,10 @@ function loadCharactersValueFavorites() {
 
 function displayMessage(message) {
   let messageDiv = document.getElementById("message")
+  messageDiv.innerHTML = message
+}
+
+function displayError(message) {
+  let messageDiv = document.getElementById("error")
   messageDiv.innerHTML = message
 }
