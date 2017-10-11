@@ -5,6 +5,21 @@ module.exports = class CharacterComparisonView extends CharacterComparisonBaseVi
   constructor(properties) {
     super(properties)
     this.valuesViewType = "average"
+
+    this.isFiltering = false
+    this.favoritesFilter = document.createElement("div")
+    this.favoritesFilter.setAttribute("id", "favorites-filter-button")
+    this.favoritesFilter.innerHTML = `Show Favorites`
+    this.favoritesFilter.addEventListener("click", (event) => {
+      this.isFiltering = !this.isFiltering
+      if(this.isFiltering) {
+        this.favoritesFilter.innerHTML = `Show All`
+      } else {
+        this.favoritesFilter.innerHTML = `Show Favorites`
+      }
+      this.updateView()
+    })
+    this.root.appendChild(this.favoritesFilter)
     
     this.comparisonView = document.createElement("div")
     this.comparisonView.setAttribute("id", "character-comparison-view")
@@ -51,32 +66,44 @@ module.exports = class CharacterComparisonView extends CharacterComparisonBaseVi
     result.setAttribute("id", "values-view")
 
     for(let value of values) {
-      let valueView = document.createElement('div')
-      valueView.setAttribute("class", "value-list-name")
+      this.getCharacterValueFavorites(characterID).then(characterValueFavorites => {
+        let valueView = document.createElement('div')
+        valueView.setAttribute("class", "value-list-name")
+  
+        let favButton = document.createElement('div')
+        favButton.setAttribute("style", "position: relative; z-index: 2; padding-top: 10px;")
+        favButton.innerHTML = `add favorite`
 
-      let favButton = document.createElement('div')
-      favButton.setAttribute("style", "position: relative; z-index: 2; padding-top: 10px;")
-      favButton.innerHTML = `add favorite`
-      if(this.charactersValueFavorites[characterID] && this.charactersValueFavorites[characterID][value.id]) {
-        favButton.innerHTML = `favorited`
-      } else {
-        var self = this
-        favButton.addEventListener('mouseup', function(event) {
-          event.target.innerHTML = `favorited`
-          self.emit('add-character-value-favorite', {valueID: value.id, characterID: characterID})
-        })
-      }
+        let favoriteValues = characterValueFavorites.values
+        let isFavorite = favoriteValues.indexOf(value.valueID) >= 0
+        if(isFavorite) {
+          favButton.innerHTML = `favorited`
+        } else {
+          var self = this
+          favButton.addEventListener('mouseup', function(event) {
+            event.target.innerHTML = `favorited`
+            self.emit('add-character-value-favorite', {valueID: value.id, characterID: characterID})
+          })
+        }
 
-      let progressView = document.createElement('div')
-      progressView.setAttribute("class", "value-list-progress")
-      progressView.setAttribute("style", `width: ${value.score*100}%`)
-      valueView.appendChild(progressView)
-      let nameView = document.createElement('div')
-      nameView.setAttribute("class", "value-list-label")
-      nameView.innerHTML = `${this.valuesMap[value.valueID.toString()].name} | ${value.score} | Wins: ${value.wins}, Losses: ${value.losses} | Battles: ${value.battleCount}`
-      valueView.appendChild(nameView)
-      valueView.appendChild(favButton)
-      result.appendChild(valueView)
+        let progressView = document.createElement('div')
+        progressView.setAttribute("class", "value-list-progress")
+        progressView.setAttribute("style", `width: ${value.score*100}%`)
+        valueView.appendChild(progressView)
+        let nameView = document.createElement('div')
+        nameView.setAttribute("class", "value-list-label")
+        nameView.innerHTML = `${this.valuesMap[value.valueID.toString()].name} | ${value.score} | Wins: ${value.wins}, Losses: ${value.losses} | Battles: ${value.battleCount}`
+        valueView.appendChild(nameView)
+        valueView.appendChild(favButton)
+
+        if(this.isFiltering && isFavorite) {
+          result.appendChild(valueView)
+        } else if(!this.isFiltering) {
+          result.appendChild(valueView)
+        }
+
+      })
+
     }
 
     return result

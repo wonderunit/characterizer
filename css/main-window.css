@@ -239,3 +239,8 @@
   justify-content: center;
   color: red;
 }
+
+#favorites-filter-button {
+  padding: 20px 0px;
+  cursor: pointer;
+}
