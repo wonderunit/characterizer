@@ -8,7 +8,21 @@ const RANDOM_SHUFFLE_FACTOR = 4
 module.exports = class CharacterComparisonConflictView extends CharacterComparisonBaseView {
   constructor(properties) {
     super(properties)
-    this.valuesViewType = "table"
+
+    this.isFiltering = false
+    this.favoritesFilter = document.createElement("div")
+    this.favoritesFilter.setAttribute("id", "favorites-filter-button")
+    this.favoritesFilter.innerHTML = `Show Favorites`
+    this.favoritesFilter.addEventListener("click", (event) => {
+      this.isFiltering = !this.isFiltering
+      if(this.isFiltering) {
+        this.favoritesFilter.innerHTML = `Show All`
+      } else {
+        this.favoritesFilter.innerHTML = `Show Favorites`
+      }
+      this.updateView()
+    })
+    this.root.appendChild(this.favoritesFilter)
     
     this.comparisonView = document.createElement("div")
     this.comparisonView.setAttribute("id", "conflict-comparison-view")
@@ -46,8 +60,10 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
 
         for(let i = 0; i < NUM_COMPARISON_ITEMS; i++) {
           let conflictContainer = this.getValuesView(i, characterValueResults, this.selectedCharacters)
-          conflictContainer.style.left = `${i/NUM_COMPARISON_ITEMS*100}%`
-          container.appendChild(conflictContainer)
+          if(conflictContainer) {
+            conflictContainer.style.left = `${i/NUM_COMPARISON_ITEMS*100}%`
+            container.appendChild(conflictContainer)
+          }
         }
         this.comparisonView.appendChild(container)
       })
@@ -55,16 +71,6 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
   }
 
   getValuesView(valueIndex, characterValueResults) {
-    switch(this.valuesViewType) {
-      case "graph":
-        return this.getGraphView(valueIndex, characterValueResults)
-      case "table":
-      default:
-        return this.getTableView(valueIndex, characterValueResults)
-    }
-  }
-
-  getTableView(valueIndex, characterValueResults) {
     let conflictContainer = document.createElement("div")
     conflictContainer.classList.add("comparison-view-conflict-container")
 
@@ -107,44 +113,11 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
       })
     }
 
-    return conflictContainer
-  }
-  
-  getGraphView(valueIndex, characterValueResults) {
-    let conflictContainer = document.createElement("div")
-    conflictContainer.classList.add("comparison-view-conflict-container-graph")
-    let dotView = document.createElement("div")
-    dotView.classList.add("comparison-view-conflict-container-graph-dot")
-    conflictContainer.appendChild(dotView)
-    let namesView = document.createElement("div")
-    namesView.classList.add("comparison-view-conflict-container-graph-names")
-    namesView.classList.add("hidden")
-    conflictContainer.appendChild(namesView)
-    let valueCumulateive = 0
-    for(var j = 0; j < characterValueResults.length; j++) {
-      if(j > 0) {
-        let vsView = document.createElement("div")
-        vsView.innerHTML = `vs`
-        namesView.appendChild(vsView)
-      }
-      let characterValues = characterValueResults[j]
-      let value = characterValues[valueIndex]
-      let name = this.valuesMap[value.valueID].name
-      let nameView = document.createElement("div")
-      nameView.classList.add("comparison-view-conflict-container-graph-name")
-      nameView.innerHTML = name
-      namesView.appendChild(nameView)
-
-      valueCumulateive += value.score
+    if(this.isFiltering && isFavorite) {
+      return conflictContainer
+    } else if(!this.isFiltering) {
+      return conflictContainer
     }
-    conflictContainer.style.bottom = `${(valueCumulateive/characterValueResults.length)*100}%`
-    conflictContainer.addEventListener("mouseenter", function(event){
-      namesView.classList.remove("hidden")
-    })
-    conflictContainer.addEventListener("mouseleave", function(event){
-      namesView.classList.add("hidden")
-    })
-    return conflictContainer
   }
 }
 
