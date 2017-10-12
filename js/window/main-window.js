@@ -50,7 +50,8 @@ var valuesLib
 var characters
 var charactersMap = {}
 var valuesMap = {} // key: valueID, value: value data
-var characterValues = {} // key: character ID, value: array of their values with scores
+var characterValues = {} // key: character ID, value: array of a ccharacter's values sorted by scores
+var characterValuesMap = {} // key: character ID, value: array of their values with scores
 var battlePairers = {} // cache battle pairers
 
 // objects of the form { winnerID: { loserID: count }, ... },
@@ -61,9 +62,11 @@ var characterSessions = {}
 var characterValueFavorites = {}
 
 // object of the form { character1ID: { value1ID: character2ID: {value2:ID } } }
+// this is to quickly look up if a value pairing exists.
 var valueComparisonFavorites = {}
 
 // object of the form { character1ID: { value1ID: character2ID: {value2:ID } } }
+// this is to quickly get a list of favorite value pairs between characters
 var characterComparisonFavorites = {}
 
 // object of the form { characterID: {valueID: true}}
@@ -82,6 +85,7 @@ const viewProperties = {
   "getCharacterSession": getCharacterSession,
   "getCharacterValueFavorites": getCharacterValueFavorites,
   "getSelectedCharacters": getSelectedCharacters,
+  "getCharacterValuesMap": getCharacterValuesMap,
   "valuesMap": valuesMap,
   "valueComparisonFavorites": valueComparisonFavorites,
   "characterComparisonFavorites": characterComparisonFavorites,
@@ -327,6 +331,29 @@ function getCharacterValues(characterID) {
           })
           resolve(result)
           characterValues[characterID] = result
+        })
+        .catch(console.error)
+    })
+  }
+}
+
+/**
+ * 
+ * @param {String} characterID 
+ */
+function getCharacterValuesMap(characterID) {
+  characterID = characterID.toString()
+  if(characterValuesMap[characterID]) {
+    return Promise.resolve(characterValuesMap[characterID])
+  } else {
+    return new Promise((fulfill, reject) => {
+      getCharacterValues(characterID)
+        .then(values => {
+          characterValuesMap[characterID] = {}
+          for(let value of values) {
+            characterValuesMap[characterID][value.valueID] = value
+          }
+          fulfill(characterValuesMap[characterID])
         })
         .catch(console.error)
     })
