@@ -16,6 +16,11 @@ module.exports = class CharacterTrainerView extends MainBaseView {
       this.onSelectCharacter(this.currentCharacterID)
     })
     this.root.appendChild(this.characterSelector)
+
+    let selectedCharacters = this.getSelectedCharacters()
+    if(selectedCharacters.length > 0) {
+      this.character = selectedCharacters[0]
+    } 
     
     this.characters = []
     this.getCharacters()
@@ -25,7 +30,9 @@ module.exports = class CharacterTrainerView extends MainBaseView {
           return
         }
         
-        this.character = inCharacters[0]
+        if(!this.character) {
+          this.character = inCharacters[0]
+        }
         this.characters = inCharacters
         for(let character of this.characters) {
           let option = document.createElement("option")

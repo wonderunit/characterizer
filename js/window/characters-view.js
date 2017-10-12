@@ -37,8 +37,10 @@ module.exports = class CharactersView extends MainBaseView {
     })
   }
   
-  addCharacterView(characterName, characterID, isSelected) {
+  addCharacterView(character, isSelected) {
     let self = this
+    let characterName = character.name
+    let characterID = character.id
 
     let characterView = document.createElement('div')
     characterView.classList.add("manage-character-container")
@@ -56,7 +58,7 @@ module.exports = class CharactersView extends MainBaseView {
     trainButton.classList.add("manage-character-button")
     trainButton.innerHTML = "Train"
     trainButton.addEventListener("click", function(event) {
-      self.emit("train", {characterID})
+      self.emit("train", [character])
     })
     characterView.appendChild(trainButton)
     
@@ -64,7 +66,7 @@ module.exports = class CharactersView extends MainBaseView {
     viewValuesButton.classList.add("manage-character-button")
     viewValuesButton.innerHTML = "Values"
     viewValuesButton.addEventListener("click", function(event) {
-      self.emit("viewValues", {characterID})
+      self.emit("viewValues", [character])
     })
     characterView.appendChild(viewValuesButton)
 
@@ -101,7 +103,7 @@ module.exports = class CharactersView extends MainBaseView {
           break
         }
       }
-      this.addCharacterView(character.name, character.id, isSelected)
+      this.addCharacterView(character, isSelected)
     }
   }
 }

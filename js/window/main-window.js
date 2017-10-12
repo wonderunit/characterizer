@@ -183,11 +183,13 @@ function onSelectView() {
   currentContentView.on('train', data => {
     curViewType = "characterTrainer"
     mainViewSelector.setSelectedViewType(curViewType)
+    selectedCharacters = data
     onSelectView()
   })
   currentContentView.on('viewValues', data => {
     curViewType = "valueList"
     mainViewSelector.setSelectedViewType(curViewType)
+    selectedCharacters = data
     onSelectView()
   })
 }
@@ -555,6 +557,14 @@ function getCharacterSession(characterID) {
 
 function getSelectedCharacters() {
   return selectedCharacters
+}
+
+function addSelectedCharacterToFront(characterID) {
+  let index = selectedCharacters.indexOf(characterID)
+  if(index >= 0) {
+    selectedCharacters.splice(index, 1)
+  }
+  selectedCharacters.unshift(characterID)
 }
 
 function cacheValueBattleFavorite(record) {

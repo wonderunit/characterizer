@@ -39,16 +39,26 @@ module.exports = class ValueListView extends MainBaseView {
       .then(inCharacters => {
         this.characters = inCharacters
 
+        let selectedCharacter
+        let selectedCharacters = this.getSelectedCharacters()
+        if(selectedCharacters && selectedCharacters.length) {
+          selectedCharacter = selectedCharacters[0]
+        } else if(this.characters && this.characters.length) {
+          selectedCharacter = this.characters[0]
+        }
+
         this.characterSelector.innerHTML = ``
         for(let character of this.characters) {
+
           let option = document.createElement("option")
           option.setAttribute("value", character.id)
           option.innerHTML = character.name
           this.characterSelector.appendChild(option)
-        }
+          if(selectedCharacter && selectedCharacter.id === character.id) {
+            option.setAttribute("selected", true)
+          }
 
-        if(this.characters && this.characters.length) {
-          this.onSelectCharacter(this.characters[0].id)
+          this.onSelectCharacter(selectedCharacter.id)
         }
       })
       .catch(console.error)
