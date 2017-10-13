@@ -269,3 +269,12 @@
   background-color: #AAA;
   cursor: pointer;
 }
+
+.common-ground-view-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 20px 0px;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+}

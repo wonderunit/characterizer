@@ -6,6 +6,7 @@ const CharacterComparisonView = require('./character-comparison-view.js')
 const CharacterComparisonConflictView = require('./character-comparison-conflict-view.js')
 const BattleFavoritesView = require('./battle-favorites-view.js')
 const InternalConflictView = require('./internal-conflict-view.js')
+const CommonGroundView = require('./common-ground-view.js')
 const CharacterComparisonValueDifferenceView = require('./character-comparison-value-difference-view.js')
 const MainViewSelector = require('./main-view-selector.js')
 
@@ -43,6 +44,10 @@ const mainViews = [
   {
     "type": "valueDifference",
     "label": "Value Difference"
+  },
+  {
+    "type": "commonGround",
+    "label": "Common Ground"
   }
 ]
 
@@ -217,6 +222,8 @@ function getContentView() {
       return InternalConflictView
     case "valueDifference":
       return CharacterComparisonValueDifferenceView
+    case "commonGround":
+      return CommonGroundView
     case "manageCharacters":
     default:
       return CharactersView

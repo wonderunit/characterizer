@@ -1,6 +1,5 @@
 const utils = require('../utils.js')
 const CharacterComparisonBaseView = require('./character-comparison-base-view.js')
-const CharacterView = require('./character-selector-multiple.js')
 const { semiRandomShuffle } = require('../utils.js')
 const NUM_COMPARISON_ITEMS = 30
 const RANDOM_SHUFFLE_FACTOR = 4
