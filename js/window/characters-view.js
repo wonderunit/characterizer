@@ -77,7 +77,7 @@ module.exports = class CharactersView extends MainBaseView {
   addCharacterFronInput(event) {
     let newNameInput = document.querySelector("#input-add-character-name")
     let newName = newNameInput.value
-    this.addCharacterView(newName, 13371337)
+    this.addCharacterView({name: newName}, 13371337)
     if(newName) {
       this.emit('add-character', {name: newName})
       newNameInput.value = ""
