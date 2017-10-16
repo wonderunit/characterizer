@@ -6,7 +6,7 @@ module.exports = class CharacterComparisonValueDifferencesView extends Character
     super(properties)
 
     this.comparisonView = document.createElement("div")
-    this.comparisonView.setAttribute("id", "conflict-comparison-view")
+    this.comparisonView.classList.add("comparison-view")
     this.root.appendChild(this.comparisonView)
     this.updateView()
   }

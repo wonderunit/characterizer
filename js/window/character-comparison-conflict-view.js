@@ -23,7 +23,7 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
     this.root.appendChild(this.viewTypeSelector)
     
     this.comparisonView = document.createElement("div")
-    this.comparisonView.setAttribute("id", "conflict-comparison-view")
+    this.comparisonView.classList.add("comparison-view")
     this.root.appendChild(this.comparisonView)
     this.updateView()
   }
@@ -34,8 +34,6 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
     headersContainer.classList.add("comparison-view-conflicts-header-container")
     this.comparisonView.appendChild(headersContainer)
 
-    let container = document.createElement("div")
-    container.classList.add("comparison-view-conflicts-values-container")
     for(let i = 0; i<this.selectedCharacters.length; i++) {
       if(i > 0) {
         let vsView = document.createElement("div")

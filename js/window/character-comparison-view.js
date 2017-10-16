@@ -45,7 +45,6 @@ module.exports = class CharacterComparisonView extends CharacterComparisonBaseVi
       for(let character of this.selectedCharacters) {
         let containerDiv = document.createElement("div")
         containerDiv.classList.add("comparison-character-view-container")
-        containerDiv.setAttribute("style", `width: ${targetWidth}%;`)
         let nameContainer = document.createElement("h2")
         nameContainer.innerHTML = character.name
         containerDiv.appendChild(nameContainer)

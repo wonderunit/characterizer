@@ -23,7 +23,7 @@ module.exports = class InternalConflictView extends MainBaseView {
     this.valuesViewContainer.setAttribute("id", "values-view-container")
 
     this.comparisonView = document.createElement("div")
-    this.comparisonView.setAttribute("id", "conflict-comparison-view")
+    this.comparisonView.classList.add("comparison-view")
     this.valuesViewContainer.appendChild(this.comparisonView)
     this.root.appendChild(this.valuesViewContainer)
 

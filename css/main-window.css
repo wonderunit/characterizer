@@ -28,12 +28,16 @@ body {
 #container {
   display: flex;
   flex-direction: row;
+  height: 100vh;
+  overflow: hidden;
 }
 
 #content-container {
   max-width: 80%;
   flex-grow: 4;
   padding: 20px 0px;
+  height: 100vh;
+  overflow: scroll;
 }
 
 /** Navigation */
@@ -56,9 +60,11 @@ body {
   background-color: #AAA;
 }
 
-/** Main Views */
+/************************/
+/** Main Content Views **/
+/************************/
 
-/** Characters */
+/** Characters **/
 #character-input-container {
   display: flex;
   padding: 10px;
@@ -150,6 +156,12 @@ body {
   justify-content: space-around;
 }
 
+.battle-type-view {
+  width: 100%;
+  text-align: center;
+  margin: 40px;
+}
+
 /** Value List */
 
 .value-list-name {
@@ -178,8 +190,7 @@ body {
   z-index: 1;
 }
 
-/** */
-
+/** Character Comparison View */
 
 #character-comparison-view {
   width: 100%;
@@ -188,12 +199,7 @@ body {
   position: relative;
 }
 
-#conflict-comparison-view {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
+/** Character Favorites **/
 
 #favorite-pairs-holder {
   margin: 20px;
@@ -201,6 +207,44 @@ body {
 
 #favorite-values-holder {
   margin: 20px;
+}
+
+/** Value Difference **/
+
+#value-difference-view {
+  margin: 10px 0px 10px 0px;
+}
+
+/** Internal Conflict **/
+
+
+/** **/
+
+.common-ground-view-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 20px 0px;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+}
+
+/** Multi Character Selector **/
+
+.character-selection-view-selected {
+  background-color: #AAA;
+}
+
+/** Generics */
+
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.favorites-filter-button {
+  padding: 20px 0px;
+  cursor: pointer;
 }
 
 .comparison-view-conflicts-header-container {
@@ -218,53 +262,9 @@ body {
   border-bottom-width: thin;
 }
 
-.comparison-view-conflict-container-graph {
-  position: absolute;
-}
-
-.comparison-view-conflicts-values-container {
+.comparison-view {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   position: relative;
-  width: 100%;
-  height: 60vh;
-}
-
-.comparison-view-conflict-container-graph-dot {
-  width: 20px;
-  height: 20px;
-  background-color: green;
-}
-
-.battle-type-view {
-  width: 100%;
-  text-align: center;
-  margin: 40px;
-}
-
-#value-difference-view {
-  margin: 10px 0px 10px 0px;
-}
-
-.character-selection-view-selected {
-  background-color: #AAA;
-}
-
-.common-ground-view-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 20px 0px;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-}
-
-/** Generics */
-
-.flex-wrap {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.favorites-filter-button {
-  padding: 20px 0px;
-  cursor: pointer;
 }
