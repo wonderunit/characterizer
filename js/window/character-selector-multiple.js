@@ -23,7 +23,7 @@ module.exports = class CharacterView extends MainBaseView {
     let characterView = document.createElement('div')
     characterView.classList.add("button")
     if(isSelected) {
-      characterView.classList.add("character-selection-view-selected")
+      characterView.classList.add("button-selected")
     }
     characterView.setAttribute("data-id", characterID || 1)
     characterView.innerHTML = characterName

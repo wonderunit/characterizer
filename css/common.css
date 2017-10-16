@@ -4,18 +4,26 @@ body {
 
 .button {
   border-width: 1px;
-  border-color: black;
   margin: 10px;
-  background-color: #DDD;
   padding: 20px;
-  border-radius: 8px;
+  border-style: solid;
+  border-color: #CCC;
   cursor: pointer;
 }
 
+.button-selected {
+  background-color: #CCC;
+}
+
 .button:hover {
-  background-color: #BBB;
+  background-color: #EEE;
 }
 
 .hidden {
   visibility: hidden;
+}
+
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
 }

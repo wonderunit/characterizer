@@ -13,12 +13,12 @@
   font-size: 15px;
   opacity: 0.5;
   color: #3A3A3A;
-  margin: 15px 40px 5px 40px;
 }
 
 .recent-documents-list {
-  display: flex;
-  flex-wrap: wrap;
+  border-bottom-style: solid;
+  border-bottom-color: #CCC;
+  border-bottom-width: 1px;
 }
 
 .recent-document {

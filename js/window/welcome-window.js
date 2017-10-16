@@ -13,6 +13,7 @@ recentContainer.appendChild(recentHeader)
 container.appendChild(recentContainer)
 
 let recentDocumentsList = document.createElement("div")
+recentDocumentsList.classList.add("flex-wrap")
 recentDocumentsList.classList.add("recent-documents-list")
 recentContainer.appendChild(recentDocumentsList)
 let recentDocuments = prefsModule.getPrefs('welcome')['recentDocuments']

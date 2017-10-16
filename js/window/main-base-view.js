@@ -16,6 +16,7 @@ module.exports = class MainBaseView extends EventEmitter {
     this.getCharacterValuesMap = properties.getCharacterValuesMap
     
     this.root = document.createElement("div")
+    this.root.classList.add("main-content-view")
   }
 
   getView() {

@@ -4,7 +4,6 @@ module.exports = class ValueListView extends MainBaseView {
   constructor(properties) {
     super(properties)
     
-    this.root = document.createElement("div")
     this.root.setAttribute("id", "value-list-container")
 
     this.characterSelector = document.createElement("select")

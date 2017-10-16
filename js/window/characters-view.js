@@ -3,7 +3,6 @@ const MainBaseView = require('./main-base-view.js')
 module.exports = class CharactersView extends MainBaseView {
   constructor(properties) {
     super(properties)
-    this.root = document.createElement('div')
     this.root.setAttribute("id", "characters-container")
     let header = document.createElement("h2")
     header.innerHTML = `Characters`

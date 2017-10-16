@@ -1,10 +1,9 @@
 const MainBaseView = require('./main-base-view.js')
 
-module.exports = class BattleFavoritesView extends MainBaseView {
+module.exports = class CharacterFavoritesView extends MainBaseView {
   constructor(properties) {
     super(properties)
     
-    this.root = document.createElement("div")
     this.root.setAttribute("id", "value-list-container")
 
     this.characterSelector = document.createElement("select")

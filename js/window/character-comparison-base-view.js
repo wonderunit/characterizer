@@ -7,9 +7,6 @@ module.exports = class CharacterComparisonBaseView extends MainBaseView {
     this.selectionsAllowedCount = 2 // the allowed number of selections
     this.selectedCharacters = this.selectedCharacters = this.getSelectedCharacters()
     this.valuesViewType = "table"
-
-    this.root = document.createElement("div")
-    this.root.setAttribute("id", "character-comparison-container")
     
     this.characterView = new CharacterView(properties)
     this.root.appendChild(this.characterView.getView())

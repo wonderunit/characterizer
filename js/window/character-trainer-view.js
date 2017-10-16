@@ -6,7 +6,6 @@ const { getFriendlyMS } = require('../utils.js')
 module.exports = class CharacterTrainerView extends MainBaseView {
   constructor(properties) {
     super(properties)
-    this.root = document.createElement("div")
     this.root.setAttribute("id", "character-trainer-container")
 
     this.characterSelector = document.createElement("select")
