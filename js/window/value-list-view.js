@@ -17,7 +17,7 @@ module.exports = class ValueListView extends MainBaseView {
 
     this.isFiltering = false
     this.favoritesFilter = document.createElement("div")
-    this.favoritesFilter.setAttribute("id", "favorites-filter-button")
+    this.favoritesFilter.classList.add("favorites-filter-button")
     this.favoritesFilter.innerHTML = `Show Favorites`
     this.favoritesFilter.addEventListener("click", (event) => {
       this.isFiltering = !this.isFiltering
@@ -57,9 +57,8 @@ module.exports = class ValueListView extends MainBaseView {
           if(selectedCharacter && selectedCharacter.id === character.id) {
             option.setAttribute("selected", true)
           }
-
-          this.onSelectCharacter(selectedCharacter.id)
         }
+        this.onSelectCharacter(selectedCharacter.id)
       })
       .catch(console.error)
   }

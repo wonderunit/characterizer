@@ -28,6 +28,7 @@ module.exports = class CharactersView extends MainBaseView {
     
     this.characterList = document.createElement("div")
     this.characterList.setAttribute("id", "character-list")
+    this.characterList.classList.add("flex-wrap")
     this.root.appendChild(this.characterList)
     
     this.characters = []

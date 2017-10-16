@@ -8,7 +8,7 @@ module.exports = class CharacterComparisonView extends CharacterComparisonBaseVi
 
     this.isFiltering = false
     this.favoritesFilter = document.createElement("div")
-    this.favoritesFilter.setAttribute("id", "favorites-filter-button")
+    this.favoritesFilter.classList.add("favorites-filter-button")
     this.favoritesFilter.innerHTML = `Show Favorites`
     this.favoritesFilter.addEventListener("click", (event) => {
       this.isFiltering = !this.isFiltering

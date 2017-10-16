@@ -37,7 +37,7 @@ module.exports = class CommonGroundView extends CharacterComparisonBaseView {
     for(let i = 0; i<this.selectedCharacters.length; i++) {
       if(i > 0) {
         let vsView = document.createElement("div")
-        vsView.innerHTML = `vs`
+        vsView.innerHTML = `and`
         headersContainer.appendChild(vsView)
       }
       let characterName = document.createElement("h2")

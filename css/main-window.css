@@ -1,8 +1,64 @@
-#character-list {
-  display: flex;
-  flex-wrap: wrap;
+body {
+  padding: 0;
+  margin: 0;
 }
 
+/** Top Level Components */
+
+#message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: red;
+}
+
+#navigation {
+  max-width: 20%;
+  flex-grow: 1;
+  height: 100vh;
+  overflow-y: scroll;
+}
+
+#container {
+  display: flex;
+  flex-direction: row;
+}
+
+#content-container {
+  max-width: 80%;
+  flex-grow: 4;
+  padding: 20px 0px;
+}
+
+/** Navigation */
+#main-view-selector {
+  padding: 10px;
+}
+
+.main-view-selector-option {
+  border-width: 1px;
+  border-color: black;
+  margin: 10px;
+  background-color: #CCC;
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+}
+
+.main-view-selector-selected {
+  background-color: #AAA;
+}
+
+/** Main Views */
+
+/** Characters */
 #character-input-container {
   display: flex;
   padding: 10px;
@@ -13,6 +69,26 @@
   cursor: pointer;
 }
 
+.manage-character-container  div {
+  margin-bottom: 10px;
+}
+
+.manage-character-container {
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  border-style: solid;
+  margin: 10px;
+  border-width: 1px;
+}
+
+.manage-character-button {
+  padding: 10px;
+  background-color: #AAA;
+  cursor: pointer;
+}
+
+/** Value Training View */
 #battle-container {
   outline: none;
 }
@@ -20,6 +96,19 @@
 .battle-view-choice-container {
   display: flex;
   justify-content: center;
+}
+
+.battle-view-timer-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 45px;
+}
+
+#battle-view-button-container {
+  display: flex;
+  margin-top: 45px;
+  justify-content: space-around;
 }
 
 .battle-view-choice-button {
@@ -33,6 +122,35 @@
   width: 50vw;
   text-align: center;
 }
+
+.countdown-progress-bar {
+  height: 20px;
+  background-color: #CCC;
+}
+
+.battle-view-button {
+  border-width: 1px;
+  border-color: black;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
+#value-list-footer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+#value-list-session {
+  display: flex;
+  justify-content: space-around;
+}
+
+/** Value List */
 
 .value-list-name {
   border-width: 1px;
@@ -60,76 +178,8 @@
   z-index: 1;
 }
 
-.values-view-linechart {
-  position: relative;
-  width: 90%;
-  margin-left: 5%;
-  height: 500px;
-}
+/** */
 
-.value-list-name-linechart {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: #70cc70;
-}
-
-.value-list-label-linechart {
-  display: block;
-  position: absolute;
-  top: -20px;
-  display: none;
-}
-
-.value-list-label-linechart-show {
-  display: block;
-}
-
-.values-view-barchart {
-  position: relative;
-  width: 90%;
-  margin-left: 5%;
-  height: 500px;
-}
-
-#battle-view-button-container {
-  display: flex;
-  margin-top: 45px;
-  justify-content: space-around;
-}
-
-.battle-view-button {
-  border-width: 1px;
-  border-color: black;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 100%;
-  text-align: center;
-}
-
-#container {
-  display: flex;
-  flex-direction: row;
-}
-
-#main-view-selector {
-  padding: 10px;
-}
-
-.main-view-selector-option {
-  border-width: 1px;
-  border-color: black;
-  margin: 10px;
-  background-color: #CCC;
-  padding: 20px;
-  border-radius: 8px;
-  position: relative;
-  cursor: pointer;
-}
-
-.main-view-selector-selected {
-  background-color: #AAA;
-}
 
 #character-comparison-view {
   width: 100%;
@@ -143,41 +193,6 @@
   display: flex;
   flex-direction: column;
   position: relative;
-}
-
-#navigation {
-  max-width: 20%;
-  flex-grow: 1;
-}
-
-#content-container {
-  max-width: 80%;
-  flex-grow: 4;
-}
-
-.countdown-progress-bar {
-  height: 20px;
-  background-color: #CCC;
-}
-
-.battle-view-timer-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: 45px;
-}
-
-#value-list-footer {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: space-around;
-  margin-top: 20px;
-}
-
-#value-list-session {
-  display: flex;
-  justify-content: space-around;
 }
 
 #favorite-pairs-holder {
@@ -196,7 +211,7 @@
 
 .comparison-view-conflict-container {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   border-bottom: black;
   border-bottom-style: solid;
   margin-top: 10px;
@@ -233,43 +248,6 @@
   background-color: #AAA;
 }
 
-#message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#error {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: red;
-}
-
-#favorites-filter-button {
-  padding: 20px 0px;
-  cursor: pointer;
-}
-
-.manage-character-container  div {
-  margin-bottom: 10px;
-}
-
-.manage-character-container {
-  display: flex;
-  flex-direction: column;
-  padding: 25px;
-  border-style: solid;
-  margin: 10px;
-  border-width: 1px;
-}
-
-.manage-character-button {
-  padding: 10px;
-  background-color: #AAA;
-  cursor: pointer;
-}
-
 .common-ground-view-container {
   display: flex;
   flex-direction: row;
@@ -277,4 +255,16 @@
   padding: 20px 0px;
   border-bottom-style: solid;
   border-bottom-width: 1px;
+}
+
+/** Generics */
+
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.favorites-filter-button {
+  padding: 20px 0px;
+  cursor: pointer;
 }
