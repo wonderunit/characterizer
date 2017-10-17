@@ -1,7 +1,11 @@
 {
   "name": "characterizer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wonderunit/characterizer.git"
+  },
   "scripts": {
     "start": "electron .",
     "postinstall": "install-app-deps",
@@ -15,6 +19,7 @@
     "electron-builder": "^19.27.7"
   },
   "dependencies": {
+    "electron-updater": "^2.13.0",
     "knex": "^0.13.0",
     "nan": "^2.7.0",
     "sqlite3": "^3.1.13",

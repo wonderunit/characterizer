@@ -8,6 +8,8 @@ const {seedDB} = require('./js/database-init.js')
 const prefModule = require('./js/prefs.js')
 const utils = require('./js/utils.js')
 const trash = require('trash')
+const autoUpdater = require('./auto-updater')
+const isDev = require('electron-is-dev')
 
 let welcomeWindow
 let loadingStatusWindow
@@ -25,6 +27,10 @@ function createWelcomeWindow () {
   welcomeWindow.on('closed', () => {
     mainWindow = null
   })
+
+  if (!isDev) {
+    autoUpdater.init()
+  }
 }
 
 app.on('ready', createWelcomeWindow)
