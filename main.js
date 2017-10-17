@@ -138,7 +138,9 @@ function showMainWindow(dbFile) {
     })
     global.knex = knex
 
-    knex.migrate.latest()
+    let migrationsPath = path.join(__dirname, `migrations`)
+
+    knex.migrate.latest({directory: migrationsPath})
       .then(()=> {
         return seedDB(knex, {valuesSeedDataPath})
       })
