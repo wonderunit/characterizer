@@ -84,7 +84,9 @@ module.exports = class CommonGroundView extends CharacterComparisonBaseView {
         let character1Value = characterValueMap1[valueID]
         let character2Value = characterValueMap2[valueID]
 
-        if(Math.abs(character1Value.score - character2Value.score) < COMMONNESS_THRESHOLD) {
+        if(Math.abs(character1Value.score - character2Value.score) < COMMONNESS_THRESHOLD
+            && character1Value.score > 0 && character2Value.score > 0) {
+
           commonValues.push([character1Value, character2Value])
         }
       }
@@ -152,7 +154,9 @@ module.exports = class CommonGroundView extends CharacterComparisonBaseView {
         let character1Value = characterValueMap1[valueID]
         let character2Value = characterValueMap2[valueID]
 
-        if(Math.abs(character1Value.score - character2Value.score) < COMMONNESS_THRESHOLD) {
+        if(Math.abs(character1Value.score - character2Value.score) < COMMONNESS_THRESHOLD
+            && character1Value.score > 0 && character2Value.score > 0) {
+              
           commonValues.push([character1Value, character2Value])
         }
       }
