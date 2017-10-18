@@ -55,7 +55,7 @@ var valuesLib
 var characters
 var charactersMap = {}
 var valuesMap = {} // key: valueID, value: value data
-var characterValues = {} // key: character ID, value: array of a ccharacter's values sorted by scores
+var characterValues = {} // key: character ID, value: array of a character's values sorted by scores
 var characterValuesMap = {} // key: character ID, value: array of their values with scores
 var battlePairers = {} // cache battle pairers
 
@@ -70,7 +70,7 @@ var characterValueFavorites = {}
 // this is to quickly look up if a value pairing exists.
 var valueComparisonFavorites = {}
 
-// object of the form { character1ID: { value1ID: character2ID: {value2:ID } } }
+// object of the form { character1ID: { character2ID: [valueID, ...] } }
 // this is to quickly get a list of favorite value pairs between characters
 var characterComparisonFavorites = {}
 
