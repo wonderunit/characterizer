@@ -5,7 +5,7 @@ module.exports = class CharacterComparisonBaseView extends MainBaseView {
   constructor(properties) {
     super(properties)
     this.selectionsAllowedCount = 2 // the allowed number of selections
-    this.selectedCharacters = this.selectedCharacters = this.getSelectedCharacters()
+    this.selectedCharacters = this.getSelectedCharacters()
     this.valuesViewType = "table"
     
     this.characterView = new CharacterView(properties)
@@ -24,6 +24,9 @@ module.exports = class CharacterComparisonBaseView extends MainBaseView {
         this.characterView.updateView()
         for(let character of inCharacters) {
           this.charactersMap[character.id] = character
+          if(this.selectedCharacters.length<2) {
+            this.onSelectCharacter(character.id)
+          }
         }
       })
       .catch(console.error)
@@ -61,7 +64,6 @@ module.exports = class CharacterComparisonBaseView extends MainBaseView {
 
   getSelectedCharacterValues() {
     let characterValuePromises = []
-    let selectedCharacters = []
     for(let aCharacter of this.selectedCharacters) {
       characterValuePromises.push(this.getCharacterValues(aCharacter.id))
     }

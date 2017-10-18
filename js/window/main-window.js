@@ -99,6 +99,7 @@ const viewProperties = {
 // Cache the system values
 knex.select().table('Values')
   .then(values => {
+    // convert these to normal json objects (instead of knex objects)
     values = JSON.parse(JSON.stringify(values))
     let end = Date.now()
     valuesLib = values
