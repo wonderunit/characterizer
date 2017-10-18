@@ -219,4 +219,8 @@ let addToRecentDocs = (filename, metadata={}) => {
   recentDocuments.unshift(recentDocument)
   // save
   prefModule.set('recentDocuments', recentDocuments)
+
+  if(welcomeWindow) {
+    welcomeWindow.webContents.send('update-recent-documents')
+  }
 }

@@ -16,25 +16,29 @@ let recentDocumentsList = document.createElement("div")
 recentDocumentsList.classList.add("flex-wrap")
 recentDocumentsList.classList.add("recent-documents-list")
 recentContainer.appendChild(recentDocumentsList)
-let recentDocuments = prefsModule.getPrefs('welcome')['recentDocuments']
-if (recentDocuments && recentDocuments.length>0) {
-  for (var recentDocument of recentDocuments) {
-    try {
-      fs.accessSync(recentDocument.filename, fs.R_OK)
-    } catch (e) {
-      // It isn't accessible
-      continue
+
+function updateRecentDocuments() {
+  recentDocumentsList.innerHTML = ``
+  let recentDocuments = prefsModule.getPrefs('welcome')['recentDocuments']
+  if (recentDocuments && recentDocuments.length>0) {
+    for (var recentDocument of recentDocuments) {
+      try {
+        fs.accessSync(recentDocument.filename, fs.R_OK)
+      } catch (e) {
+        // It isn't accessible
+        continue
+      }
+      let recent = document.createElement("div")
+      recent.classList.add("recent-document")
+      recent.classList.add("button")
+      recent.innerHTML = recentDocument.title
+      recent.setAttribute("data-filename", recentDocument.filename)
+      recent.addEventListener("click", (event)=>{
+        event.target.setAttribute("disabled", true)
+        ipcRenderer.send("open-project", event.target.dataset.filename)
+      })
+      recentDocumentsList.appendChild(recent)
     }
-    let recent = document.createElement("div")
-    recent.classList.add("recent-document")
-    recent.classList.add("button")
-    recent.innerHTML = recentDocument.title
-    recent.setAttribute("data-filename", recentDocument.filename)
-    recent.addEventListener("click", (event)=>{
-      event.target.setAttribute("disabled", true)
-      ipcRenderer.send("open-project", event.target.dataset.filename)
-    })
-    recentDocumentsList.appendChild(recent)
   }
 }
 
@@ -57,4 +61,10 @@ openButton.addEventListener('click', event => {
   ipcRenderer.send('browse-for-project')
 })
 buttonContainer.appendChild(openButton)
+
+ipcRenderer.on('update-recent-documents', (event, args)=>{
+  updateRecentDocuments()
+})
+
+updateRecentDocuments()
 
