@@ -1,6 +1,7 @@
 {
   "name": "characterizer",
   "version": "0.2.0",
+  "description": "The best app to train character values and generate conflicts, dilemmas, and common ground between characters.",
   "main": "main.js",
   "repository": {
     "type": "git",
@@ -30,6 +31,23 @@
     "appId": "com.wonderunit.characterizer",
     "mac": {
       "icon": "build/icon.icns"
+    },
+    "dmg": {
+      "background": "build/background.png",
+      "icon": "build/icon.icns",
+      "iconSize": 140,
+      "contents": [
+        {
+          "x": 120,
+          "y": 250
+        },
+        {
+          "x": 420,
+          "y": 250,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
     },
     "win": {
       "icon": "build/icon.ico"
