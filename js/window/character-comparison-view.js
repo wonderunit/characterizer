@@ -42,7 +42,8 @@ module.exports = class CharacterComparisonView extends CharacterComparisonBaseVi
       let targetWidth = 100/this.characters.length
       let index = 0
       
-      for(let character of this.selectedCharacters) {
+      for(let characterValueResult of characterValueResults) {
+        let character = this.selectedCharacters[index]
         let containerDiv = document.createElement("div")
         containerDiv.classList.add("comparison-character-view-container")
         let nameContainer = document.createElement("h2")
@@ -61,6 +62,9 @@ module.exports = class CharacterComparisonView extends CharacterComparisonBaseVi
   }
 
   getScoresView(characterID, values) {
+    if(!values) {
+      throw new Error("missing values")
+    }
     let result = document.createElement('div')
     result.setAttribute("id", "values-view")
 
