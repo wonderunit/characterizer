@@ -7,23 +7,6 @@ module.exports = class CharactersView extends MainBaseView {
     let header = document.createElement("h2")
     header.innerHTML = `Characters`
     this.root.appendChild(header)
-    this.characterInputContainer = document.createElement("div")
-    this.characterInputContainer.setAttribute("id", "character-input-container")
-    this.root.appendChild(this.characterInputContainer)
-    this.characterInput = document.createElement("input")
-    this.characterInput.setAttribute("id", "input-add-character-name")
-    this.characterInput.setAttribute("type", "text")
-    this.characterInput.addEventListener('keydown', (event)=>{
-      if(event.keyCode === 13) {
-        this.addCharacterFronInput()
-      }
-    })
-    this.characterInputContainer.appendChild(this.characterInput)
-    this.characterInputAddButton = document.createElement("div")
-    this.characterInputAddButton.setAttribute("id", "character-input-add-button")
-    this.characterInputAddButton.innerHTML = `Add Character`
-    this.characterInputAddButton.addEventListener('click', this.addCharacterFronInput.bind(this))
-    this.characterInputContainer.appendChild(this.characterInputAddButton)
     
     this.characterList = document.createElement("div")
     this.characterList.setAttribute("id", "character-list")
@@ -37,7 +20,7 @@ module.exports = class CharactersView extends MainBaseView {
     })
   }
   
-  addCharacterView(character, isSelected) {
+  addCharacterView(character) {
     let self = this
     let characterName = character.name
     let characterID = character.id
@@ -73,15 +56,66 @@ module.exports = class CharactersView extends MainBaseView {
     characterView.addEventListener('click', this.onCharacterClick.bind(this));
     this.characterList.appendChild(characterView)
   }
+
+  addInputCharacterView() {
+    this.addCharacterViewContainer = document.createElement('div')
+    this.addCharacterViewContainer.classList.add("manage-characters-add-container")
+    this.addCharacterViewContainer.dataset.mode = "button"
+
+    this.characterInput = document.createElement("input")
+    this.characterInput.setAttribute("id", "input-add-character-name")
+    this.characterInput.setAttribute("type", "text")
+    this.characterInput.classList.add("hidden")
+    this.characterInput.addEventListener('keydown', (event)=>{
+      if(event.keyCode === 13) {
+        this.addCharacterFronInput()
+      }
+    })
+    this.addCharacterViewContainer.appendChild(this.characterInput)
+    this.characterInputAddButton = document.createElement("div")
+    this.characterInputAddButton.setAttribute("id", "character-input-add-button")
+    this.characterInputAddButton.classList.add("hidden")
+    this.characterInputAddButton.innerHTML = `Add`
+    this.characterInputAddButton.addEventListener('click', this.addCharacterFronInput.bind(this))
+    this.addCharacterViewContainer.appendChild(this.characterInputAddButton)
+
+    // plus biew
+    let plusContainer = document.createElement("div")
+    plusContainer.classList.add("manage-characters-add-button-image-container")
+    this.addCharacterViewContainer.appendChild(plusContainer)
+
+    let plus = document.createElement("img")
+    plus.setAttribute("src", "images/add-character-plus.svg")
+    plus.classList.add("manage-characters-add-button-image")
+    plusContainer.appendChild(plus)
+
+    this.addCharacterViewContainer.addEventListener('click', (event)=>{
+      if(this.addCharacterViewContainer.dataset.mode === "button") {
+        this.characterInput.classList.remove("hidden")
+        this.characterInput.focus()
+        this.characterInputAddButton.classList.remove("hidden")
+        plus.classList.add("hidden")
+        this.addCharacterViewContainer.dataset.mode = "input"
+      } else {
+        this.characterInput.classList.add("hidden")
+        this.characterInputAddButton.classList.add("hidden")
+        plus.classList.remove("hidden")
+        this.addCharacterViewContainer.dataset.mode = "button"
+      }
+
+    });
+
+    this.characterList.appendChild(this.addCharacterViewContainer)
+  }
   
   addCharacterFronInput(event) {
-    let newNameInput = document.querySelector("#input-add-character-name")
-    let newName = newNameInput.value
+    this.characterList.removeChild(this.addCharacterViewContainer)
+    let newName = this.characterInput.value
     this.addCharacterView({name: newName}, 13371337)
     if(newName) {
       this.emit('add-character', {name: newName})
-      newNameInput.value = ""
     }
+    this.addInputCharacterView()
   }
   
   onCharacterClick(event) {
@@ -96,14 +130,9 @@ module.exports = class CharactersView extends MainBaseView {
     let selectedCharacters = this.getSelectedCharacters()
     this.characterList.innerHTML = ''
     for(let character of this.characters) {
-      let isSelected = false
-      for(let selectedCharacter of selectedCharacters) {
-        if(selectedCharacter.id === character.id) {
-          isSelected = true
-          break
-        }
-      }
-      this.addCharacterView(character, isSelected)
+      this.addCharacterView(character)
     }
+
+    this.addInputCharacterView()
   }
 }

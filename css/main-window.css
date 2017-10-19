@@ -73,14 +73,19 @@ body {
 }
 
 /** Characters **/
-#character-input-container {
-  display: flex;
-  padding: 10px;
+
+#characters-container {
+  margin-bottom: 10vh;
 }
 
 #character-input-add-button {
-  margin-left: 10px;
   cursor: pointer;
+  text-align: center;
+}
+
+#input-add-character-name {
+  width: 75px;
+  margin-bottom: 10px;
 }
 
 .manage-character-container  div {
@@ -101,6 +106,32 @@ body {
   background-color: #AAA;
   cursor: pointer;
 }
+
+.manage-characters-add-button-image-container {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-left: -25px;
+  padding: 0;
+}
+.manage-characters-add-button-image {
+  width: 35px;
+  height: 35px;
+}
+.manage-characters-add-container {
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  border-style: solid;
+  margin: 10px;
+  border-width: 1px;
+  cursor: pointer;
+  position: relative;
+}
+
 
 /** Value Training View */
 #battle-container {
