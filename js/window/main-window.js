@@ -306,10 +306,6 @@ function handleBattleUpdate(battleOutcome) {
     characterSessions[battleOutcome.characterID].battleStart = Date.now()
   }
 
-  if(currentContentView && typeof currentContentView.handleBattleUpdate === 'function') {
-    currentContentView.handleBattleUpdate(battleOutcome)
-  }
-
   tailPromises.push(knex('ValuesBattleOutcomes').insert(battleOutcome))
   setImmediate(()=>{
     Promise.all(tailPromises)

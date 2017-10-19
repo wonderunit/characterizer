@@ -70,6 +70,8 @@ body {
 .main-content-view {
   margin-left: 2vw;
   margin-right: 2vw;
+  height: 98vh;
+  position: relative;
 }
 
 /** Characters **/
@@ -187,7 +189,8 @@ body {
   flex-direction: row;
   width: 100%;
   justify-content: space-around;
-  margin-top: 20px;
+  bottom: 4vh;
+  position: absolute;
 }
 
 #value-list-session {
@@ -196,9 +199,7 @@ body {
 }
 
 .battle-type-view {
-  width: 100%;
   text-align: center;
-  margin: 40px;
 }
 
 /** Value List */
