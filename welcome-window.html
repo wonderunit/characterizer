@@ -13,7 +13,7 @@
     <script>
         if (typeof require !== 'undefined') {
           window.onerror = (message, source, lineno, colno, error) => require('electron').ipcRenderer.send('errorInWindow', message, source, lineno, colno, error)
-          require('./js/window/welcome-window.js')
+          require('./js/views/welcome-window.js')
         }
       </script>
   </body>
