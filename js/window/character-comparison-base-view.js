@@ -24,7 +24,7 @@ module.exports = class CharacterComparisonBaseView extends MainBaseView {
         this.characterView.updateView()
         for(let character of inCharacters) {
           this.charactersMap[character.id] = character
-          if(this.selectedCharacters.length<2) {
+          if(this.selectedCharacters.length<2 && this.selectedCharacters.indexOf(character) < 0) {
             this.onSelectCharacter(character.id)
           }
         }

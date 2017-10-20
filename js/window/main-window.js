@@ -590,14 +590,6 @@ function getSelectedCharacters() {
   return selectedCharacters
 }
 
-function addSelectedCharacterToFront(characterID) {
-  let index = selectedCharacters.indexOf(characterID)
-  if(index >= 0) {
-    selectedCharacters.splice(index, 1)
-  }
-  selectedCharacters.unshift(characterID)
-}
-
 function cacheValueBattleFavorite(record) {
   if(!characterValueFavorites[record.characterID]) {
     characterValueFavorites[record.characterID] = {
