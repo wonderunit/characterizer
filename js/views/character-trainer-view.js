@@ -83,12 +83,9 @@ module.exports = class CharacterTrainerView extends MainBaseView {
 
   setupBattleView() {
     this.getBattlePairer(this.currentCharacterID).then(battlePairer =>{
+      this.battleView.innerHTML = ``
+      
       this.battlePairer = battlePairer
-
-      if(this.battleView && typeof this.battleView.removeAllListeners === 'function') {
-        this.battleView.removeAllListeners()
-      }
-  
       this.header = document.createElement("h2")
       this.header.setAttribute("class", "battle-view-character-name")
       this.header.innerHTML = `${this.character.name} Chooses:` 
