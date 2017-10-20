@@ -206,7 +206,7 @@ body {
 
 /** Value List */
 
-.value-list-name {
+.value-list-container {
   border-width: 1px;
   border-color: black;
   margin: 10px;
@@ -214,6 +214,17 @@ body {
   padding: 20px;
   border-radius: 8px;
   position: relative;
+  display: flex;
+  flex-direction: row;
+}
+
+.favorite-button-container-value-list-view {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  z-index: 999;
+  padding-right: 10px;
+  max-height: 100%;
 }
 
 .value-list-label {
@@ -273,6 +284,14 @@ body {
 
 /** Generics */
 
+.favorite-button-container {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  z-index: 999;
+}
+
+/** deprecated **/
 .favorites-filter-button {
   padding: 20px 0px;
   cursor: pointer;

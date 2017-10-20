@@ -1,4 +1,5 @@
 const MainBaseView = require('./main-base-view.js')
+const FavoriteButton = require('./favorite-button.js')
 
 module.exports = class ValueListView extends MainBaseView {
   constructor(properties) {
@@ -93,20 +94,23 @@ module.exports = class ValueListView extends MainBaseView {
           let isFavorite = favoriteValues.indexOf(value.valueID) >= 0
 
           let valueView = document.createElement('div')
-          valueView.setAttribute("class", "value-list-name")
+          valueView.classList.add("value-list-container")
     
-          let favButton = document.createElement('div')
-          favButton.innerHTML = `add favorite`
-
-          if(isFavorite) {
-            favButton.innerHTML = `favorited`
-          } else {
-            var self = this
-            favButton.addEventListener('mouseup', function(event) {
-              event.target.innerHTML = `favorited`
-              self.emit('add-character-value-favorite', {valueID: value.valueID, characterID: self.currentCharacterID})
-            })
+          // let favButton = document.createElement('div')
+          let favButtonProperties = {
+            checked: isFavorite,
+            enabled: !isFavorite,
+            className: "favorite-button-container-value-list-view"
           }
+
+          var self = this
+          let favButton = new FavoriteButton(favButtonProperties)
+          favButton.setHandler(function(event) {
+            self.emit('add-character-value-favorite', {valueID: value.valueID, characterID: self.currentCharacterID})
+            favButton.setChecked(true)
+            favButton.setEnabled(false)
+          })
+          valueView.appendChild(favButton.getView())
           
           let progressView = document.createElement('div')
           progressView.setAttribute("class", "value-list-progress")
@@ -117,10 +121,8 @@ module.exports = class ValueListView extends MainBaseView {
           nameView.innerHTML = `${this.valuesMap[value.valueID.toString()].name} | ${value.score} | Wins: ${value.wins}, Losses: ${value.losses} | Battles: ${value.battleCount}`
           valueView.appendChild(nameView)
           if(this.isFiltering && isFavorite) {
-            result.appendChild(favButton)
             result.appendChild(valueView)
           } else if(!this.isFiltering) {
-            result.appendChild(favButton)
             result.appendChild(valueView)
           }
         })

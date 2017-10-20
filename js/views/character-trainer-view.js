@@ -1,4 +1,5 @@
 const MainBaseView = require('./main-base-view.js')
+const FavoriteButton = require('./favorite-button.js')
 const BattleTimeKeeper = require('../battle-timekeeper.js')
 const { getFriendlyMS } = require('../utils.js')
 const prefsModule = require('electron').remote.require('./js/prefs')
@@ -84,7 +85,7 @@ module.exports = class CharacterTrainerView extends MainBaseView {
   setupBattleView() {
     this.getBattlePairer(this.currentCharacterID).then(battlePairer =>{
       this.battleView.innerHTML = ``
-      
+
       this.battlePairer = battlePairer
       this.header = document.createElement("h2")
       this.header.setAttribute("class", "battle-view-character-name")
@@ -113,11 +114,14 @@ module.exports = class CharacterTrainerView extends MainBaseView {
       this.skipButton.innerHTML = `Skip`
       this.buttonContainer.appendChild(this.skipButton)
       
-      this.favoriteButton = document.createElement("div")
-      this.favoriteButton.setAttribute("class", "battle-view-button")
-      this.favoriteButton.addEventListener('click', this.onFavorite.bind(this))
-      this.favoriteButton.innerHTML = `Favorite`
-      this.buttonContainer.appendChild(this.favoriteButton)
+      // this.favoriteButton = document.createElement("div")
+      // this.favoriteButton.setAttribute("class", "battle-view-button")
+      // this.favoriteButton.addEventListener('click', this.onFavorite.bind(this))
+      // this.favoriteButton.innerHTML = `Favorite`
+      // this.buttonContainer.appendChild(this.favoriteButton)
+
+      this.favoriteButton = new FavoriteButton({handler: this.onFavorite.bind(this)})
+      this.buttonContainer.appendChild(this.favoriteButton.getView())
   
       this.showTimerSwitch = document.createElement("div")
       this.showTimerSwitch.setAttribute("id", "battle-view-show-timer")

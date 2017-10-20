@@ -71,7 +71,7 @@ module.exports = class CharacterComparisonView extends CharacterComparisonBaseVi
     for(let value of values) {
       this.getCharacterValueFavorites(characterID).then(characterValueFavorites => {
         let valueView = document.createElement('div')
-        valueView.setAttribute("class", "value-list-name")
+        valueView.setAttribute("class", "value-list-container")
   
         let favButton = document.createElement('div')
         favButton.setAttribute("style", "position: relative; z-index: 2; padding-top: 10px;")
