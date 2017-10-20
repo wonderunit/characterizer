@@ -112,11 +112,13 @@ body {
 .manage-characters-add-button-image-container {
   position: absolute;
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-left: -25px;
+  margin-top: -25px;
   padding: 0;
 }
 .manage-characters-add-button-image {
