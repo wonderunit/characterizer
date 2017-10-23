@@ -17,15 +17,15 @@ module.exports = class MainBaseView extends EventEmitter {
     this.root.appendChild(this.icon)
     this.handler = properties.handler
     this.setChecked(properties.hasOwnProperty("checked") ? properties.checked : false)
-    this.setEnabled(properties.enabled)
+    this.setEnabled(properties.hasOwnProperty("enabled") ? properties.enabled : true)
   }
 
   setEnabled(enabled) {
     this.enabled = enabled
-    if(this.enabled) {
-      this.root.addEventListener("click", this.handleClick)
-    } else {
+    if(!this.enabled) {
       this.root.removeEventListener("click", this.handleClick)
+    } else {
+      this.root.addEventListener("click", this.handleClick)
     }
   }
 

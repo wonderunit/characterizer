@@ -1,3 +1,9 @@
+/** Reset **/
+h2 {
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+}
+
 body {
   padding: 0;
   margin: 0;
@@ -26,6 +32,7 @@ body {
   border-right: solid;
   border-right-width: 1px;
   border-right-color: #CCC;
+  background: #ffffff;
 }
 
 #container {
@@ -38,7 +45,7 @@ body {
 #content-container {
   max-width: 80%;
   flex-grow: 4;
-  padding: 20px 0px;
+  padding-top: 2vh;
   height: 100vh;
   overflow: scroll;
 }
@@ -70,7 +77,7 @@ body {
 .main-content-view {
   margin-left: 2vw;
   margin-right: 2vw;
-  height: 98vh;
+  height: 88vh;
   position: relative;
 }
 
@@ -142,26 +149,25 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
+  margin-top: 10vh;
 }
 
 #character-trainer-view-header-text {
   margin-left: 10px;
 }
 
-#battle-container {
+#character-trainer-view-battle-container {
   outline: none;
-}
-
-.battle-view-choice-container {
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  max-width: 100%;
+  margin-top: 10vh;
 }
 
 .battle-view-timer-container {
   width: 100%;
   display: flex;
-  justify-content: center;
-  margin-top: 45px;
 }
 
 #battle-view-button-container {
@@ -170,16 +176,23 @@ body {
   justify-content: space-around;
 }
 
+#character-trainer-view-center-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
 .battle-view-choice-button {
-  border-width: 1px;
-  border-color: black;
-  margin: 10px;
-  background-color: #AAA;
-  padding: 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 50vw;
-  text-align: center;
+    margin: 10px;
+    background-color: rgba(200, 200, 200, 0.59);
+    padding: 20px;
+    cursor: pointer;
+    width: 30vw;
+    height: 20vh;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .countdown-progress-bar {
@@ -229,8 +242,6 @@ body {
 }
 
 .favorite-button-container-value-list-view {
-  width: 20px;
-  height: 20px;
   cursor: pointer;
   z-index: 999;
   padding-right: 10px;
@@ -295,8 +306,8 @@ body {
 /** Generics */
 
 .favorite-button-container {
-  width: 50px;
-  height: 50px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   z-index: 999;
 }

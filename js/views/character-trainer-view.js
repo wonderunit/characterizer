@@ -61,9 +61,26 @@ module.exports = class CharacterTrainerView extends MainBaseView {
       .catch(console.error)
 
     this.battleView = document.createElement("div")
-    this.battleView.setAttribute("id", "battle-container")
+    this.battleView.setAttribute("id", "character-trainer-view-battle-container")
     this.battleView.setAttribute("tabindex", 1)
     this.root.appendChild(this.battleView)
+
+    this.buttonContainer = document.createElement("div")
+    this.buttonContainer.setAttribute("id", "battle-view-button-container")
+    this.root.appendChild(this.buttonContainer)
+
+    this.skipButton = document.createElement("div")
+    this.skipButton.setAttribute("class", "battle-view-button")
+    this.skipButton.addEventListener('click', this.onSkip.bind(this))
+    this.skipButton.innerHTML = `Skip`
+    this.buttonContainer.appendChild(this.skipButton)
+
+    this.showTimerSwitch = document.createElement("div")
+    this.showTimerSwitch.setAttribute("id", "battle-view-show-timer")
+    this.showTimerSwitch.setAttribute("class", "battle-view-button")
+    this.showTimerSwitch.innerHTML = "Hide Timer"
+    this.showTimerSwitch.addEventListener("click", this.toggleTimerView.bind(this))
+    this.buttonContainer.appendChild(this.showTimerSwitch)
 
     this.footerView = document.createElement("div")
     this.footerView.setAttribute("id", "value-list-footer")
@@ -96,37 +113,36 @@ module.exports = class CharacterTrainerView extends MainBaseView {
 
       this.battlePairer = battlePairer
   
-      this.choiceContainer = document.createElement("div")
-      this.choiceContainer.classList.add("battle-view-choice-container")
-      this.battleView.appendChild(this.choiceContainer)
+      this.choiceContainer1 = document.createElement("div")
+      this.choiceContainer1.classList.add("battle-view-choice-button")
+      this.choiceContainer1.addEventListener('click', this.onChoiceClick.bind(this))
+      this.battleView.appendChild(this.choiceContainer1)
+
+      this.centerContainer = document.createElement("div")
+      this.centerContainer.setAttribute("id", "character-trainer-view-center-container")
+
+      this.favoriteButton = new FavoriteButton({handler: this.onFavorite.bind(this)})
+      this.centerContainer.appendChild(this.favoriteButton.getView())
+
+      let centerText = document.createElement("div")
+      centerText.setAttribute("id", "character-trainer-view-center-text")
+      centerText.innerHTML = `or`
+      this.centerContainer.appendChild(centerText)
   
       this.timerContainer = document.createElement("div")
       this.timerContainer.setAttribute("id", "battle-view-timer-container")
       this.timerContainer.classList.add("battle-view-timer-container")
-      this.battleView.appendChild(this.timerContainer)
       this.countdownTimer = document.createElement("div")
       this.countdownTimer.classList.add("countdown-progress-bar")
       this.timerContainer.appendChild(this.countdownTimer)
-  
-      this.buttonContainer = document.createElement("div")
-      this.buttonContainer.setAttribute("id", "battle-view-button-container")
-      this.battleView.appendChild(this.buttonContainer)
-      
-      this.skipButton = document.createElement("div")
-      this.skipButton.setAttribute("class", "battle-view-button")
-      this.skipButton.addEventListener('click', this.onSkip.bind(this))
-      this.skipButton.innerHTML = `Skip`
-      this.buttonContainer.appendChild(this.skipButton)
+      this.centerContainer.appendChild(this.timerContainer)
 
-      this.favoriteButton = new FavoriteButton({handler: this.onFavorite.bind(this)})
-      this.buttonContainer.appendChild(this.favoriteButton.getView())
-  
-      this.showTimerSwitch = document.createElement("div")
-      this.showTimerSwitch.setAttribute("id", "battle-view-show-timer")
-      this.showTimerSwitch.setAttribute("class", "battle-view-button")
-      this.showTimerSwitch.innerHTML = "Hide Timer"
-      this.showTimerSwitch.addEventListener("click", this.toggleTimerView.bind(this))
-      this.buttonContainer.appendChild(this.showTimerSwitch)
+      this.battleView.appendChild(this.centerContainer)
+
+      this.choiceContainer2 = document.createElement("div")
+      this.choiceContainer2.classList.add("battle-view-choice-button")
+      this.choiceContainer2.addEventListener('click', this.onChoiceClick.bind(this))
+      this.battleView.appendChild(this.choiceContainer2)
   
       this.battlePaiererTypeHandler = (battleType)=>{
         this.battleTypeView.innerHTML = battleType
@@ -209,16 +225,17 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     this.clearBattleTimer()
     this.favoriteButton.innerHTML = `Favorite`
 
-    this.choiceContainer.innerHTML = ""
+    this.choiceContainer1.innerHTML = ""
+    this.choiceContainer2.innerHTML = ""
     let battleData = this.battlePairer.getBattle()
 
     this.choiceDataOne = battleData[0]
-    this.choiceOne = this.getChoiceButtonView(this.choiceDataOne)
-    this.choiceContainer.appendChild(this.choiceOne)
+    this.choiceContainer1.setAttribute("data-id", this.choiceDataOne.id)
+    this.choiceContainer1.innerHTML = this.choiceDataOne.name
 
     this.choiceDataTwo = battleData[1]
-    this.choiceTwo = this.getChoiceButtonView(this.choiceDataTwo)
-    this.choiceContainer.appendChild(this.choiceTwo)
+    this.choiceContainer2.setAttribute("data-id", this.choiceDataTwo.id)
+    this.choiceContainer2.innerHTML = this.choiceDataTwo.name
 
     if(this.showTimer) {
       this.startBattleTimerView()
@@ -251,15 +268,6 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     this.updateView()
   }
 
-  getChoiceButtonView(choiceData) {
-    let result = document.createElement("div")
-    result.setAttribute("class", "battle-view-choice-button")
-    result.setAttribute("data-id", choiceData.id)
-    result.addEventListener('click', this.onChoiceClick.bind(this))
-    result.innerHTML = choiceData.name
-    return result
-  }
-
   onKeyPress(event) {
     if(event.key == "1") {
       this.handleChoice(this.choiceDataOne.id)
@@ -276,11 +284,6 @@ module.exports = class CharacterTrainerView extends MainBaseView {
 
   onFavorite(event) {
     this.emit('battle-favorite', {value1: this.choiceDataOne, value2: this.choiceDataTwo, character: this.character})
-    if(this.favoriteButton.innerHTML === `✔ Favorite`) {
-      this.favoriteButton.innerHTML = `Favorite`
-    } else {
-      this.favoriteButton.innerHTML = `✔ Favorite`
-    }
     this.setupBattle()
   }
 
@@ -300,7 +303,7 @@ module.exports = class CharacterTrainerView extends MainBaseView {
         this.onSkip()
       }
       this.countdownTimer.setAttribute("style", `width: ${((EXPIRE_TIME-elapsed)/EXPIRE_TIME)*100}%`)
-    }, 1000/60)
+    }, 1000/120)
   }
 
   toggleTimerView(event) {
