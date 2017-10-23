@@ -18,7 +18,7 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     this.root.appendChild(this.header)
 
     this.characterSelector = document.createElement("select")
-    this.characterSelector.setAttribute("id", "character-selector")
+    this.characterSelector.classList.add("character-trainer-view-character-selector")
     this.characterSelector.addEventListener('change', (event)=>{
       this.currentCharacterID = parseInt(event.target.value)
       this.onSelectCharacter(this.currentCharacterID)
