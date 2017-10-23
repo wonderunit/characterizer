@@ -138,6 +138,16 @@ body {
 
 
 /** Value Training View */
+#character-trainer-view-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#character-trainer-view-header-text {
+  margin-left: 10px;
+}
+
 #battle-container {
   outline: none;
 }

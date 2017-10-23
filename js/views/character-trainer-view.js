@@ -13,13 +13,21 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     this.root.setAttribute("id", "character-trainer-container")
     this.root.addEventListener('keypress', this.onKeyPress.bind(this))
 
+    this.header = document.createElement("h2")
+    this.header.setAttribute("id", "character-trainer-view-header")
+    this.root.appendChild(this.header)
+
     this.characterSelector = document.createElement("select")
     this.characterSelector.setAttribute("id", "character-selector")
     this.characterSelector.addEventListener('change', (event)=>{
       this.currentCharacterID = parseInt(event.target.value)
       this.onSelectCharacter(this.currentCharacterID)
     })
-    this.root.appendChild(this.characterSelector)
+    this.header.appendChild(this.characterSelector)
+    let chooses = document.createElement("div")
+    chooses.setAttribute("id", "character-trainer-view-header-text")
+    chooses.innerHTML = `faces a difficult choice...`
+    this.header.appendChild(chooses)
 
     let selectedCharacters = this.getSelectedCharacters()
     if(selectedCharacters.length > 0) {
@@ -87,10 +95,6 @@ module.exports = class CharacterTrainerView extends MainBaseView {
       this.battleView.innerHTML = ``
 
       this.battlePairer = battlePairer
-      this.header = document.createElement("h2")
-      this.header.setAttribute("class", "battle-view-character-name")
-      this.header.innerHTML = `${this.character.name} Chooses:` 
-      this.battleView.appendChild(this.header)
   
       this.choiceContainer = document.createElement("div")
       this.choiceContainer.classList.add("battle-view-choice-container")
@@ -113,12 +117,6 @@ module.exports = class CharacterTrainerView extends MainBaseView {
       this.skipButton.addEventListener('click', this.onSkip.bind(this))
       this.skipButton.innerHTML = `Skip`
       this.buttonContainer.appendChild(this.skipButton)
-      
-      // this.favoriteButton = document.createElement("div")
-      // this.favoriteButton.setAttribute("class", "battle-view-button")
-      // this.favoriteButton.addEventListener('click', this.onFavorite.bind(this))
-      // this.favoriteButton.innerHTML = `Favorite`
-      // this.buttonContainer.appendChild(this.favoriteButton)
 
       this.favoriteButton = new FavoriteButton({handler: this.onFavorite.bind(this)})
       this.buttonContainer.appendChild(this.favoriteButton.getView())
