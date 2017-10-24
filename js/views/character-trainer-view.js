@@ -75,13 +75,6 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     this.skipButton.innerHTML = `Skip`
     this.buttonContainer.appendChild(this.skipButton)
 
-    this.showTimerSwitch = document.createElement("div")
-    this.showTimerSwitch.setAttribute("id", "battle-view-show-timer")
-    this.showTimerSwitch.setAttribute("class", "battle-view-button")
-    this.showTimerSwitch.innerHTML = "Hide Timer"
-    this.showTimerSwitch.addEventListener("click", this.toggleTimerView.bind(this))
-    this.buttonContainer.appendChild(this.showTimerSwitch)
-
     this.footerView = document.createElement("div")
     this.footerView.setAttribute("id", "value-list-footer")
     this.footerView.classList.add("footer")
@@ -90,19 +83,27 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     this.battleCountView = document.createElement("div")
     this.battleCountView.setAttribute("id", "value-list-battle-count")
     this.footerView.appendChild(this.battleCountView)
-
-    let battleTypeView = document.createElement("div")
-    this.battleTypeView = battleTypeView
-    this.battleTypeView.classList.add("battle-type-view")
-    this.footerView.appendChild(this.battleTypeView)
     
     this.sessionView = document.createElement("div")
     this.sessionView.setAttribute("id", "value-list-session")
     this.sessionCountView = document.createElement("div")
     this.sessionView.appendChild(this.sessionCountView)
     this.sessionTimeView = document.createElement("div")
+    this.sessionTimeView.setAttribute("id", "session-time-view")
     this.sessionView.appendChild(this.sessionTimeView)
     this.footerView.appendChild(this.sessionView)
+
+    let battleTypeView = document.createElement("div")
+    this.battleTypeView = battleTypeView
+    this.battleTypeView.classList.add("battle-type-view")
+    this.footerView.appendChild(this.battleTypeView)
+
+    this.showTimerSwitch = document.createElement("div")
+    this.showTimerSwitch.setAttribute("id", "battle-view-show-timer")
+    this.showTimerSwitch.setAttribute("class", "battle-view-button")
+    this.showTimerSwitch.innerHTML = "Hide Timer"
+    this.showTimerSwitch.addEventListener("click", this.toggleTimerView.bind(this))
+    this.footerView.appendChild(this.showTimerSwitch)
 
     this.characterSessionStartTime = Date.now()
   }
@@ -181,11 +182,12 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     this.battleCountView.innerHTML = `${this.character.name} // ${this.getCharacterBattleCount(this.character.id)} Questions`
 
     let session = this.getCharacterSession(this.character.id)
-    this.sessionCountView.innerHTML = `${session.battleCount} Questions `
-    if(this.characterSessionStartTime) {
+    if(this.characterSessionStartTime && this.showTimer) {
       this.startSessionTimerView()
+      this.sessionCountView.innerHTML = `${session.battleCount} Questions in `
     } else {
       this.sessionTimeView.innerHTML = ``
+      this.sessionCountView.innerHTML = `${session.battleCount} Questions`
     }
   }
 
@@ -200,14 +202,14 @@ module.exports = class CharacterTrainerView extends MainBaseView {
   updateTimerView() {
       let now = Date.now()
       let elapsed = getFriendlyMS(now - this.characterSessionStartTime)
-      this.sessionTimeView.innerHTML = ` // ${elapsed.h ? elapsed.h+':' : ''}${elapsed.m}:${elapsed.s}`
+      this.sessionTimeView.innerHTML = `${elapsed.h ? elapsed.h+':' : ''}${elapsed.m}:${elapsed.s}`
   }
 
   clearSessionTimer() {
     if(this.timerID) {
       clearInterval(this.timerID)
       this.timerID = null
-      this.sessionTimeView.innerHTML = ` // 00:00:00`
+      this.sessionTimeView.innerHTML = ``
     }
   }
 
@@ -307,6 +309,8 @@ module.exports = class CharacterTrainerView extends MainBaseView {
   }
 
   toggleTimerView(event) {
+
+    let session = this.getCharacterSession(this.character.id)
     this.showTimer = !this.showTimer
     if(this.showTimer) {
       this.showTimerSwitch.innerHTML = "Hide Timer"
@@ -315,12 +319,14 @@ module.exports = class CharacterTrainerView extends MainBaseView {
       this.startBattleTimerView()
       this.emit("show-timer")
       this.startSessionTimerView()
+      this.sessionCountView.innerHTML = `${session.battleCount} Questions in `
     } else {
       this.showTimerSwitch.innerHTML = "Show Timer"
       this.timerContainer.classList.add("hidden")
       this.clearBattleTimer()
       this.emit("hide-timer")
       this.clearSessionTimer()
+      this.sessionCountView.innerHTML = `${session.battleCount} Questions`
     }
   } 
 }

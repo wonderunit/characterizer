@@ -59,6 +59,8 @@ body {
   padding: 20px;
   position: relative;
   cursor: pointer;
+  transition-property: all;
+  transition-duration: 0.25s;
 }
 
 .main-view-selector-option:hover {
@@ -77,7 +79,7 @@ body {
 .main-content-view {
   margin-left: 2vw;
   margin-right: 2vw;
-  height: 88vh;
+  height: 98vh;
   position: relative;
 }
 
@@ -145,6 +147,10 @@ body {
 
 
 /** Value Training View */
+#character-trainer-container {
+  height: 88vh;
+}
+
 #character-trainer-view-header {
   display: flex;
   flex-direction: row;
@@ -171,6 +177,7 @@ body {
   flex-direction: row;
   max-width: 100%;
   margin-top: 10vh;
+  justify-content: space-around;
 }
 
 .battle-view-timer-container {
@@ -195,13 +202,17 @@ body {
   background-color: rgba(200, 200, 200, 0.59);
   padding: 20px;
   cursor: pointer;
-  width: 30vw;
-  height: 20vh;
+  width: 24vw;
+  height: 16vh;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: x-large;
+  font-size: 2em;
+}
+
+#character-trainer-view-center-text {
+  font-size: 1.5em;
 }
 
 .countdown-progress-bar {
@@ -214,7 +225,6 @@ body {
   border-color: black;
   border-radius: 8px;
   cursor: pointer;
-  width: 100%;
   text-align: center;
 }
 
@@ -236,6 +246,10 @@ body {
   text-align: center;
 }
 
+#session-time-view {
+  margin-left: .4em;
+}
+
 /** Value List */
 
 .value-list-container {
@@ -255,6 +269,8 @@ body {
   z-index: 999;
   padding-right: 10px;
   max-height: 100%;
+  width: 1em;
+  height: 1em;
 }
 
 .value-list-label {
