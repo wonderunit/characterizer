@@ -1,4 +1,5 @@
 const {ipcRenderer, remote} = require('electron')
+const BackgroundView = require('./background-view')
 const CharactersView = require('./characters-view.js')
 const CharacterTrainerView = require('./character-trainer-view.js')
 const ValueListView = require('./value-list-view.js')
@@ -109,6 +110,10 @@ knex.select().table('Values')
     remote.valuesMap = valuesMap
   })
 
+
+var backgroundView = new BackgroundView()
+container.insertBefore(backgroundView.getView(), container.firstChild)
+
 var mainViewSelector = new MainViewSelector({type: curViewType, mainViews: mainViews})
 document.getElementById("navigation").appendChild(mainViewSelector.getView())
 mainViewSelector.on('select-view', viewType => {
@@ -202,6 +207,8 @@ function onSelectView() {
     selectedCharacters = data
     onSelectView()
   })
+
+  backgroundView.nextBackground()
 }
 
 /**

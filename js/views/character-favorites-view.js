@@ -68,7 +68,9 @@ module.exports = class CharacterFavoritesView extends MainBaseView {
       let valueNames = []
       for(let valueID of values) {
         let value = this.valuesMap[valueID]
-        valueNames.push(value.name)
+        if(value && value.name) {
+          valueNames.push(value.name)
+        }
       }
       valueNames = valueNames.sort()
       for(let valueName of valueNames) {

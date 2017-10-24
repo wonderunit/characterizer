@@ -1,5 +1,6 @@
 const CharacterComparisonBaseView = require('./character-comparison-base-view.js')
 const CharacterView = require('./character-selector-multiple.js')
+const FavoriteButton = require('./favorite-button.js')
 
 module.exports = class CharacterComparisonView extends CharacterComparisonBaseView {
   constructor(properties) {
@@ -73,21 +74,23 @@ module.exports = class CharacterComparisonView extends CharacterComparisonBaseVi
         let valueView = document.createElement('div')
         valueView.setAttribute("class", "value-list-container")
   
-        let favButton = document.createElement('div')
-        favButton.setAttribute("style", "position: relative; z-index: 2; padding-top: 10px;")
-        favButton.innerHTML = `add favorite`
 
         let favoriteValues = characterValueFavorites.values
         let isFavorite = favoriteValues.indexOf(value.valueID) >= 0
-        if(isFavorite) {
-          favButton.innerHTML = `favorited`
-        } else {
-          var self = this
-          favButton.addEventListener('mouseup', function(event) {
-            event.target.innerHTML = `favorited`
-            self.emit('add-character-value-favorite', {valueID: value.id, characterID: characterID})
-          })
+        let favButtonProperties = {
+          checked: isFavorite,
+          enabled: !isFavorite,
+          className: "favorite-button-container-value-list-view"
         }
+
+        var self = this
+        let favButton = new FavoriteButton(favButtonProperties)
+        favButton.setHandler(function(event) {
+          self.emit('add-character-value-favorite', {valueID: value.valueID, characterID: characterID})
+          favButton.setChecked(true)
+          favButton.setEnabled(false)
+        })
+        valueView.appendChild(favButton.getView())
 
         let progressView = document.createElement('div')
         progressView.setAttribute("class", "value-list-progress")
@@ -97,7 +100,6 @@ module.exports = class CharacterComparisonView extends CharacterComparisonBaseVi
         nameView.setAttribute("class", "value-list-label")
         nameView.innerHTML = `${this.valuesMap[value.valueID.toString()].name} | ${value.score} | Wins: ${value.wins}, Losses: ${value.losses} | Battles: ${value.battleCount}`
         valueView.appendChild(nameView)
-        valueView.appendChild(favButton)
 
         if(this.isFiltering && isFavorite) {
           result.appendChild(valueView)

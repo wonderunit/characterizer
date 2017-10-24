@@ -96,7 +96,6 @@ module.exports = class ValueListView extends MainBaseView {
           let valueView = document.createElement('div')
           valueView.classList.add("value-list-container")
     
-          // let favButton = document.createElement('div')
           let favButtonProperties = {
             checked: isFavorite,
             enabled: !isFavorite,

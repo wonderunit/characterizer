@@ -48,6 +48,32 @@ body {
   padding-top: 2vh;
   height: 100vh;
   overflow: scroll;
+  color: white;
+}
+
+/** Background **/
+
+.background-view {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  z-index: -1;
+  transition: all;
+  background: linear-gradient(135deg, #52edff, #0d057e)
+}
+
+.background-darkblue {
+  opacity: 1;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  transition: all;
+  transition-duration: 0.5s;
+  background: linear-gradient(135deg, #0d057e,  #52edff)
+}
+
+.hidden-background {
+  opacity: 0;
 }
 
 /** Navigation */
@@ -165,6 +191,7 @@ body {
   text-align: right;
   border: none;
   background: transparent;
+  color: white;
 }
 
 #character-trainer-view-header-text {
@@ -199,7 +226,7 @@ body {
 
 .battle-view-choice-button {
   margin: 10px;
-  background-color: rgba(200, 200, 200, 0.59);
+  background-color: rgba(255, 255, 255, 0.2);
   padding: 20px;
   cursor: pointer;
   width: 24vw;
@@ -252,10 +279,14 @@ body {
 
 /** Value List */
 
+#values-view {
+  padding-bottom: 5vh;
+}
+
 .value-list-container {
   border-width: 1px;
   border-color: black;
-  margin: 10px;
+  margin: 10px 0px;
   background-color: #AAA;
   padding: 20px;
   border-radius: 8px;
@@ -298,14 +329,18 @@ body {
   position: relative;
 }
 
+.comparison-character-view-container {
+  margin-right: 10px;
+}
+
 /** Character Favorites **/
 
 #favorite-pairs-holder {
-  margin: 20px;
+  margin: 20px 0px 20px 0px;
 }
 
 #favorite-values-holder {
-  margin: 20px;
+  margin: 20px 0px 20px 0px;
 }
 
 /** Value Difference **/
@@ -335,6 +370,24 @@ body {
   height: 20px;
   cursor: pointer;
   z-index: 999;
+}
+
+/** Character Selector **/
+.character-selector-button {
+  margin: 10px 10px 0px 0px;
+  border-width: 1px;
+  padding: 20px;
+  border-style: solid;
+  border-color: #CCC;
+  cursor: pointer;
+}
+
+.character-selector-button-selected {
+  background-color: #CCC;
+}
+
+.character-selector-button:hover {
+  background-color: #EEE;
 }
 
 /** deprecated **/

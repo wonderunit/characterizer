@@ -21,9 +21,9 @@ module.exports = class CharacterView extends MainBaseView {
 
   addCharacterView(characterName, characterID, isSelected) {
     let characterView = document.createElement('div')
-    characterView.classList.add("button")
+    characterView.classList.add("character-selector-button")
     if(isSelected) {
-      characterView.classList.add("button-selected")
+      characterView.classList.add("character-selector-button-selected")
     }
     characterView.setAttribute("data-id", characterID || 1)
     characterView.innerHTML = characterName
