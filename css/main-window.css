@@ -183,15 +183,22 @@ body {
   align-items: center;
   justify-content: center;
   margin-top: 10vh;
+  font-weight: normal;
 }
 
 .character-trainer-view-character-selector {
   font-size: 1.5em;
-  font-weight: bold;
+  font-weight: normal;
   text-align: right;
   border: none;
-  background: transparent;
+  outline: 0;
   color: white;
+  -webkit-appearance: none;
+  background: url(../images/menu-indicator.svg) no-repeat;
+  background-size: 15px;
+  background-position: 100%;
+  padding-right: 25px;
+  direction: rtl;
 }
 
 #character-trainer-view-header-text {
@@ -289,7 +296,6 @@ body {
   margin: 10px 0px;
   background-color: #AAA;
   padding: 20px;
-  border-radius: 8px;
   position: relative;
   display: flex;
   flex-direction: row;
@@ -356,20 +362,23 @@ body {
 
 .common-ground-view-container {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   padding: 20px 0px;
   border-bottom-style: solid;
   border-bottom-width: 1px;
+  width: 75vw;
 }
 
-/** Generics */
+.common-ground-view-name {
+  font-size: 1.5em;
+  font-weight: bold;
+}
 
-.favorite-button-container {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  z-index: 999;
+.common-ground-view-scores {
+  margin-top: 10px;
+  font-size: 0.6em;
 }
 
 /** Character Selector **/
@@ -382,6 +391,16 @@ body {
   cursor: pointer;
 }
 
+/** Generics */
+
+.favorite-button-container {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  z-index: 999;
+}
+
+
 .character-selector-button-selected {
   background-color: #CCC;
 }
@@ -390,7 +409,6 @@ body {
   background-color: #EEE;
 }
 
-/** deprecated **/
 .favorites-filter-button {
   padding: 20px 0px;
   cursor: pointer;

@@ -1,5 +1,6 @@
 const utils = require('../utils.js')
 const MainBaseView = require('./main-base-view.js')
+const FavoriteButton = require('./favorite-button.js')
 const { semiRandomShuffle } = require('../utils.js')
 const NUM_COMPARISON_ITEMS = 60
 const RANDOM_SHUFFLE_FACTOR = 4
@@ -76,9 +77,9 @@ module.exports = class InternalConflictView extends MainBaseView {
     let conflictContainer = document.createElement("div")
     conflictContainer.classList.add("comparison-view-conflict-container")
 
-    let favButton = document.createElement('div')
-    favButton.innerHTML = `add favorite`
-    conflictContainer.appendChild(favButton)
+    let favButton = new FavoriteButton()
+    conflictContainer.appendChild(favButton.getView())
+
     let favoriteData = {}
     favoriteData[`character1ID`] = value1.characterID
     favoriteData[`value1ID`] = value1.valueID
@@ -86,14 +87,19 @@ module.exports = class InternalConflictView extends MainBaseView {
     favoriteData[`value2ID`] = value2.valueID
     let isFavorite = utils.checkObjectPath([value1.characterID, value1.valueID, value2.characterID, value2.valueID], this.valueComparisonFavorites) 
           || utils.checkObjectPath([value2.characterID, value2.valueID, value1.characterID, value1.valueID], this.valueComparisonFavorites)
+
     if(isFavorite) {
-      favButton.innerHTML = `favorited`
+      favButton.setChecked(true)
+      favButton.setEnabled(false)
     } else {
       var self = this
-      favButton.addEventListener('mouseup', function(event) {
-        event.target.innerHTML = `favorited`
+      favButton.setHandler(function(event) {
         self.emit('add-comparison-favorite', favoriteData)
+        favButton.setChecked(true)
+        favButton.setEnabled(false)
       })
+      favButton.setChecked(false)
+      favButton.setEnabled(true)
     }
 
     let getValueView = (value)=>{

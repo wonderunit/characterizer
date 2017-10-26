@@ -109,15 +109,19 @@ module.exports = class CommonGroundView extends CharacterComparisonBaseView {
         name.innerHTML = this.valuesMap[character1Value.valueID].name
         valueContainer.appendChild(name)
 
+        let scoresContainer = document.createElement("div")
+        scoresContainer.classList.add("common-ground-view-scores")
+        valueContainer.appendChild(scoresContainer)
+
         let character1Container = document.createElement("div")
         character1Container.classList.add("common-ground-view-character-container")
         character1Container.innerHTML = `${this.selectedCharacters[0].name}: ${character1Value.score}`
-        valueContainer.appendChild(character1Container)
+        scoresContainer.appendChild(character1Container)
         
         let character2Container = document.createElement("div")
         character2Container.classList.add("common-ground-view-character-container")
         character2Container.innerHTML = `${this.selectedCharacters[1].name}: ${character2Value.score}`
-        valueContainer.appendChild(character2Container)
+        scoresContainer.appendChild(character2Container)
 
         valuesContainer.appendChild(valueContainer)
       }
@@ -179,15 +183,19 @@ module.exports = class CommonGroundView extends CharacterComparisonBaseView {
         name.innerHTML = this.valuesMap[character1Value.valueID].name
         valueContainer.appendChild(name)
 
+        let scoresContainer = document.createElement("div")
+        scoresContainer.classList.add("common-ground-view-scores")
+        valueContainer.appendChild(scoresContainer)
+
         let character1Container = document.createElement("div")
         character1Container.classList.add("common-ground-view-character-container")
         character1Container.innerHTML = `${this.selectedCharacters[0].name}: ${character1Value.score}`
-        valueContainer.appendChild(character1Container)
+        scoresContainer.appendChild(character1Container)
         
         let character2Container = document.createElement("div")
         character2Container.classList.add("common-ground-view-character-container")
         character2Container.innerHTML = `${this.selectedCharacters[1].name}: ${character2Value.score}`
-        valueContainer.appendChild(character2Container)
+        scoresContainer.appendChild(character2Container)
 
         valuesContainer.appendChild(valueContainer)
       }

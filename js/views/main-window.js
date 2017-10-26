@@ -319,6 +319,8 @@ function handleBattleUpdate(battleOutcome) {
       .then(()=> {})
       .catch(console.error)
   })
+
+  backgroundView.nextBackground()
 }
 
 /**
