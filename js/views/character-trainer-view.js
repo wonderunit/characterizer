@@ -167,6 +167,8 @@ module.exports = class CharacterTrainerView extends MainBaseView {
     }
     this.setupBattleView()
     this.updateView()
+
+    this.emit('selected-characters', [this.character])
   }
 
   getView() {
