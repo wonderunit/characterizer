@@ -11,6 +11,7 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
     this.viewType = "all"
 
     this.viewTypeSelector = document.createElement("select")
+    this.viewTypeSelector.classList.add("conflict-comparison-view-selector")
     for(let type of ["all", "favorites, paired", "favorited pairs"]) {
       let option = document.createElement("option")
       option.setAttribute("value", type)
@@ -38,6 +39,7 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
     for(let i = 0; i<this.selectedCharacters.length; i++) {
       if(i > 0) {
         let vsView = document.createElement("div")
+        vsView.classList.add("text-align-center")
         vsView.innerHTML = `vs`
         headersContainer.appendChild(vsView)
       }
@@ -68,6 +70,10 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
 
     this.getSelectedCharacterValues()
       .then(inCharacterValueResults => {
+        if(inCharacterValueResults.length < 2) {
+          return
+        }
+
         let characterValueResults = []
         for(let i = 0; i < inCharacterValueResults.length; i++) {
           let values = inCharacterValueResults[i].slice(0, NUM_COMPARISON_ITEMS)
@@ -75,34 +81,21 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
         }
 
         for(let valueIndex = 0; valueIndex < NUM_COMPARISON_ITEMS; valueIndex++) {
-          let conflictContainer = document.createElement("div")
-          conflictContainer.classList.add("comparison-view-conflict-container")
 
           var self = this
           let favButton = new FavoriteButton()
-          conflictContainer.appendChild(favButton.getView())
       
           // we use this in the add favorite event.
           let favoriteData = {}
           // we use this to check if the favorite pair exists.
           let favoritesPaths = []
-          for(var j = 0; j < characterValueResults.length; j++) {
-            if(j > 0) {
-              let vsView = document.createElement("div")
-              vsView.innerHTML = `vs`
-              conflictContainer.appendChild(vsView)
-            }
-            let characterValues = characterValueResults[j]
-            let value = characterValues[valueIndex]
-            let name = this.valuesMap[value.valueID].name
-            let nameView = document.createElement("div")
-            nameView.innerHTML = name
-            conflictContainer.appendChild(nameView)
-      
-            favoriteData[`character${j+1}ID`] = value.characterID
-            favoriteData[`value${j+1}ID`] = value.valueID
-            favoritesPaths.push([value.characterID, value.valueID])
-          }
+
+          let character1Values = characterValueResults[0]
+          let value1 = character1Values[valueIndex]
+          let character2Values = characterValueResults[1]
+          let value2 = character2Values[valueIndex]
+
+          let conflictContainer = this.getComparisonView(value1, value2)
       
           let isFavorite = false
           if(favoritesPaths.length > 1) {
@@ -166,45 +159,11 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
       let favoritePairLength = Math.min(characterValues1.length, characterValues2.length)
       let favoritePairs = []
       for(let i = 0; i<favoritePairLength; i++) {
-        let conflictContainer = document.createElement("div")
-        conflictContainer.classList.add("comparison-view-conflict-container")
-  
-        let value1 = this.valuesMap[characterValues1[i].valueID]
-        let value2 = this.valuesMap[characterValues2[i].valueID]
-
-        let favButton = document.createElement('div')
-        let isFavorite = utils.checkObjectPath([character1ID, value1.id, character2ID, value2.id], this.valueComparisonFavorites) 
-          || utils.checkObjectPath([character2ID, value2.id, character1ID, value1.id], this.valueComparisonFavorites)
-        if(isFavorite) {
-          favButton.innerHTML = `favorited`
-        } else {
-          var self = this
-          let favoriteData = { 
-            "character1ID": character1ID,
-            "character2ID": character2ID,
-            "value1ID": value1.id,
-            "value2ID": value2.id,
-          }
-          favButton.innerHTML = `add favorite`
-          favButton.addEventListener('mouseup', function(event) {
-            event.target.innerHTML = `favorited`
-            self.emit('add-comparison-favorite', favoriteData)
-          })
-        }
-        conflictContainer.appendChild(favButton)
-  
-        let nameView = document.createElement("div")
-        nameView.innerHTML = value1.name
-        conflictContainer.appendChild(nameView)
-  
-        let vsView = document.createElement("div")
-        vsView.innerHTML = `vs`
-        conflictContainer.appendChild(vsView)
-  
-        nameView = document.createElement("div")
-        nameView.innerHTML = value2.name
-        conflictContainer.appendChild(nameView)
-  
+        
+        let value1 = characterValueMap1[characterValues1[i].valueID]
+        let value2 = characterValueMap2[characterValues2[i].valueID]
+        
+        let conflictContainer = this.getComparisonView(value1, value2)
         result.appendChild(conflictContainer)
       }
     })
@@ -214,46 +173,93 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
 
   getFavoritePairedValuesView() {
     let result = document.createElement("div")
+
     let character1ID = this.selectedCharacters[0].id
     let character2ID = this.selectedCharacters[1].id
+    Promise.all([
+      this.getCharacterValuesMap(character1ID),
+      this.getCharacterValuesMap(character2ID)
+    ]).then(results => {
+      let characterValueMap1 = results[0]
+      let characterValueMap2 = results[1]
 
-    let favoritePairs = []
-    if(this.characterComparisonFavorites[character1ID] 
-      && this.characterComparisonFavorites[character1ID][character2ID]) {
-
-        favoritePairs = this.characterComparisonFavorites[character1ID][character2ID]
-    }
-
-    for(let j = 0; j<favoritePairs.length; j++) {
-      let conflictContainer = document.createElement("div")
-      conflictContainer.classList.add("comparison-view-conflict-container")
-
-      let favButton = document.createElement('div')
-      favButton.innerHTML = `favorited`
-      conflictContainer.appendChild(favButton)
-
-      let favoritePair = favoritePairs[j]
-      let value1ID = favoritePair[character1ID]
-      let value2ID = favoritePair[character2ID]
-      let value1 = this.valuesMap[value1ID]
-      let value2 = this.valuesMap[value2ID]
-
-      let nameView = document.createElement("div")
-      nameView.innerHTML = value1.name
-      conflictContainer.appendChild(nameView)
-
-      let vsView = document.createElement("div")
-      vsView.innerHTML = `vs`
-      conflictContainer.appendChild(vsView)
-
-      nameView = document.createElement("div")
-      nameView.innerHTML = value2.name
-      conflictContainer.appendChild(nameView)
-
-      result.appendChild(conflictContainer)
-    }
+      let favoritePairs = []
+      if(this.characterComparisonFavorites[character1ID] 
+        && this.characterComparisonFavorites[character1ID][character2ID]) {
+  
+          favoritePairs = this.characterComparisonFavorites[character1ID][character2ID]
+      }
+  
+      for(let j = 0; j<favoritePairs.length; j++) {
+        let favoritePair = favoritePairs[j]
+        let value1ID = favoritePair[character1ID]
+        let value2ID = favoritePair[character2ID]
+        let value1 = characterValueMap1[value1ID]
+        let value2 = characterValueMap2[value2ID]
+        
+        let conflictContainer = this.getComparisonView(value1, value2)
+  
+        result.appendChild(conflictContainer)
+      }
+    })
+    .catch(console.error)
 
     return result
+  }
+
+  getComparisonView(value1, value2) {
+    let conflictContainer = document.createElement("div")
+    conflictContainer.classList.add("comparison-view-conflict-container")
+
+    let favButton = new FavoriteButton()
+
+    let favoriteData = {}
+    favoriteData[`character1ID`] = value1.characterID
+    favoriteData[`value1ID`] = value1.valueID
+    favoriteData[`character2ID`] = value2.characterID
+    favoriteData[`value2ID`] = value2.valueID
+    let isFavorite = utils.checkObjectPath([value1.characterID, value1.valueID, value2.characterID, value2.valueID], this.valueComparisonFavorites) 
+          || utils.checkObjectPath([value2.characterID, value2.valueID, value1.characterID, value1.valueID], this.valueComparisonFavorites)
+
+    if(isFavorite) {
+      favButton.setChecked(true)
+      favButton.setEnabled(false)
+    } else {
+      var self = this
+      favButton.setHandler(function(event) {
+        self.emit('add-comparison-favorite', favoriteData)
+        favButton.setChecked(true)
+        favButton.setEnabled(false)
+      })
+      favButton.setChecked(false)
+      favButton.setEnabled(true)
+    }
+
+    let getValueView = (value)=>{
+      let name = this.valuesMap[value.valueID].name
+      let nameView = document.createElement("div")
+      nameView.classList.add("comparison-view-value-view")
+      nameView.innerHTML = name
+      return nameView
+    }
+
+    let nameView1 = getValueView(value1)
+    nameView1.classList.add("text-align-right")
+    conflictContainer.appendChild(nameView1)
+
+    let centerContainer = document.createElement("div")
+    centerContainer.classList.add('conflict-container-center')
+    conflictContainer.appendChild(centerContainer)
+
+    centerContainer.appendChild(favButton.getView())
+    let vsView = document.createElement("div")
+    vsView.innerHTML = `vs`
+    centerContainer.appendChild(vsView)
+
+    let nameView2 = getValueView(value2)
+    conflictContainer.appendChild(nameView2)
+
+    return conflictContainer
   }
 
 

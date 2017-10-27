@@ -377,10 +377,14 @@ body {
   margin-top: 1em;
 }
 
-/** Internal Conflict **/
+/** Conflict Comparison **/
+
+.conflict-comparison-view-selector {
+  margin-top: 5vh;
+}
 
 
-/** **/
+/** Common Ground **/
 
 .common-ground-view-container {
   display: flex;
@@ -444,11 +448,23 @@ body {
 
 .comparison-view-conflict-container {
   display: flex;
-  justify-content: space-between;
-  border-bottom: black;
+  align-items: center;
   border-bottom-style: solid;
-  margin-top: 10px;
+  padding: 10px 0px;
   border-bottom-width: thin;
+}
+
+.comparison-view-value-view {
+  flex: 4;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.conflict-container-center {
+  flex: 1;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .comparison-view {
@@ -456,4 +472,5 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
+  margin: 5vh 0vh;
 }

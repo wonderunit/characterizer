@@ -78,7 +78,6 @@ module.exports = class InternalConflictView extends MainBaseView {
     conflictContainer.classList.add("comparison-view-conflict-container")
 
     let favButton = new FavoriteButton()
-    conflictContainer.appendChild(favButton.getView())
 
     let favoriteData = {}
     favoriteData[`character1ID`] = value1.characterID
@@ -105,16 +104,23 @@ module.exports = class InternalConflictView extends MainBaseView {
     let getValueView = (value)=>{
       let name = this.valuesMap[value.valueID].name
       let nameView = document.createElement("div")
+      nameView.classList.add("comparison-view-value-view")
       nameView.innerHTML = name
       return nameView
     }
 
     let nameView1 = getValueView(value1)
+    nameView1.classList.add("text-align-right")
     conflictContainer.appendChild(nameView1)
 
+    let centerContainer = document.createElement("div")
+    centerContainer.classList.add('conflict-container-center')
+    conflictContainer.appendChild(centerContainer)
+
+    centerContainer.appendChild(favButton.getView())
     let vsView = document.createElement("div")
     vsView.innerHTML = `vs`
-    conflictContainer.appendChild(vsView)
+    centerContainer.appendChild(vsView)
 
     let nameView2 = getValueView(value2)
     conflictContainer.appendChild(nameView2)
@@ -125,8 +131,6 @@ module.exports = class InternalConflictView extends MainBaseView {
 
     let values = []
 
-    
-    
     if(this.valueComparisonFavorites[this.currentCharacterID]) {
       this.getCharacterValuesMap(this.currentCharacterID)
         .then(characterValueMap => {
@@ -155,7 +159,6 @@ module.exports = class InternalConflictView extends MainBaseView {
   }
   
   getAllValuesView() {
-    
     this.getCharacterValues(this.currentCharacterID).then(inCharacterValues => {
       let valuesCopy = inCharacterValues.slice(0, NUM_COMPARISON_ITEMS)
       let values = semiRandomShuffle(valuesCopy, RANDOM_SHUFFLE_FACTOR)
