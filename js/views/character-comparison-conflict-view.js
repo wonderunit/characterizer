@@ -11,7 +11,7 @@ module.exports = class CharacterComparisonConflictView extends CharacterComparis
     this.viewType = "all"
 
     this.viewTypeSelector = document.createElement("select")
-    this.viewTypeSelector.classList.add("conflict-comparison-view-selector")
+    this.viewTypeSelector.classList.add("comparison-view-selector")
     for(let type of ["all", "favorites, paired", "favorited pairs"]) {
       let option = document.createElement("option")
       option.setAttribute("value", type)

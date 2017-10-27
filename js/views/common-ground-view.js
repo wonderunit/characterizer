@@ -8,6 +8,7 @@ module.exports = class CommonGroundView extends CharacterComparisonBaseView {
     this.viewType = "all"
 
     this.viewTypeSelector = document.createElement("select")
+    this.viewTypeSelector.classList.add("comparison-view-selector")
     for(let type of ["all", "favorites"]) {
       let option = document.createElement("option")
       option.setAttribute("value", type)
@@ -158,7 +159,8 @@ module.exports = class CommonGroundView extends CharacterComparisonBaseView {
         let character1Value = characterValueMap1[valueID]
         let character2Value = characterValueMap2[valueID]
 
-        if(Math.abs(character1Value.score - character2Value.score) < COMMONNESS_THRESHOLD
+        if(character1Value && character2Value 
+            && Math.abs(character1Value.score - character2Value.score) < COMMONNESS_THRESHOLD
             && character1Value.score > 0 && character2Value.score > 0) {
               
           commonValues.push([character1Value, character2Value])

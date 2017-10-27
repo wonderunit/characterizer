@@ -687,7 +687,7 @@ function cacheValueComparisonFavorite(record) {
         favoriteValues.push(record.value1ID)
       }
 
-      if(record.character1ID === record.character1ID) {
+      if(record.character1ID === record.character2ID) {
         var favoritePairs = characterValueFavorites.pairs
         if(!favoritePairs[record.value1ID]) {
           favoritePairs[record.value1ID] = {}

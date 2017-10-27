@@ -379,10 +379,6 @@ body {
 
 /** Conflict Comparison **/
 
-.conflict-comparison-view-selector {
-  margin-top: 5vh;
-}
-
 
 /** Common Ground **/
 
@@ -418,6 +414,10 @@ body {
 }
 
 /** Generics */
+
+.comparison-view-selector {
+  margin-top: 5vh;
+}
 
 .favorite-button-container {
   width: 20px;
