@@ -18,26 +18,38 @@ module.exports = class CharacterFavoritesView extends MainBaseView {
     this.valuesViewContainer.setAttribute("id", "values-view-container")
     this.root.appendChild(this.valuesViewContainer)
 
+    var selectedCharacters = this.getSelectedCharacters()
+    if(selectedCharacters && selectedCharacters.length > 0) {
+      this.currentCharacterID = selectedCharacters[0].id
+    }
+
     this.characters = []
     this.getCharacters()
       .then(inCharacters => {
         this.characters = inCharacters
-        this.updateView()
-        if(this.characters && this.characters.length) {
-          this.onSelectCharacter(this.characters[0].id)
+
+        if(!this.currentCharacterID && this.characters && this.characters.length) {
+          this.currentCharacterID = this.characters[0].id
         }
+
+        this.characterSelector.innerHTML = ``
+        for(let character of this.characters) {
+          let option = document.createElement("option")
+          option.setAttribute("value", character.id)
+          if(character.id == this.currentCharacterID) {
+            option.setAttribute("selected", true)
+          }
+          option.innerHTML = character.name
+          this.characterSelector.appendChild(option)
+        }
+        
+        this.onSelectCharacter(this.currentCharacterID)
       })
       .catch(console.error)
   }
 
   updateView() {
-    this.characterSelector.innerHTML = ``
-    for(let character of this.characters) {
-      let option = document.createElement("option")
-      option.setAttribute("value", character.id)
-      option.innerHTML = character.name
-      this.characterSelector.appendChild(option)
-    }
+    
   }
 
   onSelectCharacter(characterID) {
@@ -94,6 +106,8 @@ module.exports = class CharacterFavoritesView extends MainBaseView {
       }
       this.valuesViewContainer.appendChild(pairsHolder)
     })
+
+    this.emit('selected-characters', [character])
   }
 
 }
