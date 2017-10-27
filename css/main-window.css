@@ -353,6 +353,28 @@ body {
 
 #value-difference-view {
   margin: 10px 0px 10px 0px;
+  border-bottom: solid;
+  border-bottom-width: 1px;
+  padding-bottom: 1em;
+  width: 100%;
+}
+
+.value-difference-view-value {
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.value-difference-comparison-view {
+  align-items: center;
+}
+
+.value-difference-view-score-container {
+  font-size: 0.6em;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-top: 1em;
 }
 
 /** Internal Conflict **/

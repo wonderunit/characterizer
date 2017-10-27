@@ -4,9 +4,6 @@ module.exports = class CharactersView extends MainBaseView {
   constructor(properties) {
     super(properties)
     this.root.setAttribute("id", "characters-container")
-    let header = document.createElement("h2")
-    header.innerHTML = `Characters`
-    this.root.appendChild(header)
     
     this.characterList = document.createElement("div")
     this.characterList.setAttribute("id", "character-list")
