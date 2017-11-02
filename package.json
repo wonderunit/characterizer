@@ -1,6 +1,6 @@
 {
   "name": "characterizer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The best app to train character values and generate conflicts, dilemmas, and common ground between characters.",
   "main": "main.js",
   "repository": {
