@@ -1,6 +1,6 @@
 {
   "name": "characterizer",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The best app to train character values and generate conflicts, dilemmas, and common ground between characters.",
   "main": "main.js",
   "repository": {
@@ -13,18 +13,20 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "dist:mac": "build -m",
-    "dist:win": "build -w"
+    "dist:win": "build -w",
+    "dist:linux": "build -l"
   },
   "devDependencies": {
-    "electron": "^1.7.2",
-    "electron-builder": "^19.27.7"
+    "electron": "4.0.0-beta.7",
+    "electron-builder": "20.36.2"
   },
   "dependencies": {
-    "electron-updater": "^2.13.0",
-    "knex": "^0.13.0",
+    "electron-updater": "4.0.4",
+    "knex": "^0.15.2",
     "nan": "^2.7.0",
-    "sqlite3": "^3.1.13",
-    "trash": "^4.0.1"
+    "sqlite3": "4.0.4",
+    "trash": "^4.0.1",
+    "electron-is-dev": "1.0.1"
   },
   "build": {
     "asar": true,
